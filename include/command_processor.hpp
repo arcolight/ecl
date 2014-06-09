@@ -8,6 +8,7 @@
 namespace ecl
 {
 
+template<typename NAME, typename... commands>
 class command_processor : public i_command
 {
 public:
