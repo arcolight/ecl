@@ -8,25 +8,21 @@ namespace ecl
 {
 
 template<typename T, size_t SIZE>
-class cb
+class c_cb
 {
 public:
-    explicit cb(const T& def) :
+    explicit c_cb(const T& def) :
         m_offset(0),
+        m_count(0),
         m_default(def)
     {
         static_assert(std::is_nothrow_copy_constructible<T>::value,
                       "T must be nothrow copy-constructible!");
-
-        static_assert(std::is_pod<T>::value,
-              "T must be POD!");
-
+        static_assert(std::is_pod<T>::value, "T must be POD!");
         static_assert(SIZE > 0, "Size must be greater than zero!");
 
         clear();
     }
-
-    ~cb() {}
 
     void clear()                                                
     {
@@ -35,27 +31,40 @@ public:
         }
 
         m_offset = 0;
+        m_count = 0;
     }
 
-    size_t size()                                               
+    size_t size()                                                          const
     {
         return SIZE;
+    }
+
+    size_t count()                                                         const
+    {
+        return m_count;
     }
 
     size_t push(const T& v)                                     
     {
         m_array[m_offset] = v;
         m_offset = wrap(m_offset + 1);
+
+        if(m_count < SIZE) {
+            ++m_count;
+        }
+
         return m_offset;
     }
 
     T pop()                                                     
     {
         m_offset = wrap(m_offset - 1);
-
         T t = m_array[m_offset];
-
         m_array[m_offset] = m_default;
+
+        if(m_count != 0) {
+            --m_count;
+        }
 
         return t;
     }
@@ -218,6 +227,7 @@ private:
     }
 
     size_t  m_offset;
+    size_t  m_count;
     T       m_array[SIZE];
     const T m_default;
 };
