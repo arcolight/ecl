@@ -5,7 +5,7 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "data.h"
+#include "internal/data.h"
 
 #ifndef RECEIVER_CAPACITY
 #define RECEIVER_CAPACITY 32
