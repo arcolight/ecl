@@ -221,11 +221,6 @@ private:
         return i % SIZE;
     }
 
-    size_t to_real_index(size_t i)
-    {
-        return wrap(i + m_offset);
-    }
-
     size_t  m_offset;
     size_t  m_count;
     T       m_array[SIZE];
