@@ -1,6 +1,7 @@
 #ifndef ECL_FIELD_H
 #define ECL_FIELD_H
 
+#include <stdint.h>
 #include <stdlib.h>
 
 #define ECL_FIELD(TYPE, NAME, SIZE) \
