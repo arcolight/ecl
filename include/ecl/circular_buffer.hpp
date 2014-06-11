@@ -1,17 +1,17 @@
 #ifndef ECL_CB_HPP
 #define ECL_CB_HPP
 
-#include <type_traits>
 #include <cstddef>
+#include <type_traits>
 
 namespace ecl
 {
 
 template<typename T, size_t SIZE>
-class c_cb
+class circular_buffer
 {
 public:
-    explicit c_cb(const T& def) :
+    explicit circular_buffer(const T& def) :
         m_offset(0),
         m_count(0),
         m_default(def)

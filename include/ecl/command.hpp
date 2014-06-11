@@ -1,11 +1,12 @@
 #ifndef ECL_COMMAND_HPP
 #define ECL_COMMAND_HPP
 
-#include <stdio.h>
-#include <stdint.h>
+#include <cstddef>
+#include <cstdint>
+
 #include <string.h>
 
-#include "data.h"
+#include "sized_data.h"
 
 #ifndef RECEIVER_CAPACITY
 #define RECEIVER_CAPACITY 32
@@ -70,7 +71,7 @@ class command : public virtual cmd_core<cmd>,
                 public i_command
 {
 public:
-    explicit command(const data_t* const buf) :
+    explicit command(const sized_data* const buf) :
         m_buf(buf),
         m_size(0)
     {}
@@ -90,7 +91,7 @@ public:
         return true;
     }
 
-    size_t append(const data_t& d)
+    size_t append(const sized_data& d)
     {
         if(nullptr == m_buf) {
             return 0;
@@ -112,7 +113,7 @@ public:
 
     size_t append(const char* const str)
     {
-        data_t d = {
+        sized_data d = {
             (uint8_t* const)str,
             strlen(str)
         };
@@ -126,11 +127,11 @@ public:
     }
 
 protected:
-    uint8_t             m_argc;
-    const uint8_t**     m_argv;
+    uint8_t                 m_argc;
+    const uint8_t**         m_argv;
 
-    const data_t* const m_buf;
-    size_t              m_size;
+    const sized_data* const m_buf;
+    size_t                  m_size;
 };
 
 template<typename cmd>

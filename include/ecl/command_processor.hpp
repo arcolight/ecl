@@ -12,7 +12,7 @@ template<typename NAME, typename... commands>
 class command_processor : public i_command
 {
 public:
-    command_processor(const data_t* const buf) :
+    command_processor(const sized_data* const buf) :
         m_buf(buf)
     {}
 
@@ -89,10 +89,10 @@ private:
         return false;
     }
 
-    uint8_t               m_argc;
-    const uint8_t* const* m_argv;
+    uint8_t                 m_argc;
+    const uint8_t* const*   m_argv;
 
-    const data_t* const m_buf;
+    const sized_data* const m_buf;
 };
 
 } // namespace ecl

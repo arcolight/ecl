@@ -1,6 +1,8 @@
 #ifndef ECL_FSM_HPP
 #define ECL_FSM_HPP
 
+#include <cstddef>
+
 namespace ecl
 {
 
