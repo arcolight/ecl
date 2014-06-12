@@ -5,15 +5,15 @@
 #include <cstdlib>
 #include <limits>
 
-#include "cb.hpp"
+#include <ecl/circular_buffer.hpp>
 
 #define CB_SIZE 16
 
-typedef ecl::cb<uint8_t, CB_SIZE> cb_t;
+typedef ecl::circular_buffer<uint8_t, CB_SIZE> circular_buffer_t;
 
-static cb_t cb(0);
+static circular_buffer_t cb(0);
 
-static void dump(cb_t& c)
+static void dump(circular_buffer_t& c)
 {
     printf(" * by index:\n\r[ ");
     for(size_t i = 0; i < CB_SIZE; ++i) {
@@ -28,9 +28,9 @@ static void dump(cb_t& c)
     printf("]\n\r");
 
     printf(" * by iterator (C++03):\n\r[ ");
-    cb_t::iterator it_begin = c.begin();
-    cb_t::iterator it_end = c.end();
-    cb_t::iterator it = it_begin;
+    circular_buffer_t::iterator it_begin = c.begin();
+    circular_buffer_t::iterator it_end = c.end();
+    circular_buffer_t::iterator it = it_begin;
 
     for(it = it_begin; it != it_end; ++it) {
         printf("%u ", *it);
@@ -57,6 +57,7 @@ int main(int argc, char* argv[])
 
     printf(" * pop\n\r");
     for(auto e: cb) {
+        (void)(e);
         cb.pop();
     }
 

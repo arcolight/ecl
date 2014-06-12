@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 
-#include "fsm.hpp"
+#include <ecl/fsm.hpp>
 
 struct ev_1 {};
 struct ev_2 {};

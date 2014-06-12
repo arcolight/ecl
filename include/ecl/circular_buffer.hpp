@@ -111,6 +111,7 @@ public:
 
             self_type operator++(int junk)
             {
+                (void)(junk);
                 ++index_;
                 return *this; 
             }
@@ -165,6 +166,7 @@ public:
 
             self_type operator++(int junk)
             {
+                (void)(junk);
                 ++index_;
                 return *this; 
             }
