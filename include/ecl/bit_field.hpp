@@ -36,8 +36,8 @@ protected:
     }
 };
 
-template <size_t SIZE, typename BASE, typename... Fs>
-class bit_field final : public Fs...
+template <size_t SIZE, typename BASE, typename... FIELDS>
+class bit_field final : public FIELDS...
 {
 public:
     typedef struct packed_data 
@@ -45,12 +45,12 @@ public:
         uint8_t data[SIZE];
     } packed_data_t;
 
-    bit_field () : Fs()...
+    bit_field () : FIELDS()...
     {
-        check<0, Fs...>();
+        check<0, FIELDS...>();
     }
 
-    bit_field(const bit_field<SIZE, BASE, Fs...>& other)
+    bit_field(const bit_field<SIZE, BASE, FIELDS...>& other)
     {
         set_data(other);
     }
@@ -65,8 +65,8 @@ public:
         return m_array;
     }
 
-    bit_field<SIZE, BASE, Fs...>&
-    operator= (const bit_field<SIZE, BASE, Fs...>& other)
+    bit_field<SIZE, BASE, FIELDS...>&
+    operator= (const bit_field<SIZE, BASE, FIELDS...>& other)
     {
         set_data(other);
         return *this;
@@ -74,7 +74,8 @@ public:
 
     void set_data(const uint8_t* const data)
     {
-        for(size_t i = 0; i < SIZE; ++i) {
+        for(size_t i = 0; i < SIZE; ++i) 
+        {
             m_array[i] = data[i];
         }
 
@@ -85,19 +86,20 @@ public:
     const uint8_t* pack()
     {
         clear_array();
-        pack_<0, Fs...>(m_array - 1);
+        pack_<0, FIELDS...>(m_array - 1);
         return m_array;
     }
 
     BASE* unpack()
     {
-        unpack_<0, Fs...>(m_array - 1);
+        unpack_<0, FIELDS...>(m_array - 1);
         return this;
     }
 
     void clear_array()
     {
-        for(uint8_t& byte: m_array) {
+        for(uint8_t& byte: m_array)
+        {
             byte = 0x00;
         }
     }
@@ -106,15 +108,16 @@ public:
 
 private:
     template<size_t SUM>
-    constexpr void check()                                                 const
+    constexpr bool check()                                                 const
     {
         static_assert((SIZE * 8 >= SUM), "array to small");
+        return true;
     }
 
-    template<size_t SUM, typename F, typename... Fields>
-    constexpr void check()                                                 const
+    template<size_t SUM, typename F, typename... TAIL>
+    constexpr bool check()                                                 const
     {
-        check<SUM + F::size, Fields...>();
+        return check<SUM + F::size, TAIL...>();
     }
 
     template<uint8_t OFFSET>
@@ -124,15 +127,17 @@ private:
         (void)array;
     }
 
-    template<uint8_t OFFSET, typename F, typename... Fields>
+    template<uint8_t OFFSET, typename F, typename... TAIL>
     void pack_(uint8_t* array)                                             const
     {
         typename F::field_t val = this->F::get();
         uint8_t bit = 0x00;
 
-        for(size_t i = 0; i < F::size; ++i) {
+        for(size_t i = 0; i < F::size; ++i)
+        {
             size_t shift = (OFFSET + i) % 8;
-            if(0 == shift) {
+            if(0 == shift)
+            {
                 ++array;
             }
 
@@ -140,7 +145,7 @@ private:
             *array |= bit << (7 - shift);
         }
 
-        pack_<(OFFSET + F::size) % 8, Fields...>(array);
+        pack_<(OFFSET + F::size) % 8, TAIL...>(array);
     }
 
     template<uint8_t OFFSET>
@@ -150,15 +155,17 @@ private:
         (void)array;
     }
 
-    template<uint8_t OFFSET, typename F, typename... Fields>
+    template<uint8_t OFFSET, typename F, typename... TAIL>
     void unpack_(uint8_t* array)
     {
         typename F::field_t val = 0;
         decltype(val) bit = 0;
 
-        for(size_t i = 0; i < F::size; ++i) {
+        for(size_t i = 0; i < F::size; ++i) 
+        {
             size_t shift = (OFFSET + i) % 8;
-            if(0 == shift) {
+            if(0 == shift) 
+            {
                 ++array;
             }
 
@@ -168,7 +175,7 @@ private:
 
         this->F::set(val);
 
-        unpack_<(OFFSET + F::size) % 8, Fields...>(array);
+        unpack_<(OFFSET + F::size) % 8, TAIL...>(array);
     }
 
     uint8_t m_array[SIZE];
