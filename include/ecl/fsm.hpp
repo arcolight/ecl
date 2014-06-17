@@ -3,6 +3,8 @@
 
 #include <cstddef>
 
+#include "singleton.hpp"
+
 namespace ecl
 {
 
@@ -20,7 +22,8 @@ protected:
         typedef bool (derived::*guard_t)(const event_t&);
 
     protected:
-        typedef struct transition_info {
+        typedef struct transition_info
+        {
             action_t action;
             guard_t  guard;
             state_t  start;
@@ -37,14 +40,16 @@ protected:
 
         void add(transition_info_t* const ti)
         {
-            if(nullptr == m_list) {
+            if(nullptr == m_list) 
+            {
                 m_list = ti;
                 return;
             }
 
             transition_info_t* entry = m_list;
 
-            while(nullptr != entry->link) {
+            while(nullptr != entry->link)
+            {
                 entry = entry->link;
             }
 
@@ -57,8 +62,10 @@ protected:
 
             const transition_info_t* entry = m_list;
 
-            while(st != entry->start) {
-                if(nullptr == entry->link) {
+            while(st != entry->start) 
+            {
+                if(nullptr == entry->link) 
+                {
                     return st;
                 }
 
@@ -67,12 +74,15 @@ protected:
 
             bool transition = true;
 
-            if(nullptr != entry->guard) {
+            if(nullptr != entry->guard) 
+            {
                 transition = (fsm.*(entry->guard))(e);
             }
 
-            if(transition) {
-                if(nullptr != entry->action) {
+            if(transition) 
+            {
+                if(nullptr != entry->action) 
+                {
                     (fsm.*(entry->action))(e);
                 }
                 return entry->next;
@@ -136,8 +146,10 @@ protected:
         template<size_t CNT, typename callback, typename... tail>
         static void on_exit_chain(derived& fsm, const state_t s)
         {
-            if(callback::cb_state() == s) {
-                if(nullptr != callback::cb_on_exit()) {
+            if(callback::cb_state() == s) 
+            {
+                if(nullptr != callback::cb_on_exit()) 
+                {
                     (fsm.*(callback::cb_on_exit()))();
                 }
                 return;
@@ -156,8 +168,10 @@ protected:
         template<size_t CNT, typename callback, typename... tail>
         static void on_enter_chain(derived& fsm, const state_t s)
         {
-            if(callback::cb_state() == s) {
-                if(nullptr != callback::cb_on_enter()) {
+            if(callback::cb_state() == s)
+            {
+                if(nullptr != callback::cb_on_enter()) 
+                {
                     (fsm.*(callback::cb_on_enter()))();
                 }
                 return;
@@ -180,13 +194,14 @@ public:
              typename callback_table_t>
     state_t transition(const event_t& e)
     {
-        static transition_table_t tt;
+        transition_table_t& tt = singleton<transition_table_t>::instance();
 
         const state_t current = m_state;
         const state_t next = tt.template transition<event_t>(*m_fsm_ptr, e);
         m_state = next;
 
-        if(next != current) {
+        if(next != current) 
+        {
             callback_table_t::call(*m_fsm_ptr, current, next);
         }
 
@@ -200,7 +215,7 @@ public:
 
     void reset()    
     {
-        m_state = m_s_init_state; 
+        m_state = m_s_init_state;
     }
 
 private:
