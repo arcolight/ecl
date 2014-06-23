@@ -70,19 +70,19 @@ void dump_bit_field(test_bit_field_t const& bf) {
     "f12: " << bf.f12 << std::endl;
 
     printf("Fields:\n\r"
-           "f0:  %8.8llu\n\r"
-           "f1:  %8.8llu\n\r"
-           "f2:  %8.8llu\n\r"
-           "f3:  %8.8llu\n\r"
-           "f4:  %8.8llu\n\r"
-           "f5:  %8.8llu\n\r"
-           "f6:  %8.8llu\n\r"
-           "f7:  %8.8llu\n\r"
-           "f8:  %8.8llu\n\r"
-           "f9:  %8.8llu\n\r"
-           "f10: %8.8llu\n\r"
-           "f11: %8.8llu\n\r"
-           "f12: %8.8llu\n\r",
+           "f0:  %u\n\r"
+           "f1:  %u\n\r"
+           "f2:  %u\n\r"
+           "f3:  %u\n\r"
+           "f4:  %u\n\r"
+           "f5:  %u\n\r"
+           "f6:  %u\n\r"
+           "f7:  %u\n\r"
+           "f8:  %u\n\r"
+           "f9:  %lu\n\r"
+           "f10: %u\n\r"
+           "f11: %u\n\r"
+           "f12: %lu\n\r",
            bf.f0, bf.f1, bf.f2, bf.f3, bf.f4, bf.f5, bf.f6, bf.f7, bf.f8, bf.f9, 
            bf.f10, bf.f11, bf.f12);
 }

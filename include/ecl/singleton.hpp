@@ -1,7 +1,7 @@
 #ifndef ECL_SINGLETON_HPP
 #define ECL_SINGLETON_HPP
 
-// simple realization of Meyers singleton
+// simple implementation of Meyers singleton
 
 namespace ecl
 {
