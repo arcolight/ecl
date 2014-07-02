@@ -6,6 +6,23 @@
 
 // #include <gtest/gtest.h>
 
+namespace numerical_chars {
+std::ostream &operator<<(std::ostream &os, char c) {
+    return os << (std::is_signed<char>::value ? static_cast<int>(c)
+                                              : static_cast<unsigned int>(c));
+}
+
+std::ostream &operator<<(std::ostream &os, signed char c) {
+    return os << static_cast<int>(c);
+}
+
+std::ostream &operator<<(std::ostream &os, unsigned char c) {
+    return os << static_cast<unsigned int>(c);
+}
+}
+
+using namespace numerical_chars;
+
 struct test_struct {
     uint8_t  f0;
     uint16_t f1;
@@ -20,6 +37,15 @@ struct test_struct {
     uint8_t  f10;
     uint32_t f11;
     uint64_t f12;
+};
+
+struct test_struct_2 {
+  uint8_t f0;
+  uint8_t f1;
+};
+
+struct test_struct_3 {
+  uint8_t array[10];
 };
 
 #define TEST_STRUCT_PACK_SIZE_BYTES 29
@@ -53,38 +79,38 @@ typedef ecl::bit_field<TEST_STRUCT_PACK_SIZE_BYTES, test_struct,
    ECL_FIELD(test_struct, f12, F12_SIZE)
 > test_bit_field_t;
 
-void dump_bit_field(test_bit_field_t const& bf) {
-    std::cout << "Fields:" << "\n\r" << 
-    "f0:  " << bf.f0  << "\n\r" <<
-    "f1:  " << bf.f1  << "\n\r" <<
-    "f2:  " << bf.f2  << "\n\r" <<
-    "f3:  " << bf.f3  << "\n\r" <<
-    "f4:  " << bf.f4  << "\n\r" <<
-    "f5:  " << bf.f5  << "\n\r" <<
-    "f6:  " << bf.f6  << "\n\r" <<
-    "f7:  " << bf.f7  << "\n\r" <<
-    "f8:  " << bf.f8  << "\n\r" <<
-    "f9:  " << bf.f9  << "\n\r" <<
-    "f10: " << bf.f10 << "\n\r" <<
-    "f11: " << bf.f11 << "\n\r" <<
-    "f12: " << bf.f12 << std::endl;
+typedef ecl::bit_field<1, test_struct_2,
+   ECL_FIELD(test_struct_2, f0, 1),
+   ECL_FIELD(test_struct_2, f1, 1)
+> test_bit_field_2_t;
 
-    printf("Fields:\n\r"
-           "f0:  %u\n\r"
-           "f1:  %u\n\r"
-           "f2:  %u\n\r"
-           "f3:  %u\n\r"
-           "f4:  %u\n\r"
-           "f5:  %u\n\r"
-           "f6:  %u\n\r"
-           "f7:  %u\n\r"
-           "f8:  %u\n\r"
-           "f9:  %lu\n\r"
-           "f10: %u\n\r"
-           "f11: %u\n\r"
-           "f12: %lu\n\r",
-           bf.f0, bf.f1, bf.f2, bf.f3, bf.f4, bf.f5, bf.f6, bf.f7, bf.f8, bf.f9, 
-           bf.f10, bf.f11, bf.f12);
+typedef ecl::bit_field<10, test_struct_3,
+   ECL_FIELD(test_struct_3, array, 80)
+> test_bit_field_3_t;
+
+void dump_bit_field(test_bit_field_t const& bf) {
+    std::cout <<
+      bf.f0 << " " << bf.f1 << " " << bf.f2  << " " << bf.f3  << " " << 
+      bf.f4 << " " << bf.f5 << " " << bf.f6  << " " << bf.f7  << " " << 
+      bf.f8 << " " << bf.f9 << " " << bf.f10 << " " << bf.f11 << " " << 
+      bf.f12 << std::endl;
+
+    // printf("Fields:\n\r"
+    //        "f0:  %u\n\r"
+    //        "f1:  %u\n\r"
+    //        "f2:  %u\n\r"
+    //        "f3:  %u\n\r"
+    //        "f4:  %u\n\r"
+    //        "f5:  %u\n\r"
+    //        "f6:  %u\n\r"
+    //        "f7:  %u\n\r"
+    //        "f8:  %u\n\r"
+    //        "f9:  %lu\n\r"
+    //        "f10: %u\n\r"
+    //        "f11: %u\n\r"
+    //        "f12: %lu\n\r",
+    //        bf.f0, bf.f1, bf.f2, bf.f3, bf.f4, bf.f5, bf.f6, bf.f7, bf.f8, bf.f9, 
+    //        bf.f10, bf.f11, bf.f12);
 }
 
 int main(int argc, char** argv)
@@ -93,27 +119,30 @@ int main(int argc, char** argv)
     (void)(argv);
 
     test_bit_field_t bf;
+    test_bit_field_2_t bf_2;
+    // test_bit_field_3_t bf_3;
 
-    std::cout << "Bit field test." << std::endl;
-    std::cout << "Initial bit field" << std::endl;
+    size_t bf_size = sizeof(test_bit_field_2_t);
+    size_t st_size = sizeof(test_struct_2);
 
-    dump_bit_field(bf);
+    std::cout << "Bit field test."  << std::endl;
+    std::cout << "struct size:    " << st_size << std::endl;
+    std::cout << "bit field size: " << bf_size << std::endl;
 
     bf.f0 =  1;
-    bf.f1 =  1;
-    bf.f2 =  1;
-    bf.f3 =  1;
-    bf.f4 =  1;
-    bf.f5 =  1;
-    bf.f6 =  1;
-    bf.f7 =  1;
-    bf.f8 =  1;
-    bf.f9 =  1;
-    bf.f10 = 1;
-    bf.f11 = 1;
-    bf.f12 = 1;
+    bf.f1 =  2;
+    bf.f2 =  3;
+    bf.f3 =  4;
+    bf.f4 =  5;
+    bf.f5 =  6;
+    bf.f6 =  7;
+    bf.f7 =  8;
+    bf.f8 =  9;
+    bf.f9 =  10;
+    bf.f10 = 11;
+    bf.f11 = 12;
+    bf.f12 = 13;
 
-    std::cout << "Set all to 1" << std::endl;
     dump_bit_field(bf);
 
     bf.pack();

@@ -7,14 +7,14 @@ namespace ecl
 {
 
 template<typename T>
-class singleton
+class singleton : public T
 {
 public:
     virtual ~singleton() {}
 
     static T& instance()
     {
-        static T object;
+        static singleton<T> object;
 
         return object;
     }
@@ -30,10 +30,10 @@ public:
         return &(instance());
     }
 
-protected:
-    singleton() {}
-
 private:
+    singleton() : T() 
+    {}
+    
     singleton(const singleton<T>& other)                               = delete;
     singleton<T>& operator= (const singleton<T>& other)                = delete;
     singleton(const singleton<T>&& other)                              = delete;

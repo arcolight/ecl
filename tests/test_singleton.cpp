@@ -2,6 +2,8 @@
 
 #include <ecl/singleton.hpp>
 
+#include "singleton_test_header.hpp"
+
 class test_class_1
 {
 public:
@@ -9,15 +11,19 @@ public:
     {
         std::cout << "test_class_1 at " << this << std::endl;
     }
+protected:
+    test_class_1() {}
 };
 
-class test_class_2 : public ecl::Singleton<test_class_2>
+class test_class_2
 {
 public:
     void hello()
     {
         std::cout << "test_class_2 at " << this << std::endl;
     }
+protected:
+    test_class_2() {}
 };
 
 int main(int argc, char** argv)
@@ -25,11 +31,14 @@ int main(int argc, char** argv)
     (void)(argc);
     (void)(argv);
 
-    ecl::Singleton<test_class_1>::instance().hello();
-    ecl::Singleton<test_class_1>::instance().hello();
-    ecl::Singleton<test_class_1>::instance().hello();
+    // test_class_2::instance().hello();
+    // test_class_2::instance().hello();
+    // test_class_2::instance().hello();
 
-    test_class_2::instance().hello();
-    test_class_2::instance().hello();
-    test_class_2::instance().hello();
+    test_class_ns_singleton::instance().hello();
+    test_class_ns_singleton::instance().hello();
+    test_class_ns_singleton::instance().hello();
+
+    // test_class_ns a;
+    // a.hello();
 }
