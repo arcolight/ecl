@@ -1,5 +1,5 @@
-#include <stdint.h>
-#include <stdio.h>
+#include <cstdint>
+#include <iostream>
 
 #include <ctime>
 #include <cstdlib>
@@ -15,27 +15,28 @@ static circular_buffer_t cb(0);
 
 static void dump(circular_buffer_t& c)
 {
-    printf(" * by index:\n\r[ ");
+    std::cout << " * by index:\n\r[ ";
     for(size_t i = 0; i < CB_SIZE; ++i) {
-        printf("%u ",c[i]);
+        std::cout << (uint32_t)c[i] << " ";
     }
-    printf("]\n\r");
+    std::cout << "]" << std::endl;
 
-    printf(" * by iterator (C++11):\n\r[ ");
+    std::cout << " * by iterator (C++11):\n\r[ ";
+
     for(auto e: c) {
-        printf("%u ", e);
+        std::cout << (uint32_t)e << " ";
     }
-    printf("]\n\r");
+    std::cout << "]" << std::endl; 
 
-    printf(" * by iterator (C++03):\n\r[ ");
+    std::cout << " * by iterator (C++03):\n\r[ ";
     circular_buffer_t::iterator it_begin = c.begin();
     circular_buffer_t::iterator it_end = c.end();
     circular_buffer_t::iterator it = it_begin;
 
     for(it = it_begin; it != it_end; ++it) {
-        printf("%u ", *it);
+        std::cout << (uint32_t)*it << " ";
     }
-    printf("]\n\r\n\r");
+    std::cout << "]" << std::endl << std::endl;
 }
 
 int main(int argc, char* argv[])
@@ -48,14 +49,14 @@ int main(int argc, char* argv[])
 
     size_t count = random_variable % (CB_SIZE*2) + 1;
 
-    printf(" * push %lu values\n\r", count);
+    std::cout << " * push " << count << " values" << std::endl;
     for(uint8_t i = 1; i < count; ++i) {
         cb.push(i);
     }
 
     dump(cb);
 
-    printf(" * pop\n\r");
+    std::cout << " * pop" << std::endl;
     for(auto e: cb) {
         (void)(e);
         cb.pop();
@@ -63,14 +64,14 @@ int main(int argc, char* argv[])
 
     dump(cb);
 
-    printf(" * push %lu values\n\r", count);
+    std::cout << " * push " << count << " values" << std::endl;
     for(uint8_t i = 1; i < count; ++i) {
         cb.push(i*2);
     }
 
     dump(cb);
 
-    printf(" * increment all\n\r");
+    std::cout << " * increment all" << std::endl;
     for(auto& e: cb) {
         ++e;
     }

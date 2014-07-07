@@ -160,24 +160,24 @@ class player : public ecl::state_machine<player, player_state, player_state::emp
     typedef player       p;
 
     typedef transition_table<
-    //    Start     Event         Next      Action
-    //  +---------+-------------+---------+---------------------+
+    //      Start         Event         Next            Action
+    //  +------------+-------------+------------+---------------------+
     row < s::stopped , play        , s::playing , &p::start_playback  >,
     row < s::stopped , open_close  , s::open    , &p::open_drawer     >,
-    //  +---------+-------------+---------+---------------------+
+    //  +------------+-------------+------------+---------------------+
     row < s::open    , open_close  , s::empty   , &p::close_drawer    >,
-    //  +---------+-------------+---------+---------------------+
+    //  +------------+-------------+------------+---------------------+
     row < s::empty   , open_close  , s::open    , &p::open_drawer     >,
     row < s::empty   , cd_detected , s::stopped , &p::store_cd_info   >,
-    //  +---------+-------------+---------+---------------------+
+    //  +------------+-------------+------------+---------------------+
     row < s::playing , stop        , s::stopped , &p::stop_playback   >,
     row < s::playing , pause       , s::paused  , &p::pause_playback  >,
     row < s::playing , open_close  , s::open    , &p::stop_and_open   >,
-    //  +---------+-------------+---------+---------------------+
+    //  +------------+-------------+------------+---------------------+
     row < s::paused  , play        , s::playing , &p::resume_playback >,
     row < s::paused  , stop        , s::stopped , &p::stop_playback   >,
     row < s::paused  , open_close  , s::open    , &p::stop_and_open   >
-    //  +---------+-------------+---------+---------------------+    
+    //  +------------+-------------+------------+---------------------+
     > transition_table_t;
 
     typedef callback_table<> callback_table_t;
