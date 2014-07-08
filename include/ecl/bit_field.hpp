@@ -2,8 +2,7 @@
 #define ECL_FIELD_H
 
 #include <cstdint>
-
-#include <stdlib.h>
+#include <cstdlib>
 
 #define ECL_FIELD(TYPE, NAME, SIZE) \
     ecl::field<TYPE, decltype(TYPE::NAME), &TYPE::NAME, SIZE>

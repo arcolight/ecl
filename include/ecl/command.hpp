@@ -4,7 +4,7 @@
 #include <cstddef>
 #include <cstdint>
 
-#include <string.h>
+#include <cstring>
 
 #include "sized_data.h"
 

@@ -3,7 +3,7 @@
 
 #include "command.hpp"
 
-#include <string.h>
+#include <cstring>
 
 namespace ecl
 {

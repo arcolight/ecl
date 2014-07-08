@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <cstdint>
 #include <cmath>
+#include <ctype.h>
 
 #include <type_traits>
 
@@ -37,6 +38,11 @@ typedef enum class options {
     s  // signed for numeric
 } opt;
 
+typedef enum class alpha_case {
+    lower,
+    upper
+} cs;
+
 // level
 enum class lvl {
     critical,
@@ -49,10 +55,11 @@ enum class lvl {
 struct end {};
 struct reset {};
 
-template<size_t BUFFER_SIZE, typename... out_t>
+template<size_t BUFFER_SIZE, 
+         typename... OUT>
 class logger{
 public:
-    explicit logger(const base   def_base = base::d,
+    explicit logger(const base  def_base = base::d,
                    const align  def_align = align::l,
                    const size_t def_width = 8,
                    const lvl    def_level = lvl::info) : 
@@ -88,6 +95,12 @@ public:
         return *this;
     }
 
+    logger& operator() (const cs& c)
+    {
+        m_case = c;
+        return *this;
+    }
+
     logger& operator<< (const base& b)
     {
         m_base = b;
@@ -99,12 +112,6 @@ public:
         m_align = a;
         return *this;
     }
-
-    // logger& operator<< (const size_t w)
-    // {
-    //     m_width = w;
-    //     return *this;
-    // }
 
     logger& operator<< (const reset& r)
     {
@@ -142,10 +149,10 @@ public:
     constexpr static size_t m_s_size { BUFFER_SIZE };
 
 private:
-    logger(const logger& other)                                          = delete;
-    logger& operator= (const logger& other)                              = delete;
-    logger(const logger&& other)                                         = delete;
-    logger& operator= (const logger&& other)                             = delete;
+    logger(const logger& other)                                        = delete;
+    logger& operator= (const logger& other)                            = delete;
+    logger(const logger&& other)                                       = delete;
+    logger& operator= (const logger&& other)                           = delete;
 
     void reset()
     {
@@ -190,29 +197,25 @@ private:
         uint8_t bs = 0;
         uint8_t p = 0;
 
-        const alphabet_char_t* p_alphabet = nullptr;
-
         switch(m_base) {
             case base::b:
-                p_alphabet = m_s_binary_alphabet;
                 bs = 2;
             break;
             case base::o:
-                p_alphabet = m_s_octal_alphabet;
                 bs = 8;
             break;
             case base::d:
-                p_alphabet = m_s_decimal_alphabet;
                 bs = 10;
             break;
             case base::h:
-                p_alphabet = m_s_hex_alphabet;
                 bs = 16;
             break;
         }
 
         do {
-            m_num_buf[p] = p_alphabet[tmp % bs].low;
+            m_num_buf[p] = (cs::upper == m_case) ?
+                           toupper(m_alphabet[tmp % bs]) :
+                           m_alphabet[tmp % bs];
             tmp /= bs;
             ++p;
         } while(0 != tmp);
@@ -322,7 +325,7 @@ private:
 
     void out_all()                                                         const
     {
-        out<0, out_t...>();
+        out<0, OUT...>();
     }
 
     template<size_t COUNT, typename o, typename... tail>
@@ -336,19 +339,21 @@ private:
     template<size_t COUNT>
     bool out()                                                             const
     {
-        static_assert((COUNT == sizeof...(out_t)), "Out count missmatch!");
+        static_assert((COUNT == sizeof...(OUT)), "Out count missmatch!");
         return true;
     }
 
-    typedef struct alphabet_char {
-        char low;
-        char high;
-    } alphabet_char_t;
+    // typedef struct alphabet_char {
+    //     char low;
+    //     char high;
+    // } alphabet_char_t;
 
-    static alphabet_char_t m_s_binary_alphabet[];
-    static alphabet_char_t m_s_octal_alphabet[];
-    static alphabet_char_t m_s_decimal_alphabet[];
-    static alphabet_char_t m_s_hex_alphabet[];
+    const char* m_alphabet = R"(0123456789abcdef)";
+
+    // static alphabet_char_t m_s_binary_alphabet[];
+    // static alphabet_char_t m_s_octal_alphabet[];
+    // static alphabet_char_t m_s_decimal_alphabet[];
+    // static alphabet_char_t m_s_hex_alphabet[];
 
     char         m_num_buf[66]; // (u)int64_t in binary mode takes 64 characters 
     char         m_buf[BUFFER_SIZE];
@@ -363,6 +368,7 @@ private:
     align        m_align;
     size_t       m_width;
     lvl          m_level;
+    cs           m_case;
 };
 
 } // namespace ecl

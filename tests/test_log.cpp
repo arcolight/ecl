@@ -10,62 +10,6 @@
 
 using namespace ecl;
 
-template<>
-logger<2048, serial_out>::alphabet_char_t
-logger<2048, serial_out>::m_s_binary_alphabet[] = {
-    { '0', '0' },
-    { '1', '1' }
-};
-
-template<>
-logger<2048, serial_out>::alphabet_char_t 
-logger<2048, serial_out>::m_s_octal_alphabet[] = {
-    { '0', '0' },
-    { '1', '1' },
-    { '2', '2' },
-    { '3', '3' },
-    { '4', '4' },
-    { '5', '5' },
-    { '6', '6' },
-    { '7', '7' }
-};
-
-template<>
-logger<2048, serial_out>::alphabet_char_t 
-logger<2048, serial_out>::m_s_decimal_alphabet[] = {
-    { '0', '0' },
-    { '1', '1' },
-    { '2', '2' },
-    { '3', '3' },
-    { '4', '4' },
-    { '5', '5' },
-    { '6', '6' },
-    { '7', '7' },
-    { '8', '8' },
-    { '9', '9' }
-};
-
-template<>
-logger<2048, serial_out>::alphabet_char_t 
-logger<2048, serial_out>::m_s_hex_alphabet[] = {
-    { '0', '0' },
-    { '1', '1' },
-    { '2', '2' },
-    { '3', '3' },
-    { '4', '4' },
-    { '5', '5' },
-    { '6', '6' },
-    { '7', '7' },
-    { '8', '8' },
-    { '9', '9' },
-    { 'a', 'A' },
-    { 'b', 'B' },
-    { 'c', 'C' },
-    { 'd', 'D' },
-    { 'e', 'E' },
-    { 'f', 'F' }
-};
-
 void printf_nums(int8_t  i8,  uint8_t  u8,
                  int16_t i16, uint16_t u16,
                  int32_t i32, uint32_t u32,
