@@ -1,3 +1,5 @@
+#include <ecl/log.hpp>
+
 #include <stdio.h>
 #include <string.h>
 #include <ctime>
@@ -5,7 +7,6 @@
 #include <cmath>
 #include <limits>
 
-#include <ecl/log.hpp>
 #include "test_log.hpp"
 
 using namespace ecl;
@@ -168,7 +169,13 @@ int main(int argc, char** argv)
     out_floats(f, d);
 
     f = 2.7181;
-    d = 2.7181;
+    d = -2.7181;
+
+    printf_floats(f,d);
+    out_floats(f, d);
+
+    f = 0.1;
+    d = -0.2;
 
     printf_floats(f,d);
     out_floats(f, d);

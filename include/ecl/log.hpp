@@ -55,8 +55,7 @@ enum class lvl {
 struct end {};
 struct reset {};
 
-template<size_t BUFFER_SIZE, 
-         typename... OUT>
+template<size_t BUFFER_SIZE, typename... OUT>
 class logger{
 public:
     explicit logger(const base  def_base = base::d,
@@ -311,9 +310,20 @@ private:
         T f = 0.0;
         f = std::modf(val, &i);
 
-        print_num_signed((int64_t)i);
-        print_val('.');
+        if((i < 0.0) || (f < 0.0)) {
+            print_val('-');
+        }
 
+        if(i < 0.0) {
+            i = -i;
+        }
+
+        if(f < 0.0) {
+            f = -f;
+        }
+
+        print_num_unsigned((uint64_t)i);
+        print_val('.');
         print_num_unsigned((uint64_t)(f * std::pow(10, m_width)));
     }
 
@@ -343,17 +353,8 @@ private:
         return true;
     }
 
-    // typedef struct alphabet_char {
-    //     char low;
-    //     char high;
-    // } alphabet_char_t;
-
+    // can be used for all bases till 16.
     const char* m_alphabet = R"(0123456789abcdef)";
-
-    // static alphabet_char_t m_s_binary_alphabet[];
-    // static alphabet_char_t m_s_octal_alphabet[];
-    // static alphabet_char_t m_s_decimal_alphabet[];
-    // static alphabet_char_t m_s_hex_alphabet[];
 
     char         m_num_buf[66]; // (u)int64_t in binary mode takes 64 characters 
     char         m_buf[BUFFER_SIZE];
