@@ -8,16 +8,6 @@
 
 #include <type_traits>
 
-// template <typename T1, typename T2> struct same_type
-// {
-//     constexpr static bool value = false;
-// };
-
-// template <typename T> struct same_type<T,T>
-// {
-//     constexpr static bool value = true;
-// };
-
 namespace ecl
 {
 
@@ -338,11 +328,11 @@ private:
         out<0, OUT...>();
     }
 
-    template<size_t COUNT, typename o, typename... tail>
+    template<size_t COUNT, typename O, typename... TAIL>
     bool out()                                                             const
     {
-        bool res_self = o::print(m_buf);
-        bool res_tail = out<COUNT + 1, tail...>();
+        bool res_self = O::print(m_buf);
+        bool res_tail = out<COUNT + 1, TAIL...>();
         return res_self && res_tail;
     }
 
