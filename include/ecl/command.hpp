@@ -6,6 +6,7 @@
 
 #include <cstring>
 
+#include "str_const.hpp"
 #include "sized_data.h"
 
 #ifndef RECEIVER_CAPACITY

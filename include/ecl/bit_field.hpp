@@ -19,7 +19,10 @@ public:
         static_assert((sizeof(T) * 8 >= SIZE), "field size > sizeof(var)");
     }
 
-    constexpr static size_t size { SIZE };
+    constexpr static size_t size()
+    {
+        return SIZE;
+    }
 
 protected:
     typedef T field_t;
@@ -116,7 +119,7 @@ private:
     template<size_t SUM, typename F, typename... TAIL>
     constexpr bool check()                                                 const
     {
-        return check<SUM + F::size, TAIL...>();
+        return check<SUM + F::size(), TAIL...>();
     }
 
     template<uint8_t OFFSET>
@@ -132,7 +135,7 @@ private:
         typename F::field_t val = this->F::get();
         uint8_t bit = 0x00;
 
-        for(size_t i = 0; i < F::size; ++i)
+        for(size_t i = 0; i < F::size(); ++i)
         {
             size_t shift = (OFFSET + i) % 8;
             if(0 == shift)
@@ -140,11 +143,11 @@ private:
                 ++array;
             }
 
-            bit = ( val >> (F::size - i - 1) ) & 0x01;
+            bit = ( val >> (F::size() - i - 1) ) & 0x01;
             *array |= bit << (7 - shift);
         }
 
-        pack_<(OFFSET + F::size) % 8, TAIL...>(array);
+        pack_<(OFFSET + F::size()) % 8, TAIL...>(array);
     }
 
     template<uint8_t OFFSET>
@@ -160,7 +163,7 @@ private:
         typename F::field_t val = 0;
         decltype(val) bit = 0;
 
-        for(size_t i = 0; i < F::size; ++i) 
+        for(size_t i = 0; i < F::size(); ++i)
         {
             size_t shift = (OFFSET + i) % 8;
             if(0 == shift) 
@@ -169,12 +172,12 @@ private:
             }
 
             bit = ( *array >> (7 - shift) ) & 0x01;
-            val |= bit << (F::size - i - 1);
+            val |= bit << (F::size() - i - 1);
         }
 
         this->F::set(val);
 
-        unpack_<(OFFSET + F::size) % 8, TAIL...>(array);
+        unpack_<(OFFSET + F::size()) % 8, TAIL...>(array);
     }
 
     uint8_t m_array[SIZE];

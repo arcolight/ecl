@@ -45,6 +45,13 @@ enum class lvl {
 struct end {};
 struct reset {};
 
+typedef struct width
+{
+    width(size_t w) : m_w(w) {}
+
+    size_t m_w;
+} wd;
+
 template<size_t BUFFER_SIZE, typename... OUT>
 class logger{
 public:
@@ -87,6 +94,18 @@ public:
     logger& operator() (const cs& c)
     {
         m_case = c;
+        return *this;
+    }
+
+    logger& operator() (const width& w)
+    {
+        m_width = w.m_w;
+        return *this;
+    }
+
+    logger& operator<< (const width& w)
+    {
+        m_width = w.m_w;
         return *this;
     }
 
@@ -285,7 +304,8 @@ private:
 
     void print_val(const char* const val)
     {
-        for(size_t i = 0; (val[i] != 0) && (m_count < BUFFER_SIZE); ++i) {
+        size_t i = 0;
+        for(i = 0; (val[i] != 0) && (m_count < BUFFER_SIZE); ++i) {
             m_buf[m_count] = val[i];
             ++m_count;
         }

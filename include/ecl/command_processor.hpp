@@ -47,7 +47,7 @@ private:
               const uint8_t               argc,
               const uint8_t* const* const argv)                            const
     {
-        static_assert((cmd::name() != nullptr), "cmd::name is nullptr!");
+        static_assert((cmd::name() != nullptr), "cmd::name is empty!");
 
         if(0 == strncmp(cmd::name(), nm, strlen(cmd::name())))
         {
