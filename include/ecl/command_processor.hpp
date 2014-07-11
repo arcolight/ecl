@@ -19,7 +19,8 @@ public:
     virtual bool init(const uint8_t argc,
                       const uint8_t* const* const argv)                 override
     {
-        if(0 == argc) {
+        if(0 == argc)
+        {
             return false;
         }
 
@@ -55,10 +56,12 @@ private:
 
             i_command* p_cmd = static_cast<i_command*>(&c);
 
-            if( ! p_cmd->init(argc, argv) ) {
+            if( ! p_cmd->init(argc, argv) )
+            {
                 const char* const p = "Invalid syntax.";
 
-                for(size_t i = 0; i < strlen(p); ++i) {
+                for(size_t i = 0; i < strlen(p); ++i)
+                {
                     m_buf->ptr[i] = p[i];
                 }
 
@@ -82,7 +85,8 @@ private:
 
         const char* const p = "Command not found.";
 
-        for(size_t i = 0; i < strlen(p); ++i) {
+        for(size_t i = 0; i < strlen(p); ++i)
+        {
             m_buf->ptr[i] = p[i];
         }
 

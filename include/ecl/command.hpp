@@ -28,7 +28,38 @@ public:
     virtual void receive(cmd&)                                              = 0;
 };
 
-}
+template<typename cmd>
+class cmd_core
+{
+protected:
+    void reg(detail::i_receiver<cmd>* const i)
+    {
+        for(auto &itf: s_array)
+        {
+            if(nullptr == itf)
+            {
+                itf = i;
+                return;
+            }
+        }
+    }
+
+    void execute(cmd& c)                                                   const
+    {
+        for(auto itf: s_array)
+        {
+            if(nullptr != itf)
+            {
+                itf->receive(c);
+            }
+        }
+    }
+
+private:
+    static detail::i_receiver<cmd>* s_array[RECEIVER_CAPACITY];
+};
+
+} // namespace detail
 
 class i_command
 {
@@ -39,35 +70,8 @@ public:
     virtual bool dispatch()                                                 = 0;
 };
 
-template<typename cmd>
-class cmd_core
-{
-protected:
-    void reg(detail::i_receiver<cmd>* const i)
-    {
-        for(auto &itf: s_array) {
-            if(nullptr == itf) {
-                itf = i;
-                return;
-            }
-        }
-    }
-
-    void execute(cmd& c)                                                   const
-    {
-        for(auto itf: s_array) {
-            if(nullptr != itf) {
-                itf->receive(c);
-            }
-        }
-    }
-
-private:
-    static detail::i_receiver<cmd>* s_array[RECEIVER_CAPACITY];
-};
-
 template<typename NAME, typename cmd>
-class command : public virtual cmd_core<cmd>,
+class command : public virtual detail::cmd_core<cmd>,
                 public i_command
 {
 public:
@@ -93,17 +97,20 @@ public:
 
     size_t append(const sized_data& d)
     {
-        if(nullptr == m_buf) {
+        if(nullptr == m_buf)
+        {
             return 0;
         }
 
-        if( (nullptr == m_buf->ptr) || (nullptr == d.ptr) || (0 == d.size) ) {
+        if( (nullptr == m_buf->ptr) || (nullptr == d.ptr) || (0 == d.size) )
+        {
             return 0;
         }
 
         size_t remain = m_buf->size - m_size;
         size_t size_safe = (d.size < remain) ? d.size : remain;
-        for(size_t i = 0; i < size_safe; ++i) {
+        for(size_t i = 0; i < size_safe; ++i)
+        {
             m_buf->ptr[m_size + i] = d.ptr[i];
             ++m_size;
         }
@@ -135,13 +142,13 @@ protected:
 };
 
 template<typename cmd>
-class receiver : public virtual cmd_core<cmd>,
+class receiver : public virtual detail::cmd_core<cmd>,
                  public detail::i_receiver<cmd>
 {
 protected:
     receiver()
     {
-        this->cmd_core<cmd>::reg(this);
+        this->detail::cmd_core<cmd>::reg(this);
     }
 
     virtual ~receiver() {}
