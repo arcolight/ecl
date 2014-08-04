@@ -5,6 +5,8 @@
 #include <cstdlib>
 #include <limits>
 
+#include <vector>
+
 #include <ecl/circular_buffer.hpp>
 
 #define CB_SIZE 16
@@ -52,6 +54,31 @@ int main(int argc, char* argv[])
 {
     (void)(argc);
     (void)(argv);
+
+    std::vector<uint32_t> test_vector;
+    test_vector.push_back(0);
+    test_vector.push_back(1);
+    test_vector.push_back(2);
+    test_vector.push_back(3);
+    test_vector.push_back(4);
+    test_vector.push_back(5);
+    std::cout << " * by iterator (C++03):" << std::endl << "[ ";
+    auto it  = test_vector.begin();
+    while(it != test_vector.end())
+    {
+        std::cout << (uint32_t)*it << " ";
+        ++it;
+    }
+    std::cout << "]" << std::endl << std::endl;
+
+    std::cout << " * by reverse iterator (C++03):" << std::endl << "[ ";
+    auto it2  = test_vector.rbegin();
+    while(it2 != test_vector.rend())
+    {
+        std::cout << (uint32_t)*it2 << " ";
+        ++it2;
+    }
+    std::cout << "]" << std::endl << std::endl;
 
     std::srand(std::time(0));
     int random_variable = std::rand();
