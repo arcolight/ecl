@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include <type_traits>
+#include <iterator>
 
 namespace ecl
 {
@@ -94,26 +95,74 @@ public:
             typedef T value_type;
             typedef T& reference;
             typedef T* pointer;
-            // typedef std::forward_iterator_tag iterator_category;
-            typedef int difference_type;
-            iterator(size_t ind, pointer data, size_t offset) : 
+            typedef std::bidirectional_iterator_tag iterator_category;
+            typedef ptrdiff_t difference_type;
+            iterator(size_t ind, pointer data, size_t offset) :
                 index_(ind), 
                 offset_(offset),
                 data_(data)
             {}
 
-            self_type operator++() 
+            self_type operator++()
             {
                 self_type i = *this;
-                ++index_;
+
+                if(SIZE == index_)
+                {
+                    index_ = 0;
+                }
+                else
+                {
+                    ++index_;
+                }
+
                 return i;
             }
 
             self_type operator++(int junk)
             {
                 (void)(junk);
-                ++index_;
-                return *this; 
+
+                if(SIZE == index_)
+                {
+                    index_ = 0;
+                }
+                else
+                {
+                    ++index_;
+                }
+
+                return *this;
+            }
+
+            self_type operator--()
+            {
+                self_type i = *this;
+
+                if(0 == index_)
+                {
+                    index_ = SIZE;
+                }
+                else
+                {
+                    --index_;
+                }
+
+                return i;
+            }
+
+            self_type operator--(int junk)
+            {
+                (void)(junk);
+                if(0 == index_)
+                {
+                    index_ = SIZE;
+                }
+                else
+                {
+                    --index_;
+                }
+                return *this;
             }
 
             reference operator*()
@@ -149,9 +198,9 @@ public:
             typedef T value_type;
             typedef T& reference;
             typedef T* pointer;
-            // typedef std::forward_iterator_tag iterator_category;
-            typedef int difference_type;
-            const_iterator(size_t ind, pointer data, size_t offset) : 
+            typedef std::bidirectional_iterator_tag iterator_category;
+            typedef ptrdiff_t difference_type;
+            const_iterator(size_t ind, pointer data, size_t offset) :
                 index_(ind), 
                 offset_(offset),
                 data_(data)
@@ -160,15 +209,63 @@ public:
             self_type operator++() 
             {
                 self_type i = *this;
-                ++index_;
+
+                if(SIZE == index_)
+                {
+                    index_ = 0;
+                }
+                else
+                {
+                    ++index_;
+                }
+
                 return i;
             }
 
             self_type operator++(int junk)
             {
                 (void)(junk);
-                ++index_;
-                return *this; 
+
+                if(SIZE == index_)
+                {
+                    index_ = 0;
+                }
+                else
+                {
+                    ++index_;
+                }
+
+                return *this;
+            }
+
+            self_type operator--()
+            {
+                self_type i = *this;
+
+                if(0 == index_)
+                {
+                    index_ = SIZE;
+                }
+                else
+                {
+                    --index_;
+                }
+
+                return i;
+            }
+
+            self_type operator--(int junk)
+            {
+                (void)(junk);
+                if(0 == index_)
+                {
+                    index_ = SIZE;
+                }
+                else
+                {
+                    --index_;
+                }
+                return *this;
             }
 
             reference operator*()                                          const
@@ -197,6 +294,9 @@ public:
             pointer data_;
     };
 
+    typedef std::reverse_iterator<iterator> reverse_iterator;
+    typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
+
     iterator begin()
     {
         return iterator(0, m_array, m_offset);
@@ -215,6 +315,26 @@ public:
     const_iterator end()                                                   const
     {
         return const_iterator(SIZE, m_array, m_offset);
+    }
+
+    reverse_iterator rbegin()
+    {
+        return reverse_iterator(end());
+    }
+
+    reverse_iterator rend()
+    {
+        return reverse_iterator(begin());
+    }
+
+    const_reverse_iterator rbegin()                                        const
+    {
+        return const_reverse_iterator(end());
+    }
+
+    const_reverse_iterator rend()                                          const
+    {
+        return const_reverse_iterator(begin());
     }
 
 private:

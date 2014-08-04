@@ -21,21 +21,30 @@ static void dump(circular_buffer_t& c)
     }
     std::cout << "]" << std::endl;
 
-    std::cout << " * by iterator (C++11):\n\r[ ";
+    std::cout << " * by iterator (C++11):" << std::endl << "[ ";
 
     for(auto e: c) {
         std::cout << (uint32_t)e << " ";
     }
-    std::cout << "]" << std::endl; 
+    std::cout << "]" << std::endl;
 
-    std::cout << " * by iterator (C++03):\n\r[ ";
-    circular_buffer_t::iterator it_begin = c.begin();
-    circular_buffer_t::iterator it_end = c.end();
-    circular_buffer_t::iterator it = it_begin;
-
-    for(it = it_begin; it != it_end; ++it) {
+    std::cout << " * by iterator (C++03):" << std::endl << "[ ";
+    for(circular_buffer_t::iterator it = c.begin(); it != c.end(); ++it) {
         std::cout << (uint32_t)*it << " ";
     }
+    std::cout << "]" << std::endl;
+
+    std::cout << " * by reverse iterator (C++03):" << std::endl << "[ ";
+    auto it  = c.rbegin();
+    while(it != c.rend())
+    {
+        std::cout << (uint32_t)*it << " ";
+        ++it;
+    }
+
+    // for(circular_buffer_t::reverse_iterator it = (++c.rbegin()); it != (++c.rend()); ++it) {
+    //     std::cout << (uint32_t)*it << " ";
+    // }
     std::cout << "]" << std::endl << std::endl;
 }
 
@@ -49,10 +58,13 @@ int main(int argc, char* argv[])
 
     size_t count = random_variable % (CB_SIZE*2) + 1;
 
-    std::cout << " * push " << count << " values" << std::endl;
-    for(uint8_t i = 1; i < count; ++i) {
+    std::cout << " * push " << count << " values [1; " << count << "] <= ";
+
+    for(uint8_t i = 1; i < count + 1; ++i) {
+        std::cout << (uint32_t)i << " ";
         cb.push(i);
     }
+    std::cout << "|" << std::endl;
 
     dump(cb);
 
@@ -64,10 +76,12 @@ int main(int argc, char* argv[])
 
     dump(cb);
 
-    std::cout << " * push " << count << " values" << std::endl;
-    for(uint8_t i = 1; i < count; ++i) {
+    std::cout << " * push " << count << " values [2; " << count*2 << "] <= ";
+    for(uint8_t i = 1; i < count + 1; ++i) {
+        std::cout << (uint32_t)(i*2) << " ";
         cb.push(i*2);
     }
+    std::cout << "|" << std::endl;
 
     dump(cb);
 
