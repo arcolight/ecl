@@ -3,10 +3,12 @@
 
 #include <cstddef>
 #include <cstdint>
-
 #include <cstring>
 
+#include <array>
+
 #include "sized_data.h"
+#include "singleton.hpp"
 
 #ifndef RECEIVER_CAPACITY
 #define RECEIVER_CAPACITY 32
@@ -34,7 +36,7 @@ class cmd_core
 protected:
     void reg(detail::i_receiver<cmd>* const i)
     {
-        for(auto &itf: s_array)
+        for(auto &itf: array_singleton::instance())
         {
             if(nullptr == itf)
             {
@@ -46,7 +48,7 @@ protected:
 
     void execute(cmd& c)                                                   const
     {
-        for(auto itf: s_array)
+        for(auto itf: array_singleton::instance())
         {
             if(nullptr != itf)
             {
@@ -56,7 +58,9 @@ protected:
     }
 
 private:
-    static detail::i_receiver<cmd>* s_array[RECEIVER_CAPACITY];
+    typedef ecl::singleton<
+                std::array<detail::i_receiver<cmd>*, RECEIVER_CAPACITY> 
+                > array_singleton;
 };
 
 } // namespace detail
