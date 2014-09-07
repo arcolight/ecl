@@ -72,6 +72,9 @@ public:
                       const uint8_t* const* const argv)                     = 0;
 
     virtual bool dispatch()                                                 = 0;
+
+    virtual size_t append(const sized_data&)                                = 0;
+    virtual size_t append(const char* const)                                = 0;
 };
 
 template<typename NAME, typename cmd>
@@ -99,7 +102,7 @@ public:
         return true;
     }
 
-    size_t append(const sized_data& d)
+    virtual size_t append(const sized_data& d)                          override
     {
         if(nullptr == m_buf)
         {
@@ -115,14 +118,14 @@ public:
         size_t size_safe = (d.size < remain) ? d.size : remain;
         for(size_t i = 0; i < size_safe; ++i)
         {
-            m_buf->ptr[m_size + i] = d.ptr[i];
+            m_buf->ptr[m_size] = d.ptr[i];
             ++m_size;
         }
 
         return size_safe;
     }
 
-    size_t append(const char* const str)
+    virtual size_t append(const char* const str)                        override
     {
         sized_data d = {
             (uint8_t* const)str,

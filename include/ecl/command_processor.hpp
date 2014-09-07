@@ -13,7 +13,8 @@ class command_processor : public i_command
 {
 public:
     command_processor(const sized_data* const buf) :
-        m_buf(buf)
+        m_buf(buf),
+        m_size(0)
     {}
 
     virtual bool init(const uint8_t argc,
@@ -40,6 +41,39 @@ public:
     constexpr static const char* const name()
     {
         return NAME::name();
+    }
+
+    virtual size_t append(const sized_data& d)                          override
+    {
+        if(nullptr == m_buf)
+        {
+            return 0;
+        }
+
+        if( (nullptr == m_buf->ptr) || (nullptr == d.ptr) || (0 == d.size) )
+        {
+            return 0;
+        }
+
+        size_t remain = m_buf->size - m_size;
+        size_t size_safe = (d.size < remain) ? d.size : remain;
+        for(size_t i = 0; i < size_safe; ++i)
+        {
+            m_buf->ptr[m_size] = d.ptr[i];
+            ++m_size;
+        }
+
+        return size_safe;
+    }
+
+    virtual size_t append(const char* const str)                        override
+    {
+        sized_data d = {
+            (uint8_t* const)str,
+            strlen(str)
+        };
+
+        return append(d);
     }
 
 private:
@@ -97,6 +131,7 @@ private:
     const uint8_t* const*   m_argv;
 
     const sized_data* const m_buf;
+    size_t                  m_size;
 };
 
 } // namespace ecl
