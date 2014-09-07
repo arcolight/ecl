@@ -2,6 +2,7 @@
 #define ECL_FSM_HPP
 
 #include <cstddef>
+#include <type_traits>
 
 #include "singleton.hpp"
 
@@ -15,106 +16,69 @@ protected:
     constexpr state_machine() : m_state(init),
                                 m_fsm_ptr(static_cast<derived*>(this)) {}
 
-    template<typename event_t>
-    class transition_layer
-    {
-        typedef void (derived::*action_t)(const event_t&);
-        typedef bool (derived::*guard_t)(const event_t&);
-
-    protected:
-        typedef struct transition_info
-        {
-            action_t action;
-            guard_t  guard;
-            state_t  start;
-            state_t  next;
-
-            struct transition_info* link;
-        } transition_info_t;
-
-    private:
-        transition_info_t* m_list;
-
-    protected:
-        transition_layer() : m_list(nullptr) {}
-
-        void add(transition_info_t* const ti)
-        {
-            if(nullptr == m_list) 
-            {
-                m_list = ti;
-                return;
-            }
-
-            transition_info_t* entry = m_list;
-
-            while(nullptr != entry->link)
-            {
-                entry = entry->link;
-            }
-
-            entry->link = ti;
-        }
-
-        state_t call(derived& fsm, const event_t& e)                       const
-        {
-            state_t st = fsm.state();
-
-            const transition_info_t* entry = m_list;
-
-            while(st != entry->start) 
-            {
-                if(nullptr == entry->link) 
-                {
-                    return st;
-                }
-
-                entry = entry->link;
-            }
-
-            bool transition = true;
-
-            if(nullptr != entry->guard) 
-            {
-                transition = (fsm.*(entry->guard))(e);
-            }
-
-            if(transition) 
-            {
-                if(nullptr != entry->action) 
-                {
-                    (fsm.*(entry->action))(e);
-                }
-                return entry->next;
-            }
-
-            return st;
-        }
-    };
-
     template<state_t start, typename event_t, state_t next,
              void (derived::*action)(const event_t&) = nullptr,
              bool (derived::*guard)(const event_t&) = nullptr>
-    class row : public virtual transition_layer<event_t>
+    class row
     {
     protected:
-        row() : ti( {action, guard, start, next, nullptr} )
+        state_t call(derived& fsm, const event_t& e)                       const
         {
-            this->transition_layer<event_t>::add(&ti);
+            state_t result = fsm.state();
+
+            bool transition = (nullptr == guard) ? true : (fsm.*(guard))(e);
+
+            if(transition)
+            {
+                if(nullptr != action) 
+                {
+                    (fsm.*(action))(e);
+                }
+                result = next;
+            }
+
+            return result;
         }
 
-    private:
-        typename transition_layer<event_t>::transition_info_t ti;
+        template<typename other_event_t>
+        state_t call(derived& fsm, const other_event_t& e)                 const
+        {
+            (void)(e);
+            return fsm.state();
+        }
+
+        typedef event_t row_event_t;
+        constexpr static state_t row_start_state() { return start; }
     };
 
     template<typename... rows>
-    class transition_table : public rows...
+    class transition_table : public rows... 
     {
     public:
         template<typename event_t>
         state_t transition(derived& fsm, const event_t& e)                 const
         {
-            return this->transition_layer<event_t>::call(fsm, e);
+            return transition_internal<event_t, rows...>(fsm, e);
+        }
+
+    private:
+        template<typename event_t, typename r, typename... tail>
+        state_t transition_internal(derived& fsm, const event_t& e)        const
+        {
+            if(std::is_same<event_t, typename r::row_event_t>::value &&
+               (fsm.state() == r::row_start_state()))
+            {
+                return this->r::call(fsm, e);
+            }
+
+            return transition_internal<event_t, tail...>(fsm, e);
+        }
+
+        template<typename event_t>
+        state_t transition_internal(derived& fsm, const event_t& e)        const
+        {
+            (void)(e);
+            return fsm.state();
         }
     };
 
@@ -138,53 +102,37 @@ protected:
     public:
         static void call(derived& fsm, const state_t prev, const state_t next)
         {
-            on_exit_chain<0, callbacks...>(fsm, prev);
-            on_enter_chain<0, callbacks...>(fsm, next);
+            call_chain<0, callbacks...>(fsm, prev, next);
         }
 
     private:
         template<size_t CNT, typename callback, typename... tail>
-        static void on_exit_chain(derived& fsm, const state_t s)
+        static void call_chain(derived& fsm, const state_t p, const state_t n)
         {
-            if(callback::cb_state() == s) 
+            if(callback::cb_state() == p)
             {
                 if(nullptr != callback::cb_on_exit()) 
                 {
                     (fsm.*(callback::cb_on_exit()))();
                 }
-                return;
             }
-
-            on_exit_chain<CNT + 1, tail...>(fsm, s);
-        }
-
-        template<size_t CNT>
-        static void on_exit_chain(derived& fsm, const state_t s)
-        {
-            (void)(fsm);
-            (void)(s);
-        }
-
-        template<size_t CNT, typename callback, typename... tail>
-        static void on_enter_chain(derived& fsm, const state_t s)
-        {
-            if(callback::cb_state() == s)
+            if(callback::cb_state() == n)
             {
                 if(nullptr != callback::cb_on_enter()) 
                 {
                     (fsm.*(callback::cb_on_enter()))();
                 }
-                return;
             }
 
-            on_enter_chain<CNT + 1, tail...>(fsm, s);
+            call_chain<CNT + 1, tail...>(fsm, p, n);
         }
 
         template<size_t CNT>
-        static void on_enter_chain(derived& fsm, const state_t s)
+        static void call_chain(derived& fsm, const state_t p, const state_t n)
         {
             (void)(fsm);
-            (void)(s);
+            (void)(p);
+            (void)(n);
         }
     };
 
@@ -213,7 +161,7 @@ public:
         return m_state; 
     }
 
-    void reset()    
+    void reset()
     {
         m_state = m_s_init_state;
     }
