@@ -48,11 +48,12 @@ protected:
 
     void execute(cmd& c)                                                   const
     {
-        for(auto itf: array_singleton::instance())
+        std::size_t sz = array_singleton::instance().size();
+        for(std::size_t i = 0; i < sz; ++i)
         {
-            if(nullptr != itf)
+            if(nullptr != array_singleton::instance()[i])
             {
-                itf->receive(c);
+                array_singleton::instance()[i]->receive(c);
             }
         }
     }

@@ -84,7 +84,10 @@ public:
         unpack();
     }
 
-    // 'm_array - 1' - Hack :( Needed more graceful solution
+    // 'm_array - 1' - Hack :( Needed more graceful solution.
+    // Disable GCC warning, we know what we do.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
     const uint8_t* pack()
     {
         clear_array();
@@ -97,6 +100,7 @@ public:
         unpack_<0, FIELDS...>(m_array - 1);
         return this;
     }
+#pragma GCC diagnostic pop
 
     void clear_array()
     {
