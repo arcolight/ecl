@@ -1,5 +1,3 @@
-
-
 #ifndef ECL_FSM_HPP
 #define ECL_FSM_HPP
 
@@ -113,6 +111,8 @@ protected:
     class transition_table : public rows...
     {
     public:
+    	transition_table();
+
         template<typename event_t>
         state_t transition(derived& fsm, const event_t& e)                 const
         {
@@ -194,21 +194,7 @@ public:
     template<typename event_t,
              typename transition_table_t,
              typename callback_table_t>
-    state_t transition(const event_t& e)
-    {
-        transition_table_t& tt = singleton<transition_table_t>::instance();
-
-        const state_t current = m_state;
-        const state_t next = tt.template transition<event_t>(*m_fsm_ptr, e);
-        m_state = next;
-
-        if(next != current) 
-        {
-            callback_table_t::call(*m_fsm_ptr, current, next);
-        }
-
-        return m_state;
-    }
+    state_t transition(const event_t& e);
 
     state_t state()                                                        const 
     {
@@ -230,6 +216,32 @@ private:
     derived* const m_fsm_ptr;
     constexpr static state_t m_s_init_state { init };
 };
+
+template<typename derived, typename state_t, state_t init>
+template<typename event_t,
+         typename transition_table_t,
+         typename callback_table_t>
+state_t state_machine<derived, state_t, init>::transition(const event_t& e)
+{
+    transition_table_t& tt = singleton<transition_table_t>::instance();
+
+    const state_t current = m_state;
+    const state_t next = tt.template transition<event_t>(*m_fsm_ptr, e);
+    m_state = next;
+
+    if(next != current)
+    {
+        callback_table_t::call(*m_fsm_ptr, current, next);
+    }
+
+    return m_state;
+}
+
+template<typename derived, typename state_t, state_t init>
+template<typename... rows>
+state_machine<derived, state_t, init>::transition_table<rows...>::transition_table()
+{
+}
 
 } // namespace ecl
 

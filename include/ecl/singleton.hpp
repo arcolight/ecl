@@ -12,12 +12,7 @@ class singleton : public T
 public:
     virtual ~singleton() {}
 
-    static T& instance()
-    {
-        static singleton<T> object;
-
-        return object;
-    }
+    static T& instance();
 
     // For really lazy people :)
     static T& inst()
@@ -39,6 +34,14 @@ private:
     singleton(const singleton<T>&& other)                              = delete;
     singleton<T>& operator= (const singleton<T>&& other)               = delete;
 };
+
+template<typename T>
+T& singleton<T>::instance()
+{
+    static singleton<T> object;
+
+    return object;
+}
 
 template<typename T>
 using Singleton = singleton<T>;
