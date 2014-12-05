@@ -20,7 +20,13 @@ enum class parser_state
     complete
 };
 
-struct event_line { char* line { nullptr }; };
+struct event_line
+{
+    explicit event_line(char* l) : line(l)
+    {}
+
+    char* line { nullptr }; 
+};
 struct empty_line {};
 struct rst        {};
 
@@ -117,7 +123,7 @@ class parser_fsm : public state_machine<parser_fsm,
             return false;
         }
 
-        m_request.body = e.line;
+        m_request.body = (uint8_t*)e.line;
 
         return true;
     }

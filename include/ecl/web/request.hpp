@@ -23,12 +23,12 @@ struct request
 
     constexpr static size_t max_headers_count() { return MAX_HEADERS_COUNT; }
 
-    method      met                         { method::UNKNOWN  };
-    version     ver                         { version::UNKNOWN };
-    const char* uri                         { nullptr };
-    const char* body                        { nullptr };
-    header      headers[MAX_HEADERS_COUNT];
-    size_t      headers_count               { 0 };
+    method         met                         { method::UNKNOWN  };
+    version        ver                         { version::UNKNOWN };
+    const char*    uri                         { nullptr };
+    const uint8_t* body                        { nullptr };
+    header         headers[MAX_HEADERS_COUNT];
+    size_t         headers_count               { 0 };
 
     void clear()
     {

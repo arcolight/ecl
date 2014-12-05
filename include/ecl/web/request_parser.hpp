@@ -16,7 +16,7 @@ class request_parser : public i_request_parser
 public:
     virtual ~request_parser() {}
 
-    virtual request* parse(char* raw, size_t size)                    override
+    virtual request* parse(char* raw, size_t size)                      override
     {
         (void)size;
         parser_state st = m_parser.process_event(rst());
@@ -43,8 +43,8 @@ public:
             }
             else
             {
-                event_line e;
-                e.line = current;
+                event_line e { current };
+                // e.line = current;
                 st = m_parser.process_event(e);
             }
 
