@@ -10,6 +10,9 @@
 namespace ecl
 {
 
+namespace web 
+{
+
 template<const uint8_t* const DATA,
          size_t               SIZE,
          typename             NAME>
@@ -55,5 +58,7 @@ public:
         return CGI_HANDLER(argc, argv);
     }
 };
+
+} // namespace web
 
 } // namespace ecl

@@ -7,6 +7,9 @@
 namespace ecl
 {
 
+namespace web
+{
+
 template<typename... RESOURCES>
 class resource_table : public i_resource_container
 {
@@ -47,5 +50,7 @@ private:
 
     const std::tuple<RESOURCES...> m_res;
 };
+
+} // namespace web
 
 } // namespace ecl

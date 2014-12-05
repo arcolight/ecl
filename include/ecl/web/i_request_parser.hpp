@@ -1,17 +1,21 @@
 #pragma once
 
+#include "request.hpp"
+
 namespace ecl
 {
 
-template<typename REQUEST>
+namespace web 
+{
+
 class i_request_parser
 {
 public:
-    typedef REQUEST request_t;
-
     virtual ~i_request_parser() {}
 
-    virtual request_t* parse(const char* raw_req, size_t size)              = 0;
+    virtual request* parse(char* raw, size_t size)                          = 0;
 };
+
+} // namespace web
     
 } // namespace ecl
