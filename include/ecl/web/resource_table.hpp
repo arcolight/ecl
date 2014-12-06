@@ -1,8 +1,10 @@
 #pragma once
 
-#include <tuple>
+#include <cstring>
 
-#include "i_resource_container.hpp"
+#include <ecl/singleton.hpp>
+
+#include <tuple>
 
 namespace ecl
 {
@@ -11,12 +13,10 @@ namespace web
 {
 
 template<typename... RESOURCES>
-class resource_table : public i_resource_container
+class resource_table
 {
 public:
-    virtual ~resource_table() {}
-
-    virtual const i_resource* lookup(const char* const name)      const override
+    static const i_resource* lookup(const char* const name)              
     {
         if(nullptr == name)
         {
@@ -28,18 +28,18 @@ public:
 
 private:
     template<size_t COUNT, typename RES, typename... TAIL>
-    const i_resource* lookup_internal(const char* const name)              const
+    static const i_resource* lookup_internal(const char* const name)
     {
-        if(name == RES::name())
+        if(0 == strncmp(name, RES::name(), strlen(RES::name())))
         {
-            return &(std::get<COUNT>(m_res));
+            return &(std::get<COUNT>(resources_tuple_singleton::instance()));
         }
 
         return lookup_internal<COUNT + 1, TAIL...>(name);
     }
 
     template<size_t COUNT>
-    const i_resource* lookup_internal(const char* const name)              const
+    static const i_resource* lookup_internal(const char* const name)
     {
         (void)(name);
         static_assert((COUNT == sizeof...(RESOURCES)), 
@@ -48,7 +48,7 @@ private:
         return nullptr;
     }
 
-    const std::tuple<RESOURCES...> m_res;
+    typedef ecl::singleton<std::tuple<RESOURCES...>> resources_tuple_singleton;
 };
 
 } // namespace web

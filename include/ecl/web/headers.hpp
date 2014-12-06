@@ -1,9 +1,5 @@
 #pragma once
 
-#include <cstring>
-
-#include <algorithm>
-
 namespace ecl
 {
 

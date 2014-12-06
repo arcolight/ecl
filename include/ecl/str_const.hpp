@@ -16,6 +16,10 @@ public:
         m_p(a), m_sz(N-1)
     {}
 
+    constexpr str_const(const char* str, std::size_t N)
+        :m_p(str), m_sz(N)
+    {}
+
     constexpr char operator[](std::size_t n)                               const
     {
         // Don't use throw. In embedded systems we have no exceptions.
@@ -43,5 +47,11 @@ private:
 };
 
 } // namespace ecl
+
+constexpr ecl::str_const& operator "" _const( const char* const str, const size_t sz)
+{
+    constexpr ecl::str_const s(str, sz);
+    return s;
+}
 
 #endif // ECL_STR_CONST

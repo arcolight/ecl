@@ -2,7 +2,6 @@
 
 #include <cstring>
 
-#include "i_request_parser.hpp"
 #include "parser_fsm.hpp"
 
 namespace ecl
@@ -11,12 +10,10 @@ namespace ecl
 namespace web 
 {
 
-class request_parser : public i_request_parser
+class request_parser
 {
 public:
-    virtual ~request_parser() {}
-
-    virtual request* parse(char* raw, size_t size)                      override
+    request* parse(char* raw, size_t size)
     {
         (void)size;
         parser_state st = m_parser.process_event(rst());

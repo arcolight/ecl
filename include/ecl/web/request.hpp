@@ -1,7 +1,6 @@
 #pragma once
 
-#include "methods.hpp"
-#include "version.hpp"
+#include "constants.hpp"
 #include "headers.hpp"
 
 #ifndef MAX_HEADERS_COUNT
@@ -23,8 +22,8 @@ struct request
 
     constexpr static size_t max_headers_count() { return MAX_HEADERS_COUNT; }
 
-    method         met                         { method::UNKNOWN  };
-    version        ver                         { version::UNKNOWN };
+    method         met                         { method::GET  };
+    version        ver                         { version::HTTP10 };
     const char*    uri                         { nullptr };
     const uint8_t* body                        { nullptr };
     header         headers[MAX_HEADERS_COUNT];
@@ -32,8 +31,8 @@ struct request
 
     void clear()
     {
-        met = method::UNKNOWN;
-        ver = version::UNKNOWN;
+        met = method::GET;
+        ver = version::HTTP10;
 
         uri = nullptr;
         body = nullptr;

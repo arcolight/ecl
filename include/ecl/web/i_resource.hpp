@@ -2,6 +2,8 @@
 
 #include <cstdint>
 
+#include "constants.hpp"
+
 namespace ecl
 {
 
@@ -12,7 +14,10 @@ class i_resource
 {
 public:
     virtual ~i_resource() {}
-    virtual const uint8_t* exec(int argc, const uint8_t** const argv) const = 0;
+    virtual status_code exec(uint8_t* out_buf, 
+                             size_t size,
+                             int argc,
+                             const uint8_t** const argv)              const = 0;
 };
 
 } // namespace web
