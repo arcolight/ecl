@@ -5,161 +5,111 @@
 #include <tuple>
 #include <cstdint>
 
-#include "str_const.hpp"
-
 namespace ecl
 {
+
+template <typename, typename> struct Cons;
+
+template <typename  T, typename ...Args>
+struct Cons<T, std::tuple<Args...>>
+{
+    using type = std::tuple<T, Args...>;
+};
+
+template <template <class, class> class,
+          typename,
+          template <class...> class,
+          class...>
+struct filter;
+
+template <template <class, class> class Pred, typename Val, template <class...> class Variadic>
+struct filter<Pred, Val, Variadic>
+{
+    using type = Variadic<>;
+};
+ 
+template <template <class, class> class Pred,
+          typename Val,
+          template <class...> class Variadic,
+          class T, class... Ts>
+struct filter<Pred, Val, Variadic, T, Ts...>
+{
+    template <class, class> struct Cons;
+    template <class Head, class... Tail>
+    struct Cons<Head, Variadic<Tail...> >
+    {
+        using type = Variadic<Head, Tail...>;
+    };
+ 
+    using type = typename std::conditional<
+        Pred<Val, T>::value,
+        typename Cons<T, typename filter<Pred, Val, Variadic, Ts...>::type>::type,
+        typename filter<Pred, Val, Variadic, Ts...>::type >::type;
+};
 
 namespace json
 {
 
-bool write_to_buf(const char* const NAME,
-                  bool&             val,
-                  uint8_t*          buf,
-                  size_t            sz,
-                  uintptr_t&        offset)
-{
-
-    return true;
-}
-
-bool write_to_buf(const char* const NAME, 
-                  int8_t&           val,
-                  uint8_t*          buf,
-                  size_t            sz,
-                  uintptr_t&        offset)
-{
-    return true;
-}
-
-bool write_to_buf(const char* const NAME, 
-                  uint8_t&          val,
-                  uint8_t*          buf,
-                  size_t            sz,
-                  uintptr_t&        offset)
-{
-    return true;
-}
-
-bool write_to_buf(const char* const NAME, 
-                  int16_t&          val,
-                  uint8_t*          buf,
-                  size_t            sz,
-                  uintptr_t&        offset)
-{
-    return true;
-}
-
-bool write_to_buf(const char* const NAME, 
-                  uint16_t&         val,
-                  uint8_t*          buf,
-                  size_t            sz,
-                  uintptr_t&        offset)
-{
-    return true;
-}
-
-bool write_to_buf(const char* const NAME, 
-                  int32_t&          val,
-                  uint8_t*          buf,
-                  size_t            sz,
-                  uintptr_t&        offset)
-{
-    return true;
-}
-
-bool write_to_buf(const char* const NAME,
-                  uint32_t&         val,
-                  uint8_t*          buf,
-                  size_t            sz,
-                  uintptr_t&        offset)
-{
-    return true;
-}
-
-bool write_to_buf(const char* const NAME,
-                  int64_t&          val,
-                  uint8_t*          buf,
-                  size_t            sz,
-                  uintptr_t&        offset)
-{
-    return true;
-}
-
-bool write_to_buf(const char* const NAME,
-                  uint64_t&         val,
-                  uint8_t*          buf,
-                  size_t            sz,
-                  uintptr_t&        offset)
-{
-    return true;
-}
-
-bool write_to_buf(const char* const NAME,
-                  const char*       val,
-                  uint8_t*          buf,
-                  size_t            sz,
-                  uintptr_t&        offset)
-{
-    return true;
-}
-
-template<typename T>
-bool write_to_buf(const char* const NAME,
-                  T&                val,
-                  uint8_t*          buf,
-                  size_t            sz,
-                  uintptr_t&        offset)
-{
-    return true;
-}
-
-template<const char* const NAME, typename VAL_TYPE>
+template<typename NAME, typename T>
 class node
 {
 public:
-	bool serialize(uint8_t* buf, size_t sz, uintptr_t& offset)    			                   const
-	{
-        return serialize_internal(buf, sz, offset);
-	}
+    typedef T    value_t;
+    typedef NAME name_t;
 
-private:
-    bool serialize_internal(uint8_t* buf, size_t sz, uintptr_t& offset)                             const
+protected:
+    bool _serialize(uint8_t* buf, size_t sz, uintptr_t& offset)            const
     {
-        return write_to_buf(NAME, m_val, buf, sz, offset);
+        (void)buf;
+        (void)sz;
+        (void)offset;
+        return true;//_write(NAME, m_val, buf, sz, offset);
     }
 
-	VAL_TYPE m_val;
+    value_t m_val;
+};
+
+template<typename NAME, typename N_NAME>
+struct name_predicate
+{
+    constexpr static bool value { std::is_same<NAME, typename N_NAME::name_t>::value };
 };
 
 template<typename... NODES>
-class object
+class object : public NODES...
 {
 public:
-	bool serialize(uint8_t* buf, size_t sz)                                const
-	{
+    bool serialize(uint8_t* buf, size_t sz)                                const
+    {
         uintptr_t offset = 0;
         return serialize_internal<0, NODES...>(buf, sz, offset);
-	}
+    }
+
+    template<typename NAME>
+    typename std::tuple_element<0, typename filter<name_predicate, NAME, std::tuple, NODES...>::type>::type::value_t& f()
+    {
+        return this->std::tuple_element<0, typename filter<name_predicate, NAME, std::tuple, NODES...>::type>::type::m_val;
+    }
 
 private:
-	template<size_t COUNT, typename NODE, typename... TAIL>
-	bool serialize_internal(uint8_t* buf, size_t sz, uintptr_t& offset)	   const
-	{
-        std::get<COUNT>(m_nodes).serialize(buf + offset, sz - offset, offset);
+    template<size_t COUNT, typename NODE, typename... TAIL>
+    bool serialize_internal(uint8_t* buf, size_t sz, uintptr_t& offset)    const
+    {
+        this->NODE::_serialize(buf + offset, sz - offset, offset);
 
-		return serialize_internal<COUNT + 1, TAIL...>(buf + offset, sz - offset, offset);
-	}
+        return serialize_internal<COUNT + 1, TAIL...>(buf + offset, sz - offset, offset);
+    }
 
-	template<size_t COUNT>
-	bool serialize_internal(uint8_t* buf, size_t sz, uintptr_t& offset)	   const
-	{
-		return true;
-	}
-
-    std::tuple<NODES...> m_nodes;
+    template<size_t COUNT>
+    bool serialize_internal(uint8_t* buf, size_t sz, uintptr_t& offset)    const
+    {
+        (void)buf;
+        (void)offset;
+        (void)sz;
+        return true;
+    }
 };
 
 } // namespace json
-	
+    
 } // namespace ecl

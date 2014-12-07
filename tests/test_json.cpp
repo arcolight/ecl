@@ -1,33 +1,39 @@
+#include <iostream>
+
 #include <ecl/json.hpp>
 
-constexpr const char name1[] = "name1";
-constexpr const char name2[] = "name2";
-constexpr const char name3[] = "name3";
-constexpr const char name4[] = "name4";
-constexpr const char name5[] = "name5";
-constexpr const char level1[] = "level1";
-constexpr const char level2[] = "level2";
-constexpr const char level3[] = "level3";
-constexpr const char ar_item1[] = "ar_item1";
-constexpr const char ar_item2[] = "ar_item2";
-constexpr const char ar_item3[] = "ar_item3";
+struct name1    { constexpr static const char* name() { return "name1"; } };
+struct name2    { constexpr static const char* name() { return "name2"; } };
+struct name3    { constexpr static const char* name() { return "name3"; } };
+struct name4    { constexpr static const char* name() { return "name4"; } };
+struct name5    { constexpr static const char* name() { return "name5"; } };
+struct level1   { constexpr static const char* name() { return "level1"; } };
+struct level2   { constexpr static const char* name() { return "level2"; } };
+struct level3   { constexpr static const char* name() { return "level3"; } };
+struct ar_item1 { constexpr static const char* name() { return "ar_item1"; } };
+struct ar_item2 { constexpr static const char* name() { return "ar_item2"; } };
+struct ar_item3 { constexpr static const char* name() { return "ar_item3"; } };
 
-typedef ecl::json::object<
-    ecl::json::node<name1, bool>,
-    ecl::json::node<name2, int32_t>,
-    ecl::json::node<level1,
-        ecl::json::object<
-          ecl::json::node<name3, const char*>,
-          ecl::json::node<level2, std::array<
-                ecl::json::object<
-                    ecl::json::node<ar_item1, bool>,
-                    ecl::json::node<ar_item2, int32_t>,
-                    ecl::json::node<ar_item3, const char*>
+using namespace ecl;
+using namespace json;
+
+typedef object<
+    node<name1, bool>,
+    node<name2, int32_t>,
+    node<level1,
+        object<
+            node<name1, bool>,
+            node<name3, const char*>,
+            node<level2, std::array<
+                object<
+                    node<ar_item1, bool>,
+                    node<ar_item2, int32_t>,
+                    node<ar_item3, const char*>
                 >, 8>
             >
         >
     >,
-    ecl::json::node<name5, bool>
+    node<name5, bool>
 > document_t;
 
 static uint8_t buffer[2048];
@@ -44,9 +50,36 @@ int main(int argc, char* argv[])
 
     document_t doc;
 
-    doc.serialize(buffer, 2048);
+    bool  val1 = doc.f<name1>();
+    bool& val2 = doc.f<name1>();
 
-    // doc["name1"] = true;
+    doc.f<name1>() = true;
+    std::cout << "Doc<name1>: " << (doc.f<name1>() ? "true" : "false") << std::endl;
+
+    doc.f<name1>() = false;
+    std::cout << "Doc<name1>: " << (doc.f<name1>() ? "true" : "false") << std::endl;
+
+    doc.f<level1>().f<name1>() = true;
+    std::cout << "Doc<level1><name1>: " << (doc.f<level1>().f<name1>() ? "true" : "false") << std::endl;
+
+    int32_t ctr = 0;
+
+    for(auto& i: doc.f<level1>().f<level2>())
+    {
+        i.f<ar_item1>() = true;
+        i.f<ar_item2>() = ctr;
+        i.f<ar_item3>() = "item3";
+        ctr++;
+    }
+
+    for(auto& i: doc.f<level1>().f<level2>())
+    {
+        std::cout << "doc<level1><level2><ar_item1>: " << (i.f<ar_item1>() ? "true" : "false") << std::endl;
+        std::cout << "doc<level1><level2><ar_item2>: " << i.f<ar_item2>() << std::endl;
+        std::cout << "doc<level1><level2><ar_item3>: " << i.f<ar_item3>() << std::endl;
+    }
+
+    doc.serialize(buffer, 2048);
 
     return 0;
 }
