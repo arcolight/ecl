@@ -48,10 +48,10 @@ private:
 
 } // namespace ecl
 
-constexpr ecl::str_const& operator "" _const( const char* const str, const size_t sz)
-{
-    constexpr ecl::str_const s(str, sz);
-    return s;
-}
+// constexpr ecl::str_const& operator "" _const( const char* const str, const size_t sz)
+// {
+//     constexpr ecl::str_const s(str, sz);
+//     return s;
+// }
 
 #endif // ECL_STR_CONST
