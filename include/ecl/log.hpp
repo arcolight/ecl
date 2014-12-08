@@ -304,9 +304,14 @@ private:
 
     void print_val(const char* const val)
     {
+        const char* v = "null";
+        if(nullptr != val)
+        {
+            v = val;
+        }
         size_t i = 0;
-        for(i = 0; (val[i] != 0) && (m_count < BUFFER_SIZE); ++i) {
-            m_buf[m_count] = val[i];
+        for(i = 0; (v[i] != 0) && (m_count < BUFFER_SIZE); ++i) {
+            m_buf[m_count] = v[i];
             ++m_count;
         }
 

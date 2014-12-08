@@ -24,7 +24,7 @@ typedef object<
         object<
             node<name1, bool>,
             node<name3, const char*>,
-            node<level2, std::array<
+            node<level2, array<
                 object<
                     node<ar_item1, bool>,
                     node<ar_item2, int32_t>,
@@ -37,6 +37,14 @@ typedef object<
 > document_t;
 
 static uint8_t buffer[2048];
+
+struct serial_out
+{
+    static bool print(const char* const string) {
+        puts((const char* const)string);
+        return true;
+    }
+};
 
 int main(int argc, char* argv[])
 {
@@ -53,14 +61,17 @@ int main(int argc, char* argv[])
     bool  val1 = doc.f<name1>();
     bool& val2 = doc.f<name1>();
 
+    doc.f<level1>().f<name3>() = "name3 node";
+    doc.f<name2>() = 0;
+
     doc.f<name1>() = true;
-    std::cout << "Doc<name1>: " << (doc.f<name1>() ? "true" : "false") << std::endl;
+    std::cout << "doc<name1>: " << (doc.f<name1>() ? "true" : "false") << std::endl;
 
     doc.f<name1>() = false;
-    std::cout << "Doc<name1>: " << (doc.f<name1>() ? "true" : "false") << std::endl;
+    std::cout << "doc<name1>: " << (doc.f<name1>() ? "true" : "false") << std::endl;
 
     doc.f<level1>().f<name1>() = true;
-    std::cout << "Doc<level1><name1>: " << (doc.f<level1>().f<name1>() ? "true" : "false") << std::endl;
+    std::cout << "doc<level1><name1>: " << (doc.f<level1>().f<name1>() ? "true" : "false") << std::endl;
 
     int32_t ctr = 0;
 
@@ -79,7 +90,13 @@ int main(int argc, char* argv[])
         std::cout << "doc<level1><level2><ar_item3>: " << i.f<ar_item3>() << std::endl;
     }
 
-    doc.serialize(buffer, 2048);
+    ecl::logger<128, serial_out> log;
+
+    bool result = doc.serialize(log);
+    std::cout << "Serialize result: " << (result ? "true" : "false") << std::endl;
+    log << ecl::end();
+
+    // std::cout << "Serialized: " << (char*)buffer << std::endl;
 
     return 0;
 }
