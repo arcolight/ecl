@@ -21,12 +21,12 @@ protected:
     typedef T    value_t;
     typedef NAME name_t;
 
-    template<typename BUFFER>
-    bool serialize(BUFFER& buf)                                            const
+    template<typename STREAM>
+    bool serialize(STREAM& st)                                            const
     {
-        stringify(buf, NAME::name());
-        buf << ':';
-        stringify(buf, m_val);
+        stringify(st, NAME::name());
+        st << ':';
+        stringify(st, m_val);
 
         return true;
     }
@@ -34,16 +34,16 @@ protected:
     value_t m_val;
 
 private:
-    template<typename BUFFER, typename V_T>
-    void stringify(BUFFER& buf, const V_T& val)                            const
+    template<typename STREAM, typename V_T>
+    void stringify(STREAM& st, const V_T& val)                            const
     {
-        buf << val;        
+        st << val;        
     }
 
-    template<typename BUFFER>
-    void stringify(BUFFER& buf, const char* val)                           const
+    template<typename STREAM>
+    void stringify(STREAM& st, const char* val)                           const
     {
-        buf << "\"" << val << "\"";
+        st << "\"" << val << "\"";
     }
 };
 
@@ -53,16 +53,16 @@ class array
 private:
     typedef std::array<OBJ, COUNT> array_t;
 protected:
-    template<typename BUFFER>
-    bool serialize(BUFFER& buf)                                            const
+    template<typename STREAM>
+    bool serialize(STREAM& st)                                            const
     {
-        buf << '[';
+        st << '[';
 
         bool result = true;
 
         for(size_t i = 0; i < COUNT; ++i)
         {
-            bool res_o = m_val[i].serialize(buf);
+            bool res_o = m_val[i].serialize(st);
             if(!res_o)
             {
                 result = false;
@@ -70,20 +70,20 @@ protected:
 
             if(i != COUNT - 1)
             {
-                buf << ',';
+                st << ',';
             }
         }
 
-        buf << ']';
+        st << ']';
 
         return result;
     }
 
 public:
-    template<typename BUFFER, typename T>
-    static void print(BUFFER& buf, const T& val)
+    template<typename STREAM, typename T>
+    static void print(STREAM& st, const T& val)
     {
-        val.serialize(buf);
+        val.serialize(st);
     }
 
     typename array_t::iterator begin()
@@ -195,18 +195,18 @@ private:
     };
 
 public:
-    template<typename BUFFER, typename T>
-    static void print(BUFFER& buf, const T& val)
+    template<typename STREAM, typename T>
+    static void print(STREAM& st, const T& val)
     {
-        val.serialize(buf);
+        val.serialize(st);
     }
 
-    template<typename BUFFER>
-    bool serialize(BUFFER& buf)                                            const
+    template<typename STREAM>
+    bool serialize(STREAM& st)                                            const
     {
-        buf << '{';
+        st << '{';
 
-        return serialize_internal<BUFFER, NODES...>(buf);
+        return serialize_internal<STREAM, NODES...>(st);
     }
 
     template<typename NAME>
@@ -216,28 +216,28 @@ public:
     }
 
 private:
-    template<typename BUFFER, typename NODE, typename NODE_NEXT, typename... TAIL>
-    bool serialize_internal(BUFFER& buf)                                   const
+    template<typename STREAM, typename NODE, typename NODE_NEXT, typename... TAIL>
+    bool serialize_internal(STREAM& st)                                   const
     {
-        if(!this->NODE::serialize(buf))
+        if(!this->NODE::serialize(st))
         {
             return false;
         }
 
-        buf << ',';
+        st << ',';
 
-        return serialize_internal<BUFFER, NODE_NEXT, TAIL...>(buf);
+        return serialize_internal<STREAM, NODE_NEXT, TAIL...>(st);
     }
 
-    template<typename BUFFER, typename NODE>
-    bool serialize_internal(BUFFER& buf)                                   const
+    template<typename STREAM, typename NODE>
+    bool serialize_internal(STREAM& st)                                   const
     {
-        if(!this->NODE::serialize(buf))
+        if(!this->NODE::serialize(st))
         {
             return false;
         }
 
-        buf << '}';
+        st << '}';
 
         return true;
     }

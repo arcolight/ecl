@@ -6,6 +6,8 @@
 #include "request_parser.hpp"
 #include "response_composer.hpp"
 
+#include "stream"
+
 namespace ecl
 {
 

@@ -55,6 +55,10 @@ int main(int argc, char* argv[])
 
     bool  val1 = doc.f<name1>();
     bool& val2 = doc.f<name1>();
+    val2 = true;
+
+    std::cout << "val1: " << (val1 ? "true" : "false") << std::endl;
+    std::cout << "val2: " << (val2 ? "true" : "false") << std::endl;
 
     doc.f<level1>().f<name3>() = "name3 node";
     doc.f<name2>() = 0;
@@ -85,6 +89,8 @@ int main(int argc, char* argv[])
         std::cout << "doc<level1><level2><ar_item3>: " << i.f<ar_item3>() << std::endl;
     }
 
+    doc.f<name5>() = false;
+
     ecl::stream<512> st;
 
     std::cout << "Serialize result: " << (doc.serialize(st) ? "true" : "false") << std::endl;
@@ -92,7 +98,7 @@ int main(int argc, char* argv[])
     std::cout << st << std::endl;
     st << ecl::reset();
 
-    // constexpr auto md5_sum = ecl::md5("TEST_STRING");
+    // constexpr auto md5_sum = ecl::md5("TEST STRING");
 
     // std::cout << "MD5: ";
     // for(auto& c: md5_sum)

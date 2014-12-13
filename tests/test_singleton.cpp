@@ -2,8 +2,6 @@
 
 #include <ecl/singleton.hpp>
 
-#include "singleton_test_header.hpp"
-
 class test_class_1
 {
 public:
@@ -25,6 +23,20 @@ public:
 protected:
     test_class_2() {}
 };
+
+class test_class_ns
+{
+public:
+    void hello()                                                       const
+    {
+        std::cout << "test_class_ns at " << this << std::endl;
+    }
+
+protected:
+    test_class_ns() {};
+};
+
+typedef ecl::singleton<test_class_ns> test_class_ns_singleton;
 
 int main(int argc, char** argv)
 {

@@ -184,7 +184,7 @@ constexpr md5_type make_md5_result(uint32_t a, uint32_t b, uint32_t c, uint32_t 
 template<>
 struct md5_step<64, 0> 
 {
-    static constexpr md5_type do_step(const char *, uint32_t a, uint32_t b, uint32_t c, uint32_t d) 
+    static constexpr md5_type do_step(const char*, uint32_t a, uint32_t b, uint32_t c, uint32_t d) 
     {
         return make_md5_result(a + 0x67452301, b + 0xefcdab89, c + 0x98badcfe, d + 0x10325476);
     }
@@ -193,7 +193,7 @@ struct md5_step<64, 0>
 template<size_t n>
 struct md5_step<n, 3> 
 {
-    static constexpr md5_type do_step(const char *data, uint32_t a, uint32_t b, uint32_t c, uint32_t d) 
+    static constexpr md5_type do_step(const char* const data, uint32_t a, uint32_t b, uint32_t c, uint32_t d) 
     {
         return md5_step<n + 1, (n + 1) % 4>::do_step(data, a, step(md5_functions[n / 16], b, c, d, a, data32(data, md5_indexes[n]), md5_constants[n], md5_shift[n]), c, d);
     }
@@ -202,7 +202,7 @@ struct md5_step<n, 3>
 template<size_t n>
 struct md5_step<n, 2> 
 {
-    static constexpr md5_type do_step(const char *data, uint32_t a, uint32_t b, uint32_t c, uint32_t d) 
+    static constexpr md5_type do_step(const char* const data, uint32_t a, uint32_t b, uint32_t c, uint32_t d) 
     {
         return md5_step<n + 1, (n + 1) % 4>::do_step(data, a, b, step(md5_functions[n / 16], c, d, a, b, data32(data, md5_indexes[n]), md5_constants[n], md5_shift[n]), d);
     }
@@ -211,7 +211,7 @@ struct md5_step<n, 2>
 template<size_t n>
 struct md5_step<n, 1> 
 {
-    static constexpr md5_type do_step(const char *data, uint32_t a, uint32_t b, uint32_t c, uint32_t d) 
+    static constexpr md5_type do_step(const char* const data, uint32_t a, uint32_t b, uint32_t c, uint32_t d) 
     {
         return md5_step<n + 1, (n + 1) % 4>::do_step(data, a, b, c, step(md5_functions[n / 16], d, a, b, c, data32(data, md5_indexes[n]), md5_constants[n], md5_shift[n]));
     }
@@ -220,7 +220,7 @@ struct md5_step<n, 1>
 template<size_t n>
 struct md5_step<n, 0> 
 {
-    static constexpr md5_type do_step(const char *data, uint32_t a, uint32_t b, uint32_t c, uint32_t d) 
+    static constexpr md5_type do_step(const char* const data, uint32_t a, uint32_t b, uint32_t c, uint32_t d) 
     {
         return md5_step<n + 1, (n + 1) % 4>::do_step(data, step(md5_functions[n / 16], a, b, c, d, data32(data, md5_indexes[n]), md5_constants[n], md5_shift[n]), b, c, d);
     }
