@@ -1,4 +1,4 @@
-#include <ecl/log.hpp>
+#include <ecl/stream.hpp>
 
 #include <stdio.h>
 #include <string.h>
@@ -6,8 +6,7 @@
 #include <cstdlib>
 #include <cmath>
 #include <limits>
-
-#include "test_log.hpp"
+#include <iostream>
 
 using namespace ecl;
 
@@ -72,33 +71,41 @@ void out_nums(int8_t  i8,  uint8_t  u8,
               int32_t i32, uint32_t u32,
               int64_t i64, uint64_t u64)
 {
-    logger<2048, serial_out> l;
+    stream<2048> l;
 
-    l(lvl::info) << "[ LOG ]" << "\r\n" << end();
+    l << "[ LOG ]" << "\r\n" << end();
 
-    l(lvl::info)(base::b)(8)    << "Binary:"           << "\r\n" <<
+    l(base::b)(8)    << "Binary:"           << "\r\n" <<
     "int8_t:  " << i8  << " | " << "uint8_t:  " << u8  << "\r\n" <<
     "int16_t: " << i16 << " | " << "uint16_t: " << u16 << "\r\n" <<
     "int32_t: " << i32 << " | " << "uint32_t: " << u32 << "\r\n" <<
-    "int64_t: " << i64 << " | " << "uint64_t: " << u64 << "\r\n" << end();
+    "int64_t: " << i64 << " | " << "uint64_t: " << u64 << "\r\n";
+    std::cout << l << std::endl;
+    l << reset();
 
-    l(lvl::info)(base::o)(8)  << "Octal:"            << "\r\n" <<
+    l(base::o)(8)  << "Octal:"            << "\r\n" <<
     "int8_t:  " << i8  << " | " << "uint8_t:  " << u8  << "\r\n" <<
     "int16_t: " << i16 << " | " << "uint16_t: " << u16 << "\r\n" <<
     "int32_t: " << i32 << " | " << "uint32_t: " << u32 << "\r\n" <<
-    "int64_t: " << i64 << " | " << "uint64_t: " << u64 << "\r\n" << end();
+    "int64_t: " << i64 << " | " << "uint64_t: " << u64 << "\r\n";
+    std::cout << l << std::endl;
+    l << reset();
 
-    l(lvl::info)(base::d)(8)  << "Decimal:"          << "\r\n" <<
+    l(base::d)(8)  << "Decimal:"          << "\r\n" <<
     "int8_t:  " << i8  << " | " << "uint8_t:  " << u8  << "\r\n" <<
     "int16_t: " << i16 << " | " << "uint16_t: " << u16 << "\r\n" <<
     "int32_t: " << i32 << " | " << "uint32_t: " << u32 << "\r\n" <<
-    "int64_t: " << i64 << " | " << "uint64_t: " << u64 << "\r\n" << end();
+    "int64_t: " << i64 << " | " << "uint64_t: " << u64 << "\r\n";
+    std::cout << l << std::endl;
+    l << reset();
 
-    l(lvl::info)(base::h)(8)  << "Hex:"              << "\r\n" <<
+    l(base::h)(8)  << "Hex:"              << "\r\n" <<
     "int8_t:  " << i8  << " | " << "uint8_t:  " << u8  << "\r\n" <<
     "int16_t: " << i16 << " | " << "uint16_t: " << u16 << "\r\n" <<
     "int32_t: " << i32 << " | " << "uint32_t: " << u32 << "\r\n" <<
-    "int64_t: " << i64 << " | " << "uint64_t: " << u64 << "\r\n" << end();
+    "int64_t: " << i64 << " | " << "uint64_t: " << u64 << "\r\n";
+    std::cout << l << std::endl;
+    l << reset();
 }
 
 void printf_floats(float_t f, double_t d)
@@ -112,25 +119,28 @@ void printf_floats(float_t f, double_t d)
 
 void out_floats(float_t f, double_t d)
 {
-    logger<2048, serial_out> l;
+    stream<2048> l;
 
-    l(lvl::info)(8) << "[ LOG ]" << "\r\n" <<
+    l(8) << "[ LOG ]" << "\r\n" <<
     "float:  " << f << " | " << "double: " << d << "\r\n";
 
-    l(lvl::info)(6) << 
+    l(6) << 
     "float:  " << f << " | " << "double: " << d << "\r\n";
 
-    l(lvl::info)(4) << 
+    l(4) << 
     "float:  " << f << " | " << "double: " << d << "\r\n";
 
-    l << end();
+    std::cout << l << std::endl;
+    l << reset();
 }
 
 void out_bool_char(bool b, char c)
 {
-    logger<32, serial_out> l;
+    stream<32> l;
 
-    l << "bool: " << b << " | " << "char: " << c << "\r\n" << end();
+    l << "bool: " << b << " | " << "char: " << c << "\r\n";
+    std::cout << l << std::endl;
+    l << reset();
 }
 
 int main(int argc, char** argv)

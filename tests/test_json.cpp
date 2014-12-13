@@ -1,6 +1,8 @@
 #include <iostream>
 
 #include <ecl/json.hpp>
+#include <ecl/stream.hpp>
+#include <ecl/constexpr_md5.hpp>
 
 struct name1    { constexpr static const char* name() { return "name1"; } };
 struct name2    { constexpr static const char* name() { return "name2"; } };
@@ -36,8 +38,6 @@ typedef object<
     node<name5, bool>
 > document_t;
 
-static uint8_t buffer[2048];
-
 struct serial_out
 {
     static bool print(const char* const string) {
@@ -50,11 +50,6 @@ int main(int argc, char* argv[])
 {
     (void)argc;
     (void)argv;
-
-    for(auto& c : buffer)
-    {
-        c = 0x00;
-    }
 
     document_t doc;
 
@@ -90,13 +85,21 @@ int main(int argc, char* argv[])
         std::cout << "doc<level1><level2><ar_item3>: " << i.f<ar_item3>() << std::endl;
     }
 
-    ecl::logger<128, serial_out> log;
+    ecl::stream<512> st;
 
-    bool result = doc.serialize(log);
-    std::cout << "Serialize result: " << (result ? "true" : "false") << std::endl;
-    log << ecl::end();
+    std::cout << "Serialize result: " << (doc.serialize(st) ? "true" : "false") << std::endl;
+    std::cout << "Serialized count: " << st.count() << std::endl;
+    std::cout << st << std::endl;
+    st << ecl::reset();
 
-    // std::cout << "Serialized: " << (char*)buffer << std::endl;
+    // constexpr auto md5_sum = ecl::md5("TEST_STRING");
+
+    // std::cout << "MD5: ";
+    // for(auto& c: md5_sum)
+    // {
+    //     std::cout << std::hex << c;
+    // }
+    // std::cout << std::endl;
 
     return 0;
 }

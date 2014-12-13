@@ -8,41 +8,13 @@ namespace web
 
 enum version
 {
-    HTTP10 = 0,
+    HTTP10        = 0,
     HTTP11,
-    HTTP20
+    HTTP20,
+    VERSION_COUNT
 };
 
-template<typename K, typename V>
-struct map_entry
-{
-    typedef K key_t;
-    typedef V value_t;
-
-    key_t   k;
-    value_t v;
-};
-
-template<typename E>
-struct static_map
-{
-    typedef E entry_t;
-
-    template<std::size_t N>
-    constexpr static_map(const entry_t(&a)[N]) : 
-        map(a)
-        {
-
-        }
-
-    entry_t map[];
-};
-
-// template<typename MAP>
-// typename MAP::value_t
-
-/*constexpr static map_entry<version, const char* const> version_map[] = */
-constexpr static static_map<map_entry<version, const char* const> > map = 
+std::array<VERSION_COUNT>
 {
     {
         { HTTP10, "HTTP/1.0" },

@@ -8,60 +8,11 @@
 #include <cstring>
 #include <cstdio>
 
-#include "log.hpp"
-
 namespace ecl
 {
 
 namespace json
 {
-
-// bool serialize_val(const char& val, uint8_t* buf, size_t sz, uintptr_t& offset)
-// {
-//     if(sz == 0)
-//     {
-//         return false;
-//     }
-
-//     *buf = val;
-//     offset += 1;
-//     return true;
-// }
-
-// bool serialize_val(const char* const val, uint8_t* buf, size_t sz, uintptr_t& offset)
-// {
-//     size_t len = strlen(val);
-//     printf("val: %s | len: %u\r\n", val, len);
-//     if(len > sz)
-//     {
-//         return false;
-//     }
-
-//     snprintf((char*)buf, len + 1, val);
-//     printf("%s\r\n", buf);
-//     offset += len;
-//     printf("offset: %u\n\r", offset);
-
-//     return true;
-// }
-
-// bool serialize_val(const bool& val, uint8_t* buf, size_t sz, uintptr_t& offset)
-// {
-//     if(val)
-//     {
-//         return serialize_val("true", buf, sz, offset);
-//     }
-//     else
-//     {
-//         return serialize_val("false", buf, sz, offset);
-//     }
-// }
-
-// template<typename T>
-// bool serialize_val(const T& val, uint8_t* buf, size_t sz, uintptr_t& offset)
-// {
-//     return true;
-// }
 
 template<typename NAME, typename T>
 class node

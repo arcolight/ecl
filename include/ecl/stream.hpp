@@ -1,5 +1,5 @@
-#ifndef ECL_LOG_HPP
-#define ECL_LOG_HPP
+#ifndef ECL_STREAM_HPP
+#define ECL_STREAM_HPP
 
 #include <cstdlib>
 #include <cstdint>
@@ -33,18 +33,6 @@ typedef enum class alpha_case {
     upper
 } cs;
 
-// level
-enum class lvl {
-    critical,
-    error,
-    warning,
-    info,
-    debug
-};
-
-struct end {};
-struct reset {};
-
 typedef struct width
 {
     width(size_t w) : m_w(w) {}
@@ -52,93 +40,86 @@ typedef struct width
     size_t m_w;
 } wd;
 
-template<size_t BUFFER_SIZE, typename... OUT>
-class logger{
+struct end {};
+struct reset {};
+
+template<size_t BUFFER_SIZE>
+class stream{
 public:
-    explicit logger(const base  def_base = base::d,
-                   const align  def_align = align::l,
-                   const size_t def_width = 8,
-                   const lvl    def_level = lvl::info) : 
+    explicit stream(const base   def_base = base::d,
+                    const align  def_align = align::l,
+                    const size_t def_width = 8) : 
         m_def_base(def_base),
         m_def_align(def_align),
-        m_def_width(def_width),
-        m_def_level(def_level)
+        m_def_width(def_width)
     {
         reset();
     }
 
-    logger& operator() (const lvl& l)
-    {
-        m_level = l;
-        return *this;
-    }
-
-    logger& operator() (const base& b)
+    stream& operator() (const base& b)
     {
         m_base = b;
         return *this;
     }
 
-    logger& operator() (const align& a)
+    stream& operator() (const align& a)
     {
         m_align = a;
         return *this;
     }
 
-    logger& operator() (const size_t w)
+    stream& operator() (const size_t w)
     {
         m_width = w;
         return *this;
     }
 
-    logger& operator() (const cs& c)
+    stream& operator() (const cs& c)
     {
         m_case = c;
         return *this;
     }
 
-    logger& operator() (const width& w)
+    stream& operator() (const width& w)
     {
         m_width = w.m_w;
         return *this;
     }
 
-    logger& operator<< (const width& w)
+    stream& operator<< (const width& w)
     {
         m_width = w.m_w;
         return *this;
     }
 
-    logger& operator<< (const base& b)
+    stream& operator<< (const base& b)
     {
         m_base = b;
         return *this;
     }
 
-    logger& operator<< (const align& a)
+    stream& operator<< (const align& a)
     {
         m_align = a;
         return *this;
     }
 
-    logger& operator<< (const reset& r)
+    stream& operator<< (const reset& r)
     {
         (void)(r);
         reset();
+        return *this;
     }
 
-    logger& operator<< (const end& end)
+    stream& operator<< (const end& end)
     {
         (void)(end);
-        out_all();
-
         reset();
-
         return *this;
     }
 
     template<typename T>
-    logger& operator<< (const T& val)
+    stream& operator<< (const T& val)
     {
         print_val(val);
         return *this;
@@ -146,25 +127,31 @@ public:
 
     operator const char* ()                                                const
     {
-        return m_buf;
+        return (const char*)m_buf;
     }
 
     operator const char* ()
     {
-        return m_buf;
+        return (const char*)m_buf;
+    }
+
+    size_t count()                                                         const
+    {
+        return m_count;
     }
 
     constexpr static size_t m_s_size { BUFFER_SIZE };
 
 private:
-    logger(const logger& other)                                        = delete;
-    logger& operator= (const logger& other)                            = delete;
-    logger(const logger&& other)                                       = delete;
-    logger& operator= (const logger&& other)                           = delete;
+    stream(const stream& other)                                        = delete;
+    stream& operator= (const stream& other)                            = delete;
+    stream(const stream&& other)                                       = delete;
+    stream& operator= (const stream&& other)                           = delete;
 
     void reset()
     {
-        for(auto &c: m_buf) {
+        for(auto &c: m_buf) 
+        {
             c = 0;
         }
 
@@ -173,22 +160,26 @@ private:
         m_base =  m_def_base;
         m_align = m_def_align;
         m_width = m_def_width;
-        m_level = m_def_level;
     }
 
     template<typename T>
     void print_num_signed(const T& val)
     {
-        if(val < 0) {
-            if(base::d == m_base) {
+        if(val < 0) 
+        {
+            if(base::d == m_base) 
+            {
                 print_val('-');
                 print_num_unsigned(-val);
-            } else {
+            }
+            else
+            {
                 typename std::make_unsigned<T>::type uval = val;
-                // typename signed_to_unsigned<T>::type uval = val;
                 print_num_unsigned(uval);
             }
-        } else {
+        }
+        else
+        {
             print_num_unsigned(val);
         }
     }
@@ -198,7 +189,8 @@ private:
     {
         T tmp = val;
 
-        for(auto &c : m_num_buf) {
+        for(auto &c : m_num_buf) 
+        {
             c = 0;
         }
 
@@ -228,7 +220,8 @@ private:
             ++p;
         } while(0 != tmp);
 
-        for(uint8_t i = 0; i < (p / 2); ++i) {
+        for(uint8_t i = 0; i < (p / 2); ++i) 
+        {
             char t = m_num_buf[p - i - 1];
             m_num_buf[p - i - 1] = m_num_buf[i];
             m_num_buf[i] = t;
@@ -289,9 +282,12 @@ private:
 
     void print_val(const bool& val)
     {
-        if(val) {
+        if(val) 
+        {
             print_val("true");
-        } else {
+        }
+        else 
+        {
             print_val("false");
         }
     }
@@ -310,7 +306,8 @@ private:
             v = val;
         }
         size_t i = 0;
-        for(i = 0; (v[i] != 0) && (m_count < BUFFER_SIZE); ++i) {
+        for(i = 0; (v[i] != 0) && (m_count < BUFFER_SIZE); ++i) 
+        {
             m_buf[m_count] = v[i];
             ++m_count;
         }
@@ -325,15 +322,18 @@ private:
         T f = 0.0;
         f = std::modf(val, &i);
 
-        if((i < 0.0) || (f < 0.0)) {
+        if((i < 0.0) || (f < 0.0)) 
+        {
             print_val('-');
         }
 
-        if(i < 0.0) {
+        if(i < 0.0) 
+        {
             i = -i;
         }
 
-        if(f < 0.0) {
+        if(f < 0.0) 
+        {
             f = -f;
         }
 
@@ -348,45 +348,23 @@ private:
         T::print(*this, val); // custom types should support print function
     }
 
-    void out_all()                                                         const
-    {
-        out<0, OUT...>();
-    }
-
-    template<size_t COUNT, typename O, typename... TAIL>
-    bool out()                                                             const
-    {
-        bool res_self = O::print(m_buf);
-        bool res_tail = out<COUNT + 1, TAIL...>();
-        return res_self && res_tail;
-    }
-
-    template<size_t COUNT>
-    bool out()                                                             const
-    {
-        static_assert((COUNT == sizeof...(OUT)), "Out count missmatch!");
-        return true;
-    }
-
     // can be used for all bases till 16.
     const char* m_alphabet = R"(0123456789abcdef)";
 
     char         m_num_buf[66]; // (u)int64_t in binary mode takes 64 characters 
-    char         m_buf[BUFFER_SIZE];
+    uint8_t      m_buf[BUFFER_SIZE];
     size_t       m_count;
 
     const base   m_def_base;
     const align  m_def_align;
     const size_t m_def_width;
-    const lvl    m_def_level;
 
     base         m_base;
     align        m_align;
     size_t       m_width;
-    lvl          m_level;
     cs           m_case;
 };
 
 } // namespace ecl
 
-#endif // ECL_LOG_HPP
+#endif // ECL_STREAM_HPP
