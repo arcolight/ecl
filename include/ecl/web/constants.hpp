@@ -18,7 +18,7 @@ enum version
 
 typedef std::map<version, const char*> version_map_t;
 
-version_map_t version_map = {
+const version_map_t version_map = {
     { HTTP10, "HTTP/1.0" },
     { HTTP11, "HTTP/1.1" },
     { HTTP20, "HTTP/2.0" }
@@ -56,30 +56,30 @@ enum status_code
 
 typedef std::map<status_code, const char*> status_code_map_t;
 
-status_code_map_t status_code_map = {
+const status_code_map_t status_code_map = {
     { CONTINUE,                   "CONTINUE"                   },
-    { SWITCHING_PROTO,            "SWITCHING_PROTO"            },
+    { SWITCHING_PROTO,            "SWITCHING PROTO"            },
     { OK,                         "OK"                         },
     { CREATED,                    "CREATED"                    },
     { ACCEPTED,                   "ACCEPTED"                   },
-    { NO_CONTENT,                 "NO_CONTENT"                 },
-    { RESET_CONTENT,              "RESET_CONTENT"              },
-    { PARTIAL_CONTENT,            "PARTIAL_CONTENT"            },
-    { BAD_REQUEST,                "BAD_REQUEST"                },
+    { NO_CONTENT,                 "NO CONTENT"                 },
+    { RESET_CONTENT,              "RESET CONTENT"              },
+    { PARTIAL_CONTENT,            "PARTIAL CONTENT"            },
+    { BAD_REQUEST,                "BAD REQUEST"                },
     { UNAUTHORIZED,               "UNAUTHORIZED"               },
-    { PAYMENT_REQUIRED,           "PAYMENT_REQUIRED"           },
+    { PAYMENT_REQUIRED,           "PAYMENT REQUIRED"           },
     { FORBIDDEN,                  "FORBIDDEN"                  },
-    { NOT_FOUND,                  "NOT_FOUND"                  },
-    { METHOD_NOT_ALLOWED,         "METHOD_NOT_ALLOWED"         },
-    { NOT_ACCEPTABLE,             "NOT_ACCEPTABLE"             },
-    { REQUEST_TIMEOUT,            "REQUEST_TIMEOUT"            },
+    { NOT_FOUND,                  "NOT FOUND"                  },
+    { METHOD_NOT_ALLOWED,         "METHOD NOT ALLOWED"         },
+    { NOT_ACCEPTABLE,             "NOT ACCEPTABLE"             },
+    { REQUEST_TIMEOUT,            "REQUEST TIMEOUT"            },
     { CONFLICT,                   "CONFLICT"                   },
-    { INTERNAL_SERVER_ERROR,      "INTERNAL_SERVER_ERROR"      },
-    { NOT_IMPLEMENTED,            "NOT_IMPLEMENTED"            },
-    { BAD_GATEWAY,                "BAD_GATEWAY"                },
-    { SERVICE_UNAVAILABLE,        "SERVICE_UNAVAILABLE"        },
-    { GATEWAY_TIMEOUT,            "GATEWAY_TIMEOUT"            },
-    { HTTP_VERSION_NOT_SUPPORTED, "HTTP_VERSION_NOT_SUPPORTED" }
+    { INTERNAL_SERVER_ERROR,      "INTERNAL SERVER ERROR"      },
+    { NOT_IMPLEMENTED,            "NOT IMPLEMENTED"            },
+    { BAD_GATEWAY,                "BAD GATEWAY"                },
+    { SERVICE_UNAVAILABLE,        "SERVICE UNAVAILABLE"        },
+    { GATEWAY_TIMEOUT,            "GATEWAY TIMEOUT"            },
+    { HTTP_VERSION_NOT_SUPPORTED, "HTTP VERSION NOT SUPPORTED" }
 };
 
 enum method
@@ -90,7 +90,7 @@ enum method
 
 typedef std::map<method, const char*> method_map_t;
 
-method_map_t method_map = {
+const method_map_t method_map = {
     { GET,  "GET"  },
     { POST, "POST" }
 };
