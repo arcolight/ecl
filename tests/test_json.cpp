@@ -38,14 +38,6 @@ typedef object<
     node<name5, bool>
 > document_t;
 
-struct serial_out
-{
-    static bool print(const char* const string) {
-        puts((const char* const)string);
-        return true;
-    }
-};
-
 int main(int argc, char* argv[])
 {
     (void)argc;
@@ -93,7 +85,8 @@ int main(int argc, char* argv[])
 
     ecl::stream<512> st;
 
-    std::cout << "Serialize result: " << (doc.serialize(st) ? "true" : "false") << std::endl;
+    doc.serialize(st);
+
     std::cout << "Serialized count: " << st.count() << std::endl;
     std::cout << st << std::endl;
     st << ecl::reset();

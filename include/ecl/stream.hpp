@@ -43,7 +43,9 @@ typedef struct width
 struct end {};
 struct reset {};
 
-template<size_t BUFFER_SIZE>
+typedef void(*flush_function_t)(void);
+
+template<size_t BUFFER_SIZE, flush_function_t* FLUSH_F_PTR = nullptr>
 class stream{
 public:
     explicit stream(const base   def_base = base::d,
@@ -308,6 +310,13 @@ private:
         size_t i = 0;
         for(i = 0; (v[i] != 0) && (m_count < BUFFER_SIZE); ++i) 
         {
+            if(m_count == BUFFER_SIZE - 1)
+            {
+                if(nullptr != FLUSH_F_PTR)
+                {
+                    FLUSH_F_PTR(m_buf);
+                }
+            }
             m_buf[m_count] = v[i];
             ++m_count;
         }

@@ -22,26 +22,24 @@ protected:
     typedef NAME name_t;
 
     template<typename STREAM>
-    bool serialize(STREAM& st)                                            const
+    void serialize(STREAM& st)                                             const
     {
         stringify(st, NAME::name());
         st << ':';
         stringify(st, m_val);
-
-        return true;
     }
 
     value_t m_val;
 
 private:
     template<typename STREAM, typename V_T>
-    void stringify(STREAM& st, const V_T& val)                            const
+    void stringify(STREAM& st, const V_T& val)                             const
     {
         st << val;        
     }
 
     template<typename STREAM>
-    void stringify(STREAM& st, const char* val)                           const
+    void stringify(STREAM& st, const char* val)                            const
     {
         st << "\"" << val << "\"";
     }
@@ -54,19 +52,14 @@ private:
     typedef std::array<OBJ, COUNT> array_t;
 protected:
     template<typename STREAM>
-    bool serialize(STREAM& st)                                            const
+    void serialize(STREAM& st)                                             const
     {
         st << '[';
 
-        bool result = true;
 
         for(size_t i = 0; i < COUNT; ++i)
         {
-            bool res_o = m_val[i].serialize(st);
-            if(!res_o)
-            {
-                result = false;
-            }
+            m_val[i].serialize(st);
 
             if(i != COUNT - 1)
             {
@@ -75,8 +68,6 @@ protected:
         }
 
         st << ']';
-
-        return result;
     }
 
 public:
@@ -195,6 +186,11 @@ private:
     };
 
 public:
+    static size_t serialized_size()
+    {
+        return size_internal(0);
+    }
+
     template<typename STREAM, typename T>
     static void print(STREAM& st, const T& val)
     {
@@ -202,11 +198,11 @@ public:
     }
 
     template<typename STREAM>
-    bool serialize(STREAM& st)                                            const
+    void serialize(STREAM& st)                                             const
     {
         st << '{';
 
-        return serialize_internal<STREAM, NODES...>(st);
+        serialize_internal<STREAM, NODES...>(st);
     }
 
     template<typename NAME>
@@ -216,30 +212,28 @@ public:
     }
 
 private:
-    template<typename STREAM, typename NODE, typename NODE_NEXT, typename... TAIL>
-    bool serialize_internal(STREAM& st)                                   const
+    template<size_t SIZE, typename NODE, typename NODE_NEXT, typename... TAIL>
+    static size_t size_internal(size_t current)
     {
-        if(!this->NODE::serialize(st))
-        {
-            return false;
-        }
+        return size_internal<NODE_NEXT, TAIL...>(current + NODE::size() + 1);
+    }
+
+    template<typename STREAM, typename NODE, typename NODE_NEXT, typename... TAIL>
+    void serialize_internal(STREAM& st)                                    const
+    {
+        this->NODE::serialize(st);
 
         st << ',';
 
-        return serialize_internal<STREAM, NODE_NEXT, TAIL...>(st);
+        serialize_internal<STREAM, NODE_NEXT, TAIL...>(st);
     }
 
     template<typename STREAM, typename NODE>
-    bool serialize_internal(STREAM& st)                                   const
+    void serialize_internal(STREAM& st)                                    const
     {
-        if(!this->NODE::serialize(st))
-        {
-            return false;
-        }
+        this->NODE::serialize(st);
 
         st << '}';
-
-        return true;
     }
 };
 
