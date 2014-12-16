@@ -8,6 +8,8 @@
 #include <cstring>
 #include <cstdio>
 
+#include "str_const.hpp"
+
 namespace ecl
 {
 
@@ -27,6 +29,11 @@ protected:
         stringify(st, NAME::name());
         st << ':';
         stringify(st, m_val);
+    }
+
+    constexpr static size_t size()
+    {
+        return 1 + (2 + strlen(NAME::name()));
     }
 
     value_t m_val;
@@ -68,6 +75,11 @@ protected:
         }
 
         st << ']';
+    }
+
+    constexpr static size_t size()
+    {
+        return 2 + OBJ::size() * COUNT + (COUNT - 1);
     }
 
 public:
@@ -186,9 +198,15 @@ private:
     };
 
 public:
-    static size_t serialized_size()
+    template<typename NAME>
+    typename std::tuple_element<0, typename filter<name_predicate, NAME, std::tuple, NODES...>::type>::type::value_t& f()
     {
-        return size_internal(0);
+        return this->std::tuple_element<0, typename filter<name_predicate, NAME, std::tuple, NODES...>::type>::type::m_val;
+    }
+
+    constexpr static size_t size()
+    {
+        return size_<NODES...>(1);
     }
 
     template<typename STREAM, typename T>
@@ -205,17 +223,17 @@ public:
         serialize_internal<STREAM, NODES...>(st);
     }
 
-    template<typename NAME>
-    typename std::tuple_element<0, typename filter<name_predicate, NAME, std::tuple, NODES...>::type>::type::value_t& f()
+private:
+    template<typename NODE, typename NODE_NEXT, typename... TAIL>
+    constexpr static size_t size_(size_t current)
     {
-        return this->std::tuple_element<0, typename filter<name_predicate, NAME, std::tuple, NODES...>::type>::type::m_val;
+        return size_<NODE_NEXT, TAIL...>(current + NODE::size() + 1);
     }
 
-private:
-    template<size_t SIZE, typename NODE, typename NODE_NEXT, typename... TAIL>
-    static size_t size_internal(size_t current)
+    template<typename NODE>
+    constexpr static size_t size_(size_t current)
     {
-        return size_internal<NODE_NEXT, TAIL...>(current + NODE::size() + 1);
+        return current + NODE::size() + 1;
     }
 
     template<typename STREAM, typename NODE, typename NODE_NEXT, typename... TAIL>

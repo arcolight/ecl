@@ -83,7 +83,9 @@ int main(int argc, char* argv[])
 
     doc.f<name5>() = false;
 
-    ecl::stream<512> st;
+    std::cout << "doc size: " << document_t::size() << std::endl;
+
+    ecl::stream<document_t::size()> st;
 
     doc.serialize(st);
 

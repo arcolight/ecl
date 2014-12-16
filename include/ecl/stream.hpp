@@ -43,9 +43,9 @@ typedef struct width
 struct end {};
 struct reset {};
 
-typedef void(*flush_function_t)(void);
+typedef void(*flush_function_t)(const char* const buf);
 
-template<size_t BUFFER_SIZE, flush_function_t* FLUSH_F_PTR = nullptr>
+template<size_t BUFFER_SIZE, flush_function_t FLUSH_F_PTR = nullptr>
 class stream{
 public:
     explicit stream(const base   def_base = base::d,
@@ -314,7 +314,7 @@ private:
             {
                 if(nullptr != FLUSH_F_PTR)
                 {
-                    FLUSH_F_PTR(m_buf);
+                    FLUSH_F_PTR((const char*)m_buf);
                 }
             }
             m_buf[m_count] = v[i];
