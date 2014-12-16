@@ -19,6 +19,9 @@ namespace json
 template<typename NAME, typename T>
 class node
 {
+public:
+    constexpr node() {}
+
 protected:
     typedef T    value_t;
     typedef NAME name_t;
@@ -55,6 +58,9 @@ private:
 template<typename OBJ, size_t COUNT>
 class array
 {
+public:
+    constexpr array() {}
+
 private:
     typedef std::array<OBJ, COUNT> array_t;
 protected:
@@ -198,6 +204,8 @@ private:
     };
 
 public:
+    constexpr object() {}
+
     template<typename NAME>
     typename std::tuple_element<0, typename filter<name_predicate, NAME, std::tuple, NODES...>::type>::type::value_t& f()
     {
@@ -206,7 +214,7 @@ public:
 
     constexpr static size_t size()
     {
-        return size_<NODES...>(1);
+        return size_<1, NODES...>();
     }
 
     template<typename STREAM, typename T>
@@ -224,16 +232,16 @@ public:
     }
 
 private:
-    template<typename NODE, typename NODE_NEXT, typename... TAIL>
-    constexpr static size_t size_(size_t current)
+    template<size_t SIZE, typename NODE, typename NODE_NEXT, typename... TAIL>
+    constexpr static size_t size_()
     {
-        return size_<NODE_NEXT, TAIL...>(current + NODE::size() + 1);
+        return size_<SIZE + NODE::size() + 1, NODE_NEXT, TAIL...>();
     }
 
-    template<typename NODE>
-    constexpr static size_t size_(size_t current)
+    template<size_t SIZE, typename NODE>
+    constexpr static size_t size_()
     {
-        return current + NODE::size() + 1;
+        return SIZE + NODE::size() + 1;
     }
 
     template<typename STREAM, typename NODE, typename NODE_NEXT, typename... TAIL>
