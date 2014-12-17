@@ -37,7 +37,6 @@ public:
             write_status(status_code::BAD_REQUEST);
         }
 
-
         m_stream.flush();
     }
 

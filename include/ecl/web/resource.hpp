@@ -5,9 +5,8 @@
 
 #include <algorithm>
 
+#include <ecl/sized_data.h>
 #include "constants.hpp"
-
-// #include "ecl/str_const.hpp"
 
 namespace ecl
 {
@@ -32,7 +31,8 @@ public:
         status_code code = status_code::OK;
 
         stream << (uint16_t)code << " " << constants::get_status_code(code) << "\r\n";
-        stream << DATA << "\r\n";
+        const sized_data sd { (uint8_t* const)DATA, SIZE };
+        stream << sd << "\r\n";
     }
 };
 

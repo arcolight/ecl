@@ -8,6 +8,8 @@
 
 #include <type_traits>
 
+#include "sized_data.h"
+
 namespace ecl
 {
 
@@ -117,6 +119,12 @@ public:
     {
         (void)(end);
         reset();
+        return *this;
+    }
+
+    stream& operator<< (const sized_data& d)
+    {
+        print_binary(d.ptr, d.size);
         return *this;
     }
 
@@ -315,23 +323,37 @@ private:
 
     void print_val(const char* const val)
     {
-        const char* v = "null";
-        if(nullptr != val)
+        if(nullptr == val)
         {
-            v = val;
+            return;
         }
-        size_t i = 0;
-        for(i = 0; (v[i] != 0) && (m_count < BUFFER_SIZE); ++i) 
+
+        for(size_t i = 0; (val[i] != 0) && (m_count < BUFFER_SIZE + 1); ++i) 
         {
-            if(m_count == BUFFER_SIZE - 1)
+            if(m_count == BUFFER_SIZE)
             {
                 flush();
             }
-            m_buf[m_count] = v[i];
+
+            m_buf[m_count] = val[i];
             ++m_count;
         }
 
-        m_buf[BUFFER_SIZE - 1] = 0;
+        m_buf[BUFFER_SIZE] = 0;
+    }
+
+    void print_binary(const uint8_t* const data, size_t size)
+    {
+        for(size_t i = 0; i < size; ++i)
+        {
+            if(m_count == BUFFER_SIZE)
+            {
+                flush();
+            }
+
+            m_buf[m_count] = data[i];
+            ++m_count;
+        }
     }
 
     template<typename T>
@@ -371,7 +393,7 @@ private:
     const char* m_alphabet = R"(0123456789abcdef)";
 
     char         m_num_buf[66]; // (u)int64_t in binary mode takes 64 characters 
-    uint8_t      m_buf[BUFFER_SIZE];
+    uint8_t      m_buf[BUFFER_SIZE + 1];
     size_t       m_count;
 
     const base   m_def_base;
