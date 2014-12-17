@@ -92,14 +92,5 @@ int main(int argc, char* argv[])
     std::cout << st << std::endl;
     st << ecl::reset();
 
-    // constexpr auto md5_sum = ecl::md5("TEST STRING");
-
-    // std::cout << "MD5: ";
-    // for(auto& c: md5_sum)
-    // {
-    //     std::cout << std::hex << c;
-    // }
-    // std::cout << std::endl;
-
     return 0;
 }

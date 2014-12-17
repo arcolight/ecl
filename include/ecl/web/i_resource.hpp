@@ -10,12 +10,13 @@ namespace ecl
 namespace web
 {
 
+typedef size_t (*write_function)(const uint8_t* buf, size_t size);
+
 class i_resource
 {
 public:
     virtual ~i_resource() {}
-    virtual status_code exec(uint8_t* out_buf, 
-                             size_t size,
+    virtual status_code exec(write_function f,
                              int argc,
                              const uint8_t** const argv)              const = 0;
 };

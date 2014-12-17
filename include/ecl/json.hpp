@@ -82,7 +82,7 @@ protected:
         return 1 + (2 + NAME::size() + val_size<value_t>::size());
     }
 
-    value_t m_val;
+    value_t m_val { };
 
 private:
     template<typename STREAM, typename V_T>

@@ -8,6 +8,8 @@
 
 #include "i_resource.hpp"
 
+#include <ecl/stream.hpp>
+
 // #include "ecl/str_const.hpp"
 
 namespace ecl
@@ -29,8 +31,7 @@ public:
         return NAME::name();
     }
 
-    virtual status_code exec(uint8_t* out_buf, 
-                             size_t size,
+    virtual status_code exec(write_function f,
                              int argc,
                              const uint8_t** const argv)          const override
     {
