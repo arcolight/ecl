@@ -144,10 +144,14 @@ public:
 
     void flush()
     {
+        // For GCC 4.7. We can pass nullptr to stream. Check is needed.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Waddress"
         if(nullptr != FLUSH_F_PTR)
         {
             FLUSH_F_PTR((const char*)m_buf, m_count);
         }
+#pragma GCC diagnostic pop
         reset();
     }
 

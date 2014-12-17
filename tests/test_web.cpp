@@ -14,7 +14,8 @@
 
 char FULL_REQUEST[] = "GET /etc/fs/jquery.js HTTP/1.1\r\nHeader 1: 1\r\nHeader 2: 2\r\nHeader 3: 3\r\nHeader 4: 4\r\nHeader 5: 5\r\nHeader 6: 6\r\n\r\nBODY_BODY\r\n\r\n";
 
-constexpr uint8_t res1_data[] = { 'S','T','A','T','I','C',' ','R','E','S','O','U','R','C','E','\0' };
+constexpr uint8_t res1_data[] = "STATIC RESOURCE 1";
+constexpr uint8_t jquery_data[] = "JQuery here. :)";
 
 ECL_DECL_NAME_TYPE_STRING(res1,   "RES1")
 ECL_DECL_NAME_TYPE_STRING(res2,   "RES2")
@@ -48,7 +49,7 @@ typedef ecl::web::server<
             1024,
             ecl::web::resource_table<
                 ecl::web::resource<res1_data, sizeof(res1_data), res1>,
-                ecl::web::resource<res1_data, sizeof(res1_data), jquery>,
+                ecl::web::resource<jquery_data, sizeof(jquery_data), jquery>,
                 test_cgi<res2>
             >,
             write_stdout

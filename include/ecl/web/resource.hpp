@@ -32,7 +32,7 @@ public:
         status_code code = status_code::OK;
 
         stream << (uint16_t)code << " " << constants::get_status_code(code) << "\r\n";
-        stream << (const char*)DATA << "\r\n";
+        stream << (const char* const)DATA << "\r\n";
     }
 };
 
