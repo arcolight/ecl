@@ -15,9 +15,9 @@ namespace ecl
 namespace web 
 {
 
-template<const uint8_t* const DATA,
-         size_t               SIZE,
-         typename             NAME>
+template<const char* DATA,
+         size_t      SIZE,
+         typename    NAME>
 class resource
 {
 public:
@@ -32,7 +32,7 @@ public:
         status_code code = status_code::OK;
 
         stream << (uint16_t)code << " " << constants::get_status_code(code) << "\r\n";
-        stream << (const char* const)DATA << "\r\n";
+        stream << DATA << "\r\n";
     }
 };
 

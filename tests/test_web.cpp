@@ -12,14 +12,15 @@
 #include <ecl/str_const.hpp>
 #include <ecl/name_type.hpp>
 
-char FULL_REQUEST[] = "GET /etc/fs/jquery.js HTTP/1.1\r\nHeader 1: 1\r\nHeader 2: 2\r\nHeader 3: 3\r\nHeader 4: 4\r\nHeader 5: 5\r\nHeader 6: 6\r\n\r\nBODY_BODY\r\n\r\n";
+#include "web_resources/index.h"
+#include "web_resources/style.h"
+#include "web_resources/jquery.h"
 
-constexpr uint8_t res1_data[] = "STATIC RESOURCE 1";
-constexpr uint8_t jquery_data[] = "JQuery here. :)";
+char FULL_REQUEST[] = "GET etc/js/jquery.js HTTP/1.1\r\nHeader 1: 1\r\nHeader 2: 2\r\nHeader 3: 3\r\nHeader 4: 4\r\nHeader 5: 5\r\nHeader 6: 6\r\n\r\nBODY_BODY\r\n\r\n";
 
-ECL_DECL_NAME_TYPE_STRING(res1,   "RES1")
-ECL_DECL_NAME_TYPE_STRING(res2,   "RES2")
-ECL_DECL_NAME_TYPE_STRING(jquery, "/etc/fs/jquery.js")
+ECL_DECL_NAME_TYPE_STRING(index_name,  "index.htm")
+ECL_DECL_NAME_TYPE_STRING(style_name,  "etc/style.css")
+ECL_DECL_NAME_TYPE_STRING(jquery_name, "etc/js/jquery.js")
 
 void write_stdout(const char* const buf, size_t size)
 {
@@ -48,9 +49,9 @@ public:
 typedef ecl::web::server<
             1024,
             ecl::web::resource_table<
-                ecl::web::resource<res1_data, sizeof(res1_data), res1>,
-                ecl::web::resource<jquery_data, sizeof(jquery_data), jquery>,
-                test_cgi<res2>
+                ecl::web::resource<index_htm, index_htm_len, index_name>,
+                ecl::web::resource<style_css, style_css_len, style_name>,
+                ecl::web::resource<jquery_js, jquery_js_len, jquery_name>
             >,
             write_stdout
 > server_t;
