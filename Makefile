@@ -1,5 +1,5 @@
 GCC_SPECIFIC = -fstack-check -fbounds-check -ggdb
-ARM_LD_FLAGS = --specs=nano.specs -lnano
+ARM_LD_FLAGS = --specs=rdimon.specs -lrdimon
 OPTIMIZATION = -O2
 DEBUG = -g3
 SECURE = -D_FORTIFY_SOURCE=2 -ftrapv -Wformat-security -fPIE -Wl,-z,relro,-z,now
