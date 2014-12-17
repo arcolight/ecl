@@ -2,18 +2,19 @@
 
 #include <ecl/json.hpp>
 #include <ecl/stream.hpp>
+#include <ecl/name_type.hpp>
 
-ECL_JSON_DECL_NAME(name1)
-ECL_JSON_DECL_NAME(name2)
-ECL_JSON_DECL_NAME(name3)
-ECL_JSON_DECL_NAME(name4)
-ECL_JSON_DECL_NAME(name5)
-ECL_JSON_DECL_NAME(level1)
-ECL_JSON_DECL_NAME(level2)
-ECL_JSON_DECL_NAME(level3)
-ECL_JSON_DECL_NAME(ar_item1)
-ECL_JSON_DECL_NAME(ar_item2)
-ECL_JSON_DECL_NAME(ar_item3)
+ECL_DECL_NAME_TYPE(name1)
+ECL_DECL_NAME_TYPE(name2)
+ECL_DECL_NAME_TYPE(name3)
+ECL_DECL_NAME_TYPE(name4)
+ECL_DECL_NAME_TYPE(name5)
+ECL_DECL_NAME_TYPE(level1)
+ECL_DECL_NAME_TYPE(level2)
+ECL_DECL_NAME_TYPE(level3)
+ECL_DECL_NAME_TYPE(ar_item1)
+ECL_DECL_NAME_TYPE(ar_item2)
+ECL_DECL_NAME_TYPE(ar_item3)
 
 using namespace ecl;
 using namespace json;

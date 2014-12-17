@@ -2,10 +2,6 @@
 
 #include <cstring>
 
-#include <ecl/singleton.hpp>
-
-#include <tuple>
-
 namespace ecl
 {
 
@@ -13,42 +9,54 @@ namespace web
 {
 
 template<typename... RESOURCES>
-class resource_table
+class resource_table : public RESOURCES...
 {
 public:
-    const i_resource* lookup(const char* const name)              
+    template<typename T>
+    bool call(T&                    stream,
+              const char* const     name,
+              int                   argc,
+              const char*           argv[])
     {
         if(nullptr == name)
         {
-            return nullptr;
+            return false;
         }
 
-        return lookup_internal<0, RESOURCES...>(name);
+        return call_internal<0, T, RESOURCES...>(stream, name, argc, argv);
     }
 
 private:
-    template<size_t COUNT, typename RES, typename... TAIL>
-    const i_resource* lookup_internal(const char* const name)
+    template<size_t COUNT, typename T, typename RES, typename... TAIL>
+    bool call_internal(T&                    stream,
+                       const char* const     name,
+                       int                   argc,
+                       const char*           argv[])
     {
-        if(0 == strncmp(name, RES::name(), strlen(RES::name())))
+        if(0 == strncmp(name, RES::name_t::name(), RES::name_t::size()))
         {
-            return &(std::get<COUNT>(*this));
+            this->RES::template exec<T>(stream, argc, argv);
+            return true;
         }
 
-        return lookup_internal<COUNT + 1, TAIL...>(name);
+        return call_internal<COUNT + 1, T, TAIL...>(stream, name, argc, argv);
     }
 
-    template<size_t COUNT>
-    const i_resource* lookup_internal(const char* const name)
+    template<size_t COUNT, typename T>
+    bool call_internal(T&                stream,
+                       const char* const name,
+                       int               argc,
+                       const char*       argv[])
     {
+        (void)(stream);
         (void)(name);
+        (void)(argc);
+        (void)(argv);
         static_assert((COUNT == sizeof...(RESOURCES)), 
                       "Variadic template instantiation error!");
 
-        return nullptr;
+        return false;
     }
-
-    typedef ecl::singleton<std::tuple<RESOURCES...>> resources_tuple_singleton;
 };
 
 } // namespace web

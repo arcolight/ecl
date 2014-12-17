@@ -142,6 +142,15 @@ public:
         return m_count;
     }
 
+    void flush()
+    {
+        if(nullptr != FLUSH_F_PTR)
+        {
+            FLUSH_F_PTR((const char*)m_buf, m_count);
+        }
+        reset();
+    }
+
     constexpr static size_t m_s_size { BUFFER_SIZE };
 
 private:
@@ -312,11 +321,7 @@ private:
         {
             if(m_count == BUFFER_SIZE - 1)
             {
-                if(nullptr != FLUSH_F_PTR)
-                {
-                    FLUSH_F_PTR((const char*)m_buf, m_count);
-                    reset();
-                }
+                flush();
             }
             m_buf[m_count] = v[i];
             ++m_count;

@@ -1,10 +1,6 @@
 #pragma once
 
-#include <array>
-
-#include "resource_table.hpp"
 #include "request_parser.hpp"
-#include "response_composer.hpp"
 
 #include <ecl/stream.hpp>
 
@@ -14,60 +10,51 @@ namespace ecl
 namespace web
 {
 
-template<size_t IN_BUFFER_SIZE,
-         size_t OUT_BUFFER_SIZE,
+template<size_t STREAM_SIZE,
          typename RESOURCES,
-         write_function F>
+         flush_function_t F>
 class server
 {
 public:
-    typedef std::array<uint8_t, IN_BUFFER_SIZE>  in_buffer_t;
-    typedef std::array<uint8_t, OUT_BUFFER_SIZE> out_buffer_t;
-    typedef RESOURCES                            resources_t;
+    typedef RESOURCES              resources_t;
+    typedef stream<STREAM_SIZE, F> stream_t;
 
-    status_code process_request(size_t size)
+    void process_request(char* req_raw, size_t size)
     {
-        m_out_buf.fill(0x00);
-
-        request* req_ptr = m_parser.parse((char*)m_in_buf.data(), size);
-
-        status_code code = status_code::BAD_REQUEST;
-        version ver = version::HTTP11;
+        request* req_ptr = m_parser.parse(req_raw, size);
 
         if(nullptr != req_ptr)
         {
-            status_code code = status_code::NOT_FOUND;
-            ver = req_ptr->ver;
-
-            const i_resource* res = m_resources.lookup(req_ptr->uri);
-            if(nullptr != res)
+            write_version(req_ptr->ver);
+            if( ! m_resources.template call<stream_t>(m_stream, req_ptr->uri, 0, nullptr))
             {
-                code = res->exec(F, 0, nullptr);
+                write_status(status_code::NOT_FOUND);
             }
         }
+        else
+        {
+            write_version(HTTP11);
+            write_status(status_code::BAD_REQUEST);
+        }
 
-        // m_composer.compose(ver, code, m_out_buf.data(), m_out_buf.size(), m_out_buf.data(), m_out_buf.size());
 
-        return code;
-    }
-
-    in_buffer_t& get_in_buffer()
-    {
-        return m_in_buf;
-    }
-
-    out_buffer_t& get_out_buffer()
-    {
-        return m_out_buf;
+        m_stream.flush();
     }
 
 private:
-    in_buffer_t       m_in_buf;
-    out_buffer_t      m_out_buf;
+    void write_status(status_code code)
+    {
+        m_stream << (uint16_t)code << " " << constants::get_status_code(code);
+    }
 
-    resourcest_t      m_resources;
-    request_parser    m_parser;
-    response_composer m_composer;
+    void write_version(version ver)
+    {
+        m_stream << constants::get_version(ver) << " ";
+    }
+
+    stream_t       m_stream    {};
+    resources_t    m_resources {};
+    request_parser m_parser    {};
 };
 
 } // namespace web

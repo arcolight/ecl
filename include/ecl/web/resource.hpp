@@ -1,14 +1,11 @@
 #pragma once
 
 #include <cstdint>
-#include <cstdlib>
 #include <cstring>
 
 #include <algorithm>
 
-#include "i_resource.hpp"
-
-#include <ecl/stream.hpp>
+#include "constants.hpp"
 
 // #include "ecl/str_const.hpp"
 
@@ -21,25 +18,21 @@ namespace web
 template<const uint8_t* const DATA,
          size_t               SIZE,
          typename             NAME>
-class resource : public i_resource
+class resource
 {
 public:
-    virtual ~resource()  {}
+    typedef NAME name_t;
 
-    constexpr static const char* name()
-    {
-        return NAME::name();
-    }
-
-    virtual status_code exec(write_function f,
-                             int argc,
-                             const uint8_t** const argv)          const override
+    template<typename T>
+    void exec(T& stream, int argc, const char* argv[])                     const
     {
         (void)(argc);
         (void)(argv);
-        memcpy(out_buf, DATA, std::min(size, SIZE));
 
-        return status_code::OK;
+        status_code code = status_code::OK;
+
+        stream << (uint16_t)code << " " << constants::get_status_code(code) << "\r\n";
+        stream << (const char*)DATA << "\r\n";
     }
 };
 

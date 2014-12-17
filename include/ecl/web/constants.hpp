@@ -1,7 +1,5 @@
 #pragma once
 
-#include <map>
-
 namespace ecl
 {
 
@@ -12,16 +10,7 @@ enum version
 {
     HTTP10        = 0,
     HTTP11,
-    HTTP20,
-    VERSION_COUNT
-};
-
-typedef std::map<version, const char*> version_map_t;
-
-const version_map_t version_map = {
-    { HTTP10, "HTTP/1.0" },
-    { HTTP11, "HTTP/1.1" },
-    { HTTP20, "HTTP/2.0" }
+    HTTP20
 };
 
 enum status_code
@@ -54,45 +43,74 @@ enum status_code
     HTTP_VERSION_NOT_SUPPORTED = 505
 };
 
-typedef std::map<status_code, const char*> status_code_map_t;
-
-const status_code_map_t status_code_map = {
-    { CONTINUE,                   "CONTINUE"                   },
-    { SWITCHING_PROTO,            "SWITCHING PROTO"            },
-    { OK,                         "OK"                         },
-    { CREATED,                    "CREATED"                    },
-    { ACCEPTED,                   "ACCEPTED"                   },
-    { NO_CONTENT,                 "NO CONTENT"                 },
-    { RESET_CONTENT,              "RESET CONTENT"              },
-    { PARTIAL_CONTENT,            "PARTIAL CONTENT"            },
-    { BAD_REQUEST,                "BAD REQUEST"                },
-    { UNAUTHORIZED,               "UNAUTHORIZED"               },
-    { PAYMENT_REQUIRED,           "PAYMENT REQUIRED"           },
-    { FORBIDDEN,                  "FORBIDDEN"                  },
-    { NOT_FOUND,                  "NOT FOUND"                  },
-    { METHOD_NOT_ALLOWED,         "METHOD NOT ALLOWED"         },
-    { NOT_ACCEPTABLE,             "NOT ACCEPTABLE"             },
-    { REQUEST_TIMEOUT,            "REQUEST TIMEOUT"            },
-    { CONFLICT,                   "CONFLICT"                   },
-    { INTERNAL_SERVER_ERROR,      "INTERNAL SERVER ERROR"      },
-    { NOT_IMPLEMENTED,            "NOT IMPLEMENTED"            },
-    { BAD_GATEWAY,                "BAD GATEWAY"                },
-    { SERVICE_UNAVAILABLE,        "SERVICE UNAVAILABLE"        },
-    { GATEWAY_TIMEOUT,            "GATEWAY TIMEOUT"            },
-    { HTTP_VERSION_NOT_SUPPORTED, "HTTP VERSION NOT SUPPORTED" }
-};
-
 enum method
 {
     GET,
     POST
 };
 
-typedef std::map<method, const char*> method_map_t;
+struct version_str
+{
 
-const method_map_t method_map = {
-    { GET,  "GET"  },
-    { POST, "POST" }
+};
+
+struct constants
+{
+    // typedef std::map<version, const char*>     version_map_t;
+    // typedef std::map<status_code, const char*> status_code_map_t;
+    // typedef std::map<method, const char*>      method_map_t;
+
+    static const char* get_version(version v)
+    {
+        switch(v)
+        {
+            case HTTP10: return "HTTP/1.0"; break;
+            case HTTP11: return "HTTP/1.1"; break;
+            case HTTP20: return "HTTP/2.0"; break;
+            default:     return "UNKNOWN";  break;
+        }
+    }
+
+    static const char* get_status_code(status_code code)
+    {
+        switch(code)
+        {
+            case CONTINUE:                   return "CONTINUE";                   break;
+            case SWITCHING_PROTO:            return "SWITCHING PROTO";            break;
+            case OK:                         return "OK";                         break;
+            case CREATED:                    return "CREATED";                    break;
+            case ACCEPTED:                   return "ACCEPTED";                   break;
+            case NO_CONTENT:                 return "NO CONTENT";                 break;
+            case RESET_CONTENT:              return "RESET CONTENT";              break;
+            case PARTIAL_CONTENT:            return "PARTIAL CONTENT";            break;
+            case BAD_REQUEST:                return "BAD REQUEST";                break;
+            case UNAUTHORIZED:               return "UNAUTHORIZED";               break;
+            case PAYMENT_REQUIRED:           return "PAYMENT REQUIRED";           break;
+            case FORBIDDEN:                  return "FORBIDDEN";                  break;
+            case NOT_FOUND:                  return "NOT FOUND";                  break;
+            case METHOD_NOT_ALLOWED:         return "METHOD NOT ALLOWED";         break;
+            case NOT_ACCEPTABLE:             return "NOT ACCEPTABLE";             break;
+            case REQUEST_TIMEOUT:            return "REQUEST TIMEOUT";            break;
+            case CONFLICT:                   return "CONFLICT";                   break;
+            case INTERNAL_SERVER_ERROR:      return "INTERNAL SERVER ERROR";      break;
+            case NOT_IMPLEMENTED:            return "NOT IMPLEMENTED";            break;
+            case BAD_GATEWAY:                return "BAD GATEWAY";                break;
+            case SERVICE_UNAVAILABLE:        return "SERVICE UNAVAILABLE";        break;
+            case GATEWAY_TIMEOUT:            return "GATEWAY TIMEOUT";            break;
+            case HTTP_VERSION_NOT_SUPPORTED: return "HTTP VERSION NOT SUPPORTED"; break;
+            default:                         return "UNKNOWN";                    break;
+        }
+    }
+
+    static const char* get_method(method m)
+    {
+        switch(m)
+        {
+            case GET:  return "GET";     break;
+            case POST: return "POST";    break;
+            default:   return "UNKNOWN"; break;
+        }
+    }
 };
 
 } // namespace web

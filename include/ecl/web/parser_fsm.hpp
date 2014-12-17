@@ -62,11 +62,11 @@ class parser_fsm : public state_machine<parser_fsm,
         *uri_str = 0x00;     ++uri_str;
         *version_str = 0x00; ++version_str;
 
-        if(0 == strncmp(method_str, "GET", strlen(method_str)))
+        if(0 == strncmp(method_str, constants::get_method(method::GET), strlen(method_str)))
         {
             m_request.met = method::GET;
         }
-        else if(0 == strncmp(method_str, "POST", strlen(method_str)))
+        else if(0 == strncmp(method_str, constants::get_method(method::POST), strlen(method_str)))
         {
             m_request.met = method::POST;
         }
@@ -77,11 +77,11 @@ class parser_fsm : public state_machine<parser_fsm,
 
         m_request.uri = uri_str;
 
-        if(0 == strncmp(version_str, "HTTP/1.1", strlen(version_str)))
+        if(0 == strncmp(version_str, constants::get_version(version::HTTP11), strlen(version_str)))
         {
             m_request.ver = version::HTTP11;
         }
-        else if(0 == strncmp(version_str, "HTTP/2.0", strlen(version_str)))
+        else if(0 == strncmp(version_str, constants::get_version(version::HTTP20), strlen(version_str)))
         {
             m_request.ver = version::HTTP20;
         }
@@ -163,7 +163,7 @@ public:
     }
 
 private:
-    request m_request;
+    request m_request {};
 };
 
 } // namespace web

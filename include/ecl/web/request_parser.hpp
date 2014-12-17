@@ -57,7 +57,7 @@ public:
     }
 
 private:
-    parser_fsm        m_parser;
+    parser_fsm        m_parser {};
 
     const char* const m_crlf = "\r\n";
 };

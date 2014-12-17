@@ -8,31 +8,11 @@
 #include <cstring>
 #include <cstdio>
 
-#include "str_const.hpp"
-
-#define ECL_JSON_DECL_NAME(nm)                            \
-    struct nm                                             \
-    {                                                     \
-        constexpr static const char* name()               \
-        {                                                 \
-            return m_name;                                \
-        }                                                 \
-                                                          \
-        constexpr static size_t size()                    \
-        {                                                 \
-            return sizeof(m_name);                        \
-        }                                                 \
-                                                          \
-    private:                                              \
-        constexpr static const char* const m_name { #nm };\
-    };
-
 namespace ecl
 {
 
 namespace json
 {
-
 
 template<typename T>
 struct val_size             { constexpr static size_t size() { return T::size(); } };
@@ -79,7 +59,7 @@ protected:
     // 2 - 2 * '"'
     constexpr static size_t size()
     {
-        return 1 + (2 + NAME::size() + val_size<value_t>::size());
+        return 1 + 2 + NAME::size() + val_size<value_t>::size();
     }
 
     value_t m_val { };
