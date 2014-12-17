@@ -10,11 +10,52 @@
 
 #include "str_const.hpp"
 
+#define ECL_JSON_DECL_NAME(nm)                            \
+    struct nm                                             \
+    {                                                     \
+        constexpr static const char* name()               \
+        {                                                 \
+            return m_name;                                \
+        }                                                 \
+                                                          \
+        constexpr static size_t size()                    \
+        {                                                 \
+            return sizeof(m_name);                        \
+        }                                                 \
+                                                          \
+    private:                                              \
+        constexpr static const char* const m_name { #nm };\
+    };
+
 namespace ecl
 {
 
 namespace json
 {
+
+
+template<typename T>
+struct val_size             { constexpr static size_t size() { return T::size(); } };
+template<>
+struct val_size<bool>       { constexpr static size_t size() { return 5;         } };
+template<>
+struct val_size<const char*>{ constexpr static size_t size() { return 8;         } };
+template<>
+struct val_size<int8_t>     { constexpr static size_t size() { return 4;         } };
+template<>
+struct val_size<uint8_t>    { constexpr static size_t size() { return 3;         } };
+template<>
+struct val_size<int16_t>    { constexpr static size_t size() { return 6;         } };
+template<>
+struct val_size<uint16_t>   { constexpr static size_t size() { return 5;         } };
+template<>
+struct val_size<int32_t>    { constexpr static size_t size() { return 11;        } };
+template<>
+struct val_size<uint32_t>   { constexpr static size_t size() { return 10;        } };
+template<>
+struct val_size<int64_t>    { constexpr static size_t size() { return 21;        } };
+template<>
+struct val_size<uint64_t>   { constexpr static size_t size() { return 20;        } };
 
 template<typename NAME, typename T>
 class node
@@ -34,9 +75,11 @@ protected:
         stringify(st, m_val);
     }
 
+    // 1 -     ':'
+    // 2 - 2 * '"'
     constexpr static size_t size()
     {
-        return 1 + (2 + strlen(NAME::name()));
+        return 1 + (2 + NAME::size() + val_size<value_t>::size());
     }
 
     value_t m_val;
@@ -61,6 +104,11 @@ class array
 public:
     constexpr array() {}
 
+    constexpr static size_t size()
+    {
+        return 2 + OBJ::size() * COUNT + (COUNT - 1);
+    }
+
 private:
     typedef std::array<OBJ, COUNT> array_t;
 protected:
@@ -81,11 +129,6 @@ protected:
         }
 
         st << ']';
-    }
-
-    constexpr static size_t size()
-    {
-        return 2 + OBJ::size() * COUNT + (COUNT - 1);
     }
 
 public:

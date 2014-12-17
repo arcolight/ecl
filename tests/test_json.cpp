@@ -4,17 +4,29 @@
 #include <ecl/stream.hpp>
 #include <ecl/constexpr_md5.hpp>
 
-struct name1    { constexpr static const char* name() { return "name1"; } };
-struct name2    { constexpr static const char* name() { return "name2"; } };
-struct name3    { constexpr static const char* name() { return "name3"; } };
-struct name4    { constexpr static const char* name() { return "name4"; } };
-struct name5    { constexpr static const char* name() { return "name5"; } };
-struct level1   { constexpr static const char* name() { return "level1"; } };
-struct level2   { constexpr static const char* name() { return "level2"; } };
-struct level3   { constexpr static const char* name() { return "level3"; } };
-struct ar_item1 { constexpr static const char* name() { return "ar_item1"; } };
-struct ar_item2 { constexpr static const char* name() { return "ar_item2"; } };
-struct ar_item3 { constexpr static const char* name() { return "ar_item3"; } };
+// struct name1    { constexpr static const char* name() { return "name1"; } };
+// struct name2    { constexpr static const char* name() { return "name2"; } };
+// struct name3    { constexpr static const char* name() { return "name3"; } };
+// struct name4    { constexpr static const char* name() { return "name4"; } };
+// struct name5    { constexpr static const char* name() { return "name5"; } };
+// struct level1   { constexpr static const char* name() { return "level1"; } };
+// struct level2   { constexpr static const char* name() { return "level2"; } };
+// struct level3   { constexpr static const char* name() { return "level3"; } };
+// struct ar_item1 { constexpr static const char* name() { return "ar_item1"; } };
+// struct ar_item2 { constexpr static const char* name() { return "ar_item2"; } };
+// struct ar_item3 { constexpr static const char* name() { return "ar_item3"; } };
+
+ECL_JSON_DECL_NAME(name1)
+ECL_JSON_DECL_NAME(name2)
+ECL_JSON_DECL_NAME(name3)
+ECL_JSON_DECL_NAME(name4)
+ECL_JSON_DECL_NAME(name5)
+ECL_JSON_DECL_NAME(level1)
+ECL_JSON_DECL_NAME(level2)
+ECL_JSON_DECL_NAME(level3)
+ECL_JSON_DECL_NAME(ar_item1)
+ECL_JSON_DECL_NAME(ar_item2)
+ECL_JSON_DECL_NAME(ar_item3)
 
 using namespace ecl;
 using namespace json;
