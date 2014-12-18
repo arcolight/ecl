@@ -10,8 +10,8 @@ Influenced by boost::MSM, but more simple.
 
 ### bitfield
 Class for serialization and deserialization of bitfield-like structures.
-Main problem in btfields is compiler-specific implementation and ending problems.
-Bit field class architecture independent. Of course, at cost of complexity.
+Main problem in bitfields is compiler-specific implementation and ending problems.
+bitfield class architecture independent. Of course, at cost of complexity.
 
 ### command processor & command
 Simple classes suitable for composing command processors on embedded systems.
