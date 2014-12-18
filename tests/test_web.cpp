@@ -8,14 +8,13 @@
 
 #include <ecl/web/resource.hpp>
 #include <ecl/web/resource_table.hpp>
-#include <ecl/web/request_parser.hpp>
-#include <ecl/web/headers.hpp>
 #include <ecl/web/server.hpp>
 #include <ecl/web/cgi.hpp>
 #include <ecl/web/default_pages.hpp>
 
 #include <ecl/str_const.hpp>
 #include <ecl/name_type.hpp>
+#include <ecl/json.hpp>
 
 #include "web_resources/index.h"
 #include "web_resources/style.h"
@@ -29,6 +28,7 @@ ECL_DECL_NAME_TYPE_STRING(index_name_2,  "/index.html")
 ECL_DECL_NAME_TYPE_STRING(icon_name,     "/etc/img/icon.png")
 ECL_DECL_NAME_TYPE_STRING(style_name,    "/etc/style.css")
 ECL_DECL_NAME_TYPE_STRING(jquery_name,   "/etc/js/jquery.js")
+ECL_DECL_NAME_TYPE_STRING(info_name,     "/info")
 
 int new_sd = 0;
 
@@ -44,21 +44,42 @@ void write_stdout(const char* const buf, size_t size)
     std::cout << buf;
 }
 
-template<typename NAME>
-class test_cgi : public ecl::web::cgi<NAME>
+ECL_DECL_NAME_TYPE(json_1)
+ECL_DECL_NAME_TYPE(json_2)
+ECL_DECL_NAME_TYPE(json_3)
+
+template<typename... NAME>
+class info : public ecl::web::cgi<NAME...>
 {
+private:
+    typedef ecl::json::object<
+        ecl::json::node<json_1, bool>,
+        ecl::json::node<json_2, uint32_t>,
+        ecl::json::node<json_3, const char*>
+    > document_t;
 public:
-    virtual ~test_cgi() {}
-
     template<typename T>
-    void exec(T& stream, const ecl::web::request* req)                     const
+    void exec(T& st, const ecl::web::request* req)
     {
-        (void)(req);
-        ecl::web::status_code code = ecl::web::status_code::OK;
+        ecl::web::constants::write_status_line(st, req->ver, ecl::web::OK);
 
-        stream << (uint16_t)code << ecl::web::constants::get_status_code(code) << "\r\n";
-        stream << "TEST_CGI1" << "\r\n";
+        st << ecl::web::constants::get_header_name(ecl::web::CONTENT_TYPE)
+           << ":" 
+           << ecl::web::constants::get_content_type(ecl::web::APPLICATION_JSON) << "\r\n";
+        st << "\r\n";
+
+        (void)(req);
+        m_doc.f<json_1>() = !m_doc.f<json_1>();
+        m_doc.f<json_2>() = m_counter++;
+        m_doc.f<json_3>() = "Test json string";
+
+        m_doc.serialize(st);
+        st << "\r\n";
     }
+
+private:
+    document_t m_doc;
+    uint32_t   m_counter { 0 };
 };
 
 typedef ecl::web::server<
@@ -67,10 +88,11 @@ typedef ecl::web::server<
                 ecl::web::default_page_400,
                 ecl::web::default_page_404,
                 ecl::web::default_page_500,
-                ecl::web::resource<index_htm_len, index_htm, ecl::web::TEXT_HTML,       ecl::web::OK, index_name_1, index_name_2>,
-                ecl::web::resource<icon_png_len,  icon_png,  ecl::web::IMAGE_PNG,       ecl::web::OK, icon_name>,
-                ecl::web::resource<style_css_len, style_css, ecl::web::TEXT_CSS,        ecl::web::OK, style_name>,
-                ecl::web::resource<jquery_js_len, jquery_js, ecl::web::TEXT_JAVASCRIPT, ecl::web::OK, jquery_name>
+                ecl::web::resource<index_html_len, index_html, ecl::web::TEXT_HTML,       ecl::web::OK, index_name_1, index_name_2>,
+                ecl::web::resource<icon_png_len,   icon_png,   ecl::web::IMAGE_PNG,       ecl::web::OK, icon_name>,
+                ecl::web::resource<style_css_len,  style_css,  ecl::web::TEXT_CSS,        ecl::web::OK, style_name>,
+                ecl::web::resource<jquery_js_len,  jquery_js,  ecl::web::TEXT_JAVASCRIPT, ecl::web::OK, jquery_name>,
+                info<info_name>
             >,
             write_sock
 > server_t;

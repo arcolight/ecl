@@ -3,17 +3,17 @@
 namespace ecl
 {
 
-namespace web 
+namespace web
 {
 
 struct header
 {
-    char*  name  { nullptr };
-    char*  value { nullptr };
+    char* name { nullptr };
+    char* value { nullptr };
 
     void clear()
     {
-        name =  nullptr;
+        name = nullptr;
         value = nullptr;
     }
 };

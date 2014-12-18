@@ -63,6 +63,13 @@ class parser_fsm : public state_machine<parser_fsm,
         *uri_str = 0x00;     ++uri_str;
         *version_str = 0x00; ++version_str;
 
+        char* uri_param_str = strchr(uri_str, '?');
+        if(nullptr != uri_param_str)
+        {
+            *uri_param_str = 0x00; uri_param_str++;
+            m_request.uri_param = uri_param_str;
+        }
+
         if(0 == strncmp(method_str, constants::get_method(method::GET), strlen(method_str)))
         {
             m_request.met = method::GET;
