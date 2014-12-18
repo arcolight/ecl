@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstring>
+#include "request.hpp"
 
 namespace ecl
 {
@@ -8,52 +9,55 @@ namespace ecl
 namespace web
 {
 
-template<typename... RESOURCES>
-class resource_table : public RESOURCES...
+template<
+    typename    PAGE_400,
+    typename    PAGE_404,
+    typename    PAGE_500,
+    typename... RESOURCES
+>
+class resource_table : public PAGE_400,
+                       public PAGE_404,
+                       public PAGE_500,
+                       public RESOURCES...
 {
 public:
     template<typename T>
-    bool call(T&                    stream,
-              const char* const     name,
-              int                   argc,
-              const char*           argv[])
+    bool call(T& st, const request* req)
     {
-        if(nullptr == name)
+        if(nullptr == req)
         {
+            this->PAGE_400::template exec<T>(st, nullptr);
+            return false;
+        }
+        if(nullptr == req->uri)
+        {
+            this->PAGE_400::template exec<T>(st, nullptr);
             return false;
         }
 
-        return call_internal<0, T, RESOURCES...>(stream, name, argc, argv);
+        return call_internal<0, T, RESOURCES...>(st, req);
     }
 
 private:
     template<size_t COUNT, typename T, typename RES, typename... TAIL>
-    bool call_internal(T&                    stream,
-                       const char* const     name,
-                       int                   argc,
-                       const char*           argv[])
+    bool call_internal(T& st, const request* req)
     {
-        if(0 == strncmp(name, RES::name_t::name(), RES::name_t::size()))
+        if(RES::check_resource(req))
         {
-            this->RES::template exec<T>(stream, argc, argv);
+            this->RES::template exec<T>(st, req);
             return true;
         }
 
-        return call_internal<COUNT + 1, T, TAIL...>(stream, name, argc, argv);
+        return call_internal<COUNT + 1, T, TAIL...>(st, req);
     }
 
     template<size_t COUNT, typename T>
-    bool call_internal(T&                stream,
-                       const char* const name,
-                       int               argc,
-                       const char*       argv[])
+    bool call_internal(T& st, const request* req)
     {
-        (void)(stream);
-        (void)(name);
-        (void)(argc);
-        (void)(argv);
         static_assert((COUNT == sizeof...(RESOURCES)), 
                       "Variadic template instantiation error!");
+
+        this->PAGE_404::template exec<T>(st, req);
 
         return false;
     }

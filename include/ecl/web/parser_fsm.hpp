@@ -28,6 +28,7 @@ struct event_line
     char* line { nullptr }; 
 };
 struct empty_line {};
+struct end_of_req {};
 struct rst        {};
 
 class parser_fsm : public state_machine<parser_fsm,
@@ -77,7 +78,11 @@ class parser_fsm : public state_machine<parser_fsm,
 
         m_request.uri = uri_str;
 
-        if(0 == strncmp(version_str, constants::get_version(version::HTTP11), strlen(version_str)))
+        if(0 == strncmp(version_str, constants::get_version(version::HTTP10), strlen(version_str)))
+        {
+            m_request.ver = version::HTTP10;
+        }
+        else if(0 == strncmp(version_str, constants::get_version(version::HTTP11), strlen(version_str)))
         {
             m_request.ver = version::HTTP11;
         }
@@ -136,6 +141,7 @@ class parser_fsm : public state_machine<parser_fsm,
         row< s::request_line_parsed, event_line, s::header_parse,        nullptr, &p::g_header_parse       >,
         row< s::header_parse,        event_line, s::header_parse,        nullptr, &p::g_header_parse       >,
         row< s::header_parse,        empty_line, s::headers_parsed,      nullptr, nullptr                  >,
+        row< s::headers_parsed,      end_of_req, s::complete,            nullptr, nullptr                  >,
         row< s::headers_parsed,      event_line, s::body_parsed,         nullptr, &p::g_body_parsed        >,
         row< s::body_parsed,         empty_line, s::complete,            nullptr, nullptr                  >,
 

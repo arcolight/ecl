@@ -20,16 +20,27 @@ public:
 
         char* current = raw;
         char* next = nullptr;
+        char* next_cr = nullptr;
+        char* next_lf = nullptr;
 
         do
         {
-            next = strstr(current, m_crlf);
-            bool is_empty_line = (next == current);
+            next    = strstr(current, m_crlf);
+            next_cr = strstr(current, m_cr);
+            next_lf = strstr(current, m_lf);
+
+            if(nullptr == next_cr || nullptr == next_lf)
+            {
+                next = std::max(next_cr, next_lf);
+            }
 
             if(nullptr == next)
             {
+                st = m_parser.process_event(end_of_req());
                 break;
             }
+
+            bool is_empty_line = (next == current);
 
             *next = 0x00; ++next;
             *next = 0x00; ++next;
@@ -40,9 +51,7 @@ public:
             }
             else
             {
-                event_line e { current };
-                // e.line = current;
-                st = m_parser.process_event(e);
+                st = m_parser.process_event(event_line { current });
             }
 
             current = next;
@@ -60,6 +69,8 @@ private:
     parser_fsm        m_parser {};
 
     const char* const m_crlf = "\r\n";
+    const char* const m_cr   = "\r";
+    const char* const m_lf   = "\n";
 };
 
 } // namespace web

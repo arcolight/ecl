@@ -8,7 +8,7 @@ namespace web
 
 enum version
 {
-    HTTP10        = 0,
+    HTTP10,
     HTTP11,
     HTTP20
 };
@@ -45,13 +45,27 @@ enum status_code
 
 enum method
 {
-    GET,
-    POST
+    GET  = 0x00,
+    POST = 0x01,
+    PUT  = 0x02
 };
 
-struct version_str
+enum header_name
 {
+    CONTENT_TYPE,
+    CONTENT_LENGTH,
+};
 
+enum content_type_header
+{
+    APPLICATION_JSON,
+    TEXT_HTML,
+    TEXT_CSS,
+    TEXT_JAVASCRIPT,
+    IMAGE_PNG,
+    IMAGE_JPEG,
+    IMAGE_GIF,
+    TEXT_PLAIN
 };
 
 struct constants
@@ -110,6 +124,52 @@ struct constants
             case POST: return "POST";    break;
             default:   return "UNKNOWN"; break;
         }
+    }
+
+    static const char* get_header_name(header_name n)
+    {
+        switch(n)
+        {
+            case CONTENT_TYPE:   return "Content-Type";   break;
+            case CONTENT_LENGTH: return "Content-Length"; break;
+            default:             return "UNKNOWN";        break;
+        }
+    }
+
+    static const char* get_content_type(content_type_header t)
+    {
+        switch(t)
+        {
+            case APPLICATION_JSON: return "application/json"; break;
+            case TEXT_HTML:        return "text/html";        break;
+            case TEXT_CSS:         return "text/css";         break;
+            case TEXT_JAVASCRIPT:  return "text/javascript";  break;
+            case IMAGE_PNG:        return "image/png";        break;
+            case IMAGE_JPEG:       return "image/jpeg";       break;
+            case IMAGE_GIF:        return "image/gif";        break;
+            case TEXT_PLAIN:       return "text/plain";       break;
+            default:               return "UNKNOWN";          break;
+        }
+    }
+
+    template<typename T>
+    static void write_status(T& st, status_code code)
+    {
+        st << (uint16_t)code << " " << get_status_code(code);
+    }
+
+    template<typename T>
+    static void write_version(T& st, version ver)
+    {
+        st << get_version(ver) << " ";
+    }
+
+    template<typename T>
+    static void write_status_line(T& st, version ver, status_code code)
+    {
+        write_version<T>(st, ver);
+        write_status<T>(st, code);
+        st << "\r\n";
     }
 };
 
