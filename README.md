@@ -39,3 +39,9 @@ tests
 ===
 
 All tests can be compiled by gcc, clang, gcc-arm-none-eabi. Except web_server(no arm-none-eabi)
+
+For web server resource change:
+    cd ${ecl_root}/tests/web_resources
+    xxd -i ${RESOURCE} > ${RESOURCE_HEADER_NAME}
+
+And after that in header len should be marked as 'const' and array should be marked as 'extern constexpr'
