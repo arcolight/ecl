@@ -11,12 +11,12 @@
 namespace ecl
 {
 
-namespace web 
+namespace web
 {
 
-template<const char* DATA,
-         size_t      SIZE,
-         typename    NAME>
+template<size_t               SIZE,
+         const uint8_t (&DATA)[SIZE],
+         typename             NAME>
 class resource
 {
 public:
@@ -31,8 +31,7 @@ public:
         status_code code = status_code::OK;
 
         stream << (uint16_t)code << " " << constants::get_status_code(code) << "\r\n";
-        const sized_data sd { (uint8_t* const)DATA, SIZE };
-        stream << sd << "\r\n";
+        stream << const_sized_data { DATA, SIZE } << "\r\n";
     }
 };
 

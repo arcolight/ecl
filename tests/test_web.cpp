@@ -25,7 +25,7 @@ ECL_DECL_NAME_TYPE_STRING(jquery_name, "etc/js/jquery.js")
 void write_stdout(const char* const buf, size_t size)
 {
     (void)(size);
-    std::cout << buf << std::endl;
+    std::cout << buf;
 }
 
 template<typename NAME>
@@ -49,9 +49,9 @@ public:
 typedef ecl::web::server<
             1024,
             ecl::web::resource_table<
-                ecl::web::resource<index_htm, index_htm_len, index_name>,
-                ecl::web::resource<style_css, style_css_len, style_name>,
-                ecl::web::resource<jquery_js, jquery_js_len, jquery_name>
+                ecl::web::resource<index_htm_len, index_htm, index_name>,
+                ecl::web::resource<style_css_len, style_css, style_name>,
+                ecl::web::resource<jquery_js_len, jquery_js, jquery_name>
             >,
             write_stdout
 > server_t;

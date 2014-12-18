@@ -128,6 +128,12 @@ public:
         return *this;
     }
 
+    stream& operator<< (const const_sized_data& d)
+    {
+        print_binary(d.ptr, d.size);
+        return *this;
+    }
+
     template<typename T>
     stream& operator<< (const T& val)
     {
