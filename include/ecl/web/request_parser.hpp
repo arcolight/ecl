@@ -2,6 +2,8 @@
 
 #include <cstring>
 
+#include <algorithm>
+
 #include "parser_fsm.hpp"
 
 namespace ecl
