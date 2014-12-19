@@ -43,10 +43,10 @@ class node
 public:
     constexpr node() {}
 
-protected:
     typedef T    value_t;
     typedef NAME name_t;
 
+protected:
     template<typename STREAM>
     void serialize(STREAM& st)                                             const
     {
