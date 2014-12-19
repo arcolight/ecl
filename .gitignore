@@ -22,3 +22,4 @@
 
 # All in 'bin' folder
 bin/*
+tests/web_resources/*

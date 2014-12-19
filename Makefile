@@ -19,6 +19,8 @@ CE_MD5 = constexpr_md5
 INCLUDE_DIR = ./include
 TESTS_DIR = ./tests
 BIN_DIR = ./bin
+WEB_RES_SRC_DIR = ./tests/web_resources_src
+WEB_RES_GEN_DIR = ./tests/web_resources
 
 GCC_TGT = _gcc_x86
 CLANG_TGT = _clang_x86
@@ -26,7 +28,14 @@ GCC_ARM_TGT = _gcc_arm
 
 all: gcc clang gcc_arm_none_eabi
 
-gcc:
+gen_web_res:
+	@mkdir -p $(WEB_RES_GEN_DIR)
+	./res_gen.sh $(WEB_RES_SRC_DIR)/index.html $(WEB_RES_GEN_DIR)/index.h
+	./res_gen.sh $(WEB_RES_SRC_DIR)/style.css  $(WEB_RES_GEN_DIR)/style.h
+	./res_gen.sh $(WEB_RES_SRC_DIR)/icon.png   $(WEB_RES_GEN_DIR)/icon.h
+	./res_gen.sh $(WEB_RES_SRC_DIR)/jquery.js  $(WEB_RES_GEN_DIR)/jquery.h
+
+gcc: gen_web_res
 	@mkdir -p $(BIN_DIR)
 	g++ $(CXXFLAGS) $(GCC_SPECIFIC) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(FSM).cpp -o $(BIN_DIR)/test_$(FSM)$(GCC_TGT)
 	g++ $(CXXFLAGS) $(GCC_SPECIFIC) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(CB).cpp -o $(BIN_DIR)/test_$(CB)$(GCC_TGT)
@@ -38,7 +47,7 @@ gcc:
 	g++ $(CXXFLAGS) $(GCC_SPECIFIC) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(WEB).cpp -o $(BIN_DIR)/test_$(WEB)$(GCC_TGT)
 #	g++ $(CXXFLAGS) $(GCC_SPECIFIC) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(CE_MD5).cpp -o $(BIN_DIR)/test_$(CE_MD5)$(GCC_TGT)
 
-clang:
+clang: gen_web_res
 	@mkdir -p $(BIN_DIR)
 	clang++ $(CXXFLAGS) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(FSM).cpp -o $(BIN_DIR)/test_$(FSM)$(CLANG_TGT)
 	clang++ $(CXXFLAGS) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(CB).cpp -o $(BIN_DIR)/test_$(CB)$(CLANG_TGT)
@@ -64,3 +73,4 @@ gcc_arm_none_eabi:
 
 clean:
 	$(RM) -r $(BIN_DIR)
+	$(RM) -r $(WEB_RES_GEN_DIR)
