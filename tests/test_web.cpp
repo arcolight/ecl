@@ -22,8 +22,6 @@
 #include "web_resources/icon.h"
 #include "web_resources/favicon.h"
 
-char FULL_REQUEST[] = "GET etc/js/jquery.js HTTP/1.1\r\nHeader 1: 1\r\nHeader 2: 2\r\nHeader 3: 3\r\nHeader 4: 4\r\nHeader 5: 5\r\nHeader 6: 6\r\n\r\nBODY_BODY\r\n\r\n";
-
 ECL_DECL_NAME_TYPE_STRING(index_name_1,  "/")
 ECL_DECL_NAME_TYPE_STRING(index_name_2,  "/index.html")
 ECL_DECL_NAME_TYPE_STRING(icon_name,     "/etc/img/icon.png")
