@@ -64,6 +64,7 @@ enum content_type_header
     TEXT_JAVASCRIPT,
     IMAGE_PNG,
     IMAGE_JPEG,
+    IMAGE_X_ICON,
     IMAGE_GIF,
     TEXT_PLAIN
 };
@@ -146,6 +147,7 @@ struct constants
             case TEXT_JAVASCRIPT:  return "text/javascript";  break;
             case IMAGE_PNG:        return "image/png";        break;
             case IMAGE_JPEG:       return "image/jpeg";       break;
+            case IMAGE_X_ICON:     return "image/x-icon";     break;
             case IMAGE_GIF:        return "image/gif";        break;
             case TEXT_PLAIN:       return "text/plain";       break;
             default:               return "UNKNOWN";          break;

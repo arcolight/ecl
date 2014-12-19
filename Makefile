@@ -30,10 +30,11 @@ all: gcc clang gcc_arm_none_eabi
 
 gen_web_res:
 	@mkdir -p $(WEB_RES_GEN_DIR)
-	./res_gen.sh $(WEB_RES_SRC_DIR)/index.html $(WEB_RES_GEN_DIR)/index.h
-	./res_gen.sh $(WEB_RES_SRC_DIR)/style.css  $(WEB_RES_GEN_DIR)/style.h
-	./res_gen.sh $(WEB_RES_SRC_DIR)/icon.png   $(WEB_RES_GEN_DIR)/icon.h
-	./res_gen.sh $(WEB_RES_SRC_DIR)/jquery.js  $(WEB_RES_GEN_DIR)/jquery.h
+	./res_gen.sh $(WEB_RES_SRC_DIR)/index.html  $(WEB_RES_GEN_DIR)/index.h
+	./res_gen.sh $(WEB_RES_SRC_DIR)/style.css   $(WEB_RES_GEN_DIR)/style.h
+	./res_gen.sh $(WEB_RES_SRC_DIR)/icon.png    $(WEB_RES_GEN_DIR)/icon.h
+	./res_gen.sh $(WEB_RES_SRC_DIR)/favicon.png $(WEB_RES_GEN_DIR)/favicon.h
+	./res_gen.sh $(WEB_RES_SRC_DIR)/jquery.js   $(WEB_RES_GEN_DIR)/jquery.h
 
 gcc: gen_web_res
 	@mkdir -p $(BIN_DIR)

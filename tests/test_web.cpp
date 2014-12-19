@@ -20,12 +20,14 @@
 #include "web_resources/style.h"
 #include "web_resources/jquery.h"
 #include "web_resources/icon.h"
+#include "web_resources/favicon.h"
 
 char FULL_REQUEST[] = "GET etc/js/jquery.js HTTP/1.1\r\nHeader 1: 1\r\nHeader 2: 2\r\nHeader 3: 3\r\nHeader 4: 4\r\nHeader 5: 5\r\nHeader 6: 6\r\n\r\nBODY_BODY\r\n\r\n";
 
 ECL_DECL_NAME_TYPE_STRING(index_name_1,  "/")
 ECL_DECL_NAME_TYPE_STRING(index_name_2,  "/index.html")
 ECL_DECL_NAME_TYPE_STRING(icon_name,     "/etc/img/icon.png")
+ECL_DECL_NAME_TYPE_STRING(favicon_name,  "/favicon.png")
 ECL_DECL_NAME_TYPE_STRING(style_name,    "/etc/style.css")
 ECL_DECL_NAME_TYPE_STRING(jquery_name,   "/etc/js/jquery.js")
 ECL_DECL_NAME_TYPE_STRING(info_name,     "/info")
@@ -88,10 +90,11 @@ typedef ecl::web::server<
                 ecl::web::default_page_400,
                 ecl::web::default_page_404,
                 ecl::web::default_page_500,
-                ecl::web::resource<index_html_len, index_html, ecl::web::TEXT_HTML,       ecl::web::OK, index_name_1, index_name_2>,
-                ecl::web::resource<icon_png_len,   icon_png,   ecl::web::IMAGE_PNG,       ecl::web::OK, icon_name>,
-                ecl::web::resource<style_css_len,  style_css,  ecl::web::TEXT_CSS,        ecl::web::OK, style_name>,
-                ecl::web::resource<jquery_js_len,  jquery_js,  ecl::web::TEXT_JAVASCRIPT, ecl::web::OK, jquery_name>,
+                ecl::web::resource<index_html_len,  index_html,  ecl::web::TEXT_HTML,       ecl::web::OK, index_name_1, index_name_2>,
+                ecl::web::resource<icon_png_len,    icon_png,    ecl::web::IMAGE_PNG,       ecl::web::OK, icon_name>,
+                ecl::web::resource<favicon_png_len, favicon_png, ecl::web::IMAGE_PNG,       ecl::web::OK, favicon_name>,
+                ecl::web::resource<style_css_len,   style_css,   ecl::web::TEXT_CSS,        ecl::web::OK, style_name>,
+                ecl::web::resource<jquery_js_len,   jquery_js,   ecl::web::TEXT_JAVASCRIPT, ecl::web::OK, jquery_name>,
                 info<info_name>
             >,
             write_sock
