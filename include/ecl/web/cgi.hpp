@@ -1,5 +1,7 @@
 #pragma once
 
+#include "request.hpp"
+
 namespace ecl
 {
 

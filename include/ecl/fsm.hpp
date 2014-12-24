@@ -62,30 +62,28 @@ protected:
 
             const transition_info_t* entry = m_list;
 
-            while(st != entry->start) 
+            while(nullptr != entry)
             {
-                if(nullptr == entry->link) 
+                if(st == entry->start)
                 {
-                    return st;
+                    bool transition = true;
+
+                    if(nullptr != entry->guard) 
+                    {
+                        transition = (fsm.*(entry->guard))(e);
+                    }
+
+                    if(transition) 
+                    {
+                        if(nullptr != entry->action) 
+                        {
+                            (fsm.*(entry->action))(e);
+                        }
+                        return entry->next;
+                    }
                 }
 
                 entry = entry->link;
-            }
-
-            bool transition = true;
-
-            if(nullptr != entry->guard) 
-            {
-                transition = (fsm.*(entry->guard))(e);
-            }
-
-            if(transition) 
-            {
-                if(nullptr != entry->action) 
-                {
-                    (fsm.*(entry->action))(e);
-                }
-                return entry->next;
             }
 
             return st;

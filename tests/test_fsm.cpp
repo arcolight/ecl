@@ -7,7 +7,7 @@ struct ev_1 {};
 struct ev_2 {};
 struct ev_3 {};
 struct ev_4 {};
-struct ev_5 {};
+struct ev_5 { bool val { false }; };
 struct ev_6 {};
 
 enum class st
@@ -21,19 +21,21 @@ enum class st
 
 class test_fsm : public ecl::state_machine<test_fsm, st, st::s_1>
 {
-    void on_ev_1(const ev_1& e) { (void)(e); std::cout << "event 1 -> "; }
-    void on_ev_2(const ev_2& e) { (void)(e); std::cout << "event 2 -> "; }
-    void on_ev_3(const ev_3& e) { (void)(e); std::cout << "event 3 -> "; }
-    void on_ev_4(const ev_4& e) { (void)(e); std::cout << "event 4 -> "; }
-    void on_ev_5(const ev_5& e) { (void)(e); std::cout << "event 5 -> "; }
-    void on_ev_6(const ev_6& e) { (void)(e); std::cout << "event 6 -> "; }
+    void on_ev_1  (const ev_1& e) { (void)(e); std::cout << "event 1 -> ";   }
+    void on_ev_2  (const ev_2& e) { (void)(e); std::cout << "event 2 -> ";   }
+    void on_ev_3  (const ev_3& e) { (void)(e); std::cout << "event 3 -> ";   }
+    void on_ev_4  (const ev_4& e) { (void)(e); std::cout << "event 4 -> ";   }
+    void on_ev_5_1(const ev_5& e) { (void)(e); std::cout << "event 5_1 -> "; }
+    void on_ev_5_2(const ev_5& e) { (void)(e); std::cout << "event 5_2 -> "; }
+    void on_ev_6  (const ev_6& e) { (void)(e); std::cout << "event 6 -> ";   }
 
-    bool g_ev_1(const ev_1& e) { (void)(e); std::cout << "guard 1 -> "; return true; }
-    bool g_ev_2(const ev_2& e) { (void)(e); std::cout << "guard 2 -> "; return true; }
-    bool g_ev_3(const ev_3& e) { (void)(e); std::cout << "guard 3 -> "; return true; }
-    bool g_ev_4(const ev_4& e) { (void)(e); std::cout << "guard 4 -> "; return true; }
-    bool g_ev_5(const ev_5& e) { (void)(e); std::cout << "guard 5 -> "; return true; }
-    bool g_ev_6(const ev_6& e) { (void)(e); std::cout << "guard 6 -> "; return true; }
+    bool g_ev_1  (const ev_1& e) { (void)(e); std::cout << "guard 1 -> ";   return true;    }
+    bool g_ev_2  (const ev_2& e) { (void)(e); std::cout << "guard 2 -> ";   return true;    }
+    bool g_ev_3  (const ev_3& e) { (void)(e); std::cout << "guard 3 -> ";   return true;    }
+    bool g_ev_4  (const ev_4& e) { (void)(e); std::cout << "guard 4 -> ";   return true;    }
+    bool g_ev_5_1(const ev_5& e) { (void)(e); std::cout << "guard 5_1 -> "; return e.val;   }
+    bool g_ev_5_2(const ev_5& e) { (void)(e); std::cout << "guard 5_2 -> "; return ! e.val; }
+    bool g_ev_6  (const ev_6& e) { (void)(e); std::cout << "guard 6 -> ";   return true;    }
 
     template<typename ev>
     bool g_false(const ev& e) { (void)(e); std::cout << "false guard -> "; return false; }
@@ -57,15 +59,16 @@ class test_fsm : public ecl::state_machine<test_fsm, st, st::s_1>
     typedef transition_table<
 //         | Start  | Event |  Next  |  Callback  |     Guard   |
 // --------|--------|-------|--------|------------|-------------|
-        row< st::s_1, ev_1, st::s_2, &f::on_ev_1, &f::g_ev_1  >,
-        row< st::s_2, ev_2, st::s_3, &f::on_ev_2, &f::g_ev_2  >,
-        row< st::s_3, ev_3, st::s_4, &f::on_ev_3, &f::g_ev_3  >,
-        row< st::s_4, ev_4, st::s_5, &f::on_ev_4, &f::g_ev_4  >,
-        row< st::s_5, ev_5, st::s_1, &f::on_ev_5, &f::g_ev_5  >,
+        row< st::s_1, ev_1, st::s_2, &f::on_ev_1,   &f::g_ev_1    >,
+        row< st::s_2, ev_2, st::s_3, &f::on_ev_2,   &f::g_ev_2    >,
+        row< st::s_3, ev_3, st::s_4, &f::on_ev_3,   &f::g_ev_3    >,
+        row< st::s_4, ev_4, st::s_5, &f::on_ev_4,   &f::g_ev_4    >,
+        row< st::s_5, ev_5, st::s_1, &f::on_ev_5_1, &f::g_ev_5_1  >,
+        row< st::s_5, ev_5, st::s_3, &f::on_ev_5_2, &f::g_ev_5_2  >,
 // --------+--------+-------+--------+------------+-------------|
-        row< st::s_2, ev_6, st::s_4, &f::on_ev_6, &f::g_ev_6  >,
-        row< st::s_3, ev_6, st::s_5, &f::on_ev_6              >,
-        row< st::s_5, ev_6, st::s_1, &f::on_ev_6, &f::g_false >
+        row< st::s_2, ev_6, st::s_4, &f::on_ev_6,   &f::g_ev_6    >,
+        row< st::s_3, ev_6, st::s_5, &f::on_ev_6                  >,
+        row< st::s_5, ev_6, st::s_1, &f::on_ev_6,   &f::g_false   >
     > transition_table_t;
 
     typedef callback_table<
@@ -231,7 +234,8 @@ int main(int argc, char** argv)
 
     st s;
 
-    std::cout << "TEST 1" << std::endl;
+    fsm.reset();
+    std::cout << "TEST 1 e5.val = true" << std::endl;
     std::cout << "initial state: ";
     out_state(fsm.state());
 
@@ -244,9 +248,29 @@ int main(int argc, char** argv)
     out_state(s);
     s = fsm.process_event(ev4);
     out_state(s);
+    ev5.val = true;
     s = fsm.process_event(ev5);
     out_state(s);
 
+    fsm.reset();
+    std::cout << "TEST 1 e5.val = false" << std::endl;
+    std::cout << "initial state: ";
+    out_state(fsm.state());
+
+    // 1 -> 2 -> 3 -> 4 -> 5 -> 1
+    s = fsm.process_event(ev1);
+    out_state(s);
+    s = fsm.process_event(ev2);
+    out_state(s);
+    s = fsm.process_event(ev3);
+    out_state(s);
+    s = fsm.process_event(ev4);
+    out_state(s);
+    ev5.val = false;
+    s = fsm.process_event(ev5);
+    out_state(s);
+
+    fsm.reset();
     std::cout << std::endl << "TEST 2" << std::endl;
     std::cout << "initial state: ";
     out_state(fsm.state());
