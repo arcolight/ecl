@@ -400,7 +400,7 @@ private:
 
     char         m_num_buf[66]; // (u)int64_t in binary mode takes 64 characters 
     uint8_t      m_buf[BUFFER_SIZE + 1];
-    size_t       m_count;
+    size_t       m_count { 0 };
 
     const base   m_def_base;
     const align  m_def_align;

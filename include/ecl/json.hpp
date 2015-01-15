@@ -104,7 +104,10 @@ protected:
 
             if(i != COUNT - 1)
             {
-                st << ',';
+                if(m_val[i + 1].is_enabled())
+                {
+                    st << ',';
+                }
             }
         }
 
@@ -229,6 +232,21 @@ private:
 public:
     constexpr object() {}
 
+    void disable()
+    {
+        m_enabled = false;
+    }
+
+    void enable()
+    {
+        m_enabled = true;
+    }
+
+    bool is_enabled()                                                      const
+    {
+        return m_enabled;
+    }
+
     template<typename NAME>
     typename std::tuple_element<0, typename filter<name_predicate, NAME, std::tuple, NODES...>::type>::type::value_t& f()
     {
@@ -249,9 +267,12 @@ public:
     template<typename STREAM>
     void serialize(STREAM& st)                                             const
     {
-        st << '{';
+        if(m_enabled)
+        {
+            st << '{';
 
-        serialize_internal<STREAM, NODES...>(st);
+            serialize_internal<STREAM, NODES...>(st);
+        }
     }
 
 private:
@@ -284,6 +305,8 @@ private:
 
         st << '}';
     }
+
+    bool m_enabled { true };
 };
 
 } // namespace json
