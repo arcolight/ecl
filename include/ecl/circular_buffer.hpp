@@ -28,7 +28,7 @@ public:
         m_size = 0;
     }
 
-    size_t capacity()                                                      const
+    constexpr static size_t capacity()
     {
         return CAPACITY;
     }
@@ -53,10 +53,12 @@ public:
 
     T pop()
     {
+        T t = m_array[wrap(m_offset - m_size)];
+        m_array[wrap(m_offset - m_size)] = T();
         if(m_size != 0)
         {
             --m_size;
-            return m_array[wrap(m_offset - m_size + 1)];;
+            return t;
         }
 
         return T();
@@ -81,7 +83,7 @@ public:
             typedef T* pointer;
             typedef std::bidirectional_iterator_tag iterator_category;
             typedef ptrdiff_t difference_type;
-            iterator(size_t ind, pointer data) :
+            iterator(size_t ind, circular_buffer<T, CAPACITY>& data) :
                 index_(ind),
                 data_(data)
             {}
@@ -90,7 +92,7 @@ public:
             {
                 self_type i = *this;
 
-                if(CAPACITY - 1 == index_)
+                if(CAPACITY == index_)
                 {
                     index_ = 0;
                 }
@@ -106,7 +108,7 @@ public:
             {
                 (void)(junk);
 
-                if(CAPACITY - 1 == index_)
+                if(CAPACITY == index_)
                 {
                     index_ = 0;
                 }
@@ -150,12 +152,7 @@ public:
 
             reference operator*()
             {
-                return data_[wrap(index_)];
-            }
-
-            pointer operator->() 
-            {   
-                return data_; 
+                return data_[index_];
             }
 
             bool operator==(const self_type& rhs)                          const
@@ -169,8 +166,8 @@ public:
             }
 
         private:
-            size_t  index_;
-            pointer data_;
+            size_t                       index_;
+            circular_buffer<T, CAPACITY> data_;
     };
 
     class const_iterator 
@@ -182,7 +179,7 @@ public:
             typedef T* pointer;
             typedef std::bidirectional_iterator_tag iterator_category;
             typedef ptrdiff_t difference_type;
-            const_iterator(size_t ind, pointer data) :
+            const_iterator(size_t ind, const circular_buffer<T, CAPACITY>& data) :
                 index_(ind), 
                 data_(data)
             {}
@@ -191,7 +188,7 @@ public:
             {
                 self_type i = *this;
 
-                if(CAPACITY - 1 == index_)
+                if(CAPACITY == index_)
                 {
                     index_ = 0;
                 }
@@ -207,7 +204,7 @@ public:
             {
                 (void)(junk);
 
-                if(CAPACITY - 1 == index_)
+                if(CAPACITY == index_)
                 {
                     index_ = 0;
                 }
@@ -251,12 +248,7 @@ public:
 
             reference operator*()                                          const
             {
-                return data_[wrap(index_)];
-            }
-
-            pointer operator->() 
-            {   
-                return data_; 
+                return data_[index_];
             }
 
             bool operator==(const self_type& rhs)                          const
@@ -270,8 +262,8 @@ public:
             }
 
         private:
-            size_t  index_;
-            pointer data_;
+            size_t                              index_;
+            const circular_buffer<T, CAPACITY>& data_;
     };
 
     typedef std::reverse_iterator<iterator> reverse_iterator;
@@ -279,22 +271,22 @@ public:
 
     iterator begin()
     {
-        return iterator(0, m_array);
+        return iterator(0, *this);
     }
 
     iterator end()
     {
-        return iterator(m_size, m_array);
+        return iterator(m_size, *this);
     }
 
     const_iterator begin()                                                 const
     {
-        return const_iterator(0, m_array);
+        return const_iterator(0, *this);
     }
 
     const_iterator end()                                                   const
     {
-        return const_iterator(m_size, m_array);
+        return const_iterator(m_size, *this);
     }
 
     reverse_iterator rbegin()
