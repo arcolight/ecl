@@ -33,6 +33,11 @@ protected:
         } transition_info_t;
 
     private:
+        transition_layer(const transition_layer& other)                = delete;
+        transition_layer& operator= (const transition_layer& other)    = delete;
+        transition_layer(const transition_layer&& other)               = delete;
+        transition_layer& operator= (const transition_layer&& other)   = delete;
+
         transition_info_t* m_list;
 
     protected:
@@ -102,6 +107,11 @@ protected:
         }
 
     private:
+        row(const row& other)                                          = delete;
+        row& operator= (const row& other)                              = delete;
+        row(const row&& other)                                         = delete;
+        row& operator= (const row&& other)                             = delete;
+
         typename transition_layer<event_t>::transition_info_t ti;
     };
 
@@ -116,6 +126,12 @@ protected:
         {
             return this->transition_layer<event_t>::call(fsm, e);
         }
+
+    private:
+        transition_table(const transition_table& other)                = delete;
+        transition_table& operator= (const transition_table& other)    = delete;
+        transition_table(const transition_table&& other)               = delete;
+        transition_table& operator= (const transition_table&& other)   = delete;
     };
 
     typedef void (derived::*on_enter_t)(void);
@@ -130,6 +146,12 @@ protected:
         constexpr static state_t    cb_state()    { return state;    }
         constexpr static on_enter_t cb_on_enter() { return on_enter; }
         constexpr static on_exit_t  cb_on_exit()  { return on_exit;  }
+
+    private:
+        scb(const scb& other)                                          = delete;
+        scb& operator= (const scb& other)                              = delete;
+        scb(const scb&& other)                                         = delete;
+        scb& operator= (const scb&& other)                             = delete;
     };
 
     template<typename... callbacks>
@@ -143,6 +165,11 @@ protected:
         }
 
     private:
+        callback_table(const callback_table& other)                    = delete;
+        callback_table& operator= (const callback_table& other)        = delete;
+        callback_table(const callback_table&& other)                   = delete;
+        callback_table& operator= (const callback_table&& other)       = delete;
+
         template<size_t CNT, typename callback, typename... tail>
         static void on_exit_chain(derived& fsm, const state_t s)
         {
@@ -208,7 +235,7 @@ private:
     state_machine(const state_machine& other)                          = delete;
     state_machine& operator= (const state_machine& other)              = delete;
     state_machine(const state_machine&& other)                         = delete;
-    state_machine& operator= (const state_machine&& other)             = delete;    
+    state_machine& operator= (const state_machine&& other)             = delete;
 
     state_t m_state;
     derived* const m_fsm_ptr;

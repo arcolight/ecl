@@ -28,20 +28,19 @@ private:
 
     void out_all()                                                         const
     {
-        out<0, OUT...>();
+        out<OUT...>();
     }
 
-    template<size_t COUNT, typename O, typename... TAIL>
+    template<typename O, typename NEXT, typename... TAIL>
     bool out()                                                             const
     {
         return O::print(m_buf) && out<COUNT + 1, TAIL...>();
     }
 
-    template<size_t COUNT>
+    template<typename O>
     bool out()                                                             const
     {
-        static_assert((COUNT == sizeof...(OUT)), "Out count missmatch!");
-        return true;
+        return O::print(m_buf);
     }
 };
     

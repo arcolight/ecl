@@ -11,7 +11,7 @@
 
 typedef ecl::circular_buffer<uint8_t, CB_SIZE> circular_buffer_t;
 
-static circular_buffer_t cb(0);
+static circular_buffer_t cb;
 
 static void dump(circular_buffer_t& c)
 {
@@ -57,6 +57,8 @@ int main(int argc, char* argv[])
     int random_variable = std::rand();
 
     size_t count = random_variable % (CB_SIZE*2) + 1;
+
+    std::cout << "CB size: " << CB_SIZE << std::endl;
 
     std::cout << " * push " << count << " values [1; " << count << "] <= ";
 

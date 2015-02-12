@@ -29,19 +29,17 @@ class test_fsm : public ecl::state_machine<test_fsm, st, st::s_1>
     void on_ev_5_2(const ev_5& e) { (void)(e); std::cout << "event 5_2 -> "; }
     void on_ev_6  (const ev_6& e) { (void)(e); std::cout << "event 6 -> ";   }
 
-    bool g_ev_1  (const ev_1& e) { (void)(e); std::cout << "guard 1 -> ";   return true;    }
-    bool g_ev_2  (const ev_2& e) { (void)(e); std::cout << "guard 2 -> ";   return true;    }
-    bool g_ev_3  (const ev_3& e) { (void)(e); std::cout << "guard 3 -> ";   return true;    }
-    bool g_ev_4  (const ev_4& e) { (void)(e); std::cout << "guard 4 -> ";   return true;    }
-    bool g_ev_5_1(const ev_5& e) { (void)(e); std::cout << "guard 5_1 -> "; return e.val;   }
-    bool g_ev_5_2(const ev_5& e) { (void)(e); std::cout << "guard 5_2 -> "; return ! e.val; }
-    bool g_ev_6  (const ev_6& e) { (void)(e); std::cout << "guard 6 -> ";   return true;    }
-
+    bool g_ev_1  (const ev_1& e) { (void)(e); std::cout << "guard 1 -> ";     return true;    }
+    bool g_ev_2  (const ev_2& e) { (void)(e); std::cout << "guard 2 -> ";     return true;    }
+    bool g_ev_3  (const ev_3& e) { (void)(e); std::cout << "guard 3 -> ";     return true;    }
+    bool g_ev_4  (const ev_4& e) { (void)(e); std::cout << "guard 4 -> ";     return true;    }
+    bool g_ev_5_1(const ev_5& e) { (void)(e); std::cout << "guard 5_1 -> ";   return e.val;   }
+    bool g_ev_5_2(const ev_5& e) { (void)(e); std::cout << "guard 5_2 -> ";   return ! e.val; }
+    bool g_ev_6  (const ev_6& e) { (void)(e); std::cout << "guard 6 -> ";     return true;    }
     template<typename ev>
-    bool g_false(const ev& e) { (void)(e); std::cout << "false guard -> "; return false; }
-
+    bool g_false (const ev& e)   { (void)(e); std::cout << "false guard -> "; return false;   }
     template<typename ev>
-    bool g_true(const ev& e) { (void)(e); std::cout << "true guard -> "; return true; }
+    bool g_true (const ev& e)    { (void)(e); std::cout << "true guard -> ";  return true;    }
 
     void on_s_1_enter() { std::cout << "s_1 enter -> "; }
     void on_s_1_exit()  { std::cout << "s_1 exit -> ";  }
