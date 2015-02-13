@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
     std::cout << " * pop" << std::endl;
     for(auto e: cb) {
         (void)(e);
-        cb.pop();
+        std::cout << "pop element: " << (uint32_t)cb.pop() << std::endl;
     }
 
     dump(cb);
