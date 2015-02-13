@@ -166,8 +166,8 @@ public:
             }
 
         private:
-            size_t                       index_;
-            circular_buffer<T, CAPACITY> data_;
+            size_t                        index_;
+            circular_buffer<T, CAPACITY>& data_;
     };
 
     class const_iterator 
