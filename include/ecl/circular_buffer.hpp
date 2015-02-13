@@ -38,26 +38,29 @@ public:
         return m_size;
     }
 
-    size_t push(const T& v)
+    void push(const T& v)
     {
-        m_array[m_offset] = v;
-        m_offset = wrap(m_offset + 1);
+        m_array[wrap(m_offset + m_size)] = v;
 
         if(m_size < CAPACITY) 
         {
             ++m_size;
         }
-
-        return m_offset - m_size;
+        else
+        {
+            m_offset = wrap(m_offset + 1);
+        }
     }
 
     T pop()
     {
-        T t = m_array[wrap(m_offset - m_size)];
-        m_array[wrap(m_offset - m_size)] = T();
+        T t = m_array[m_offset];
+        m_array[m_offset] = T();
+
         if(m_size != 0)
         {
             --m_size;
+            m_offset = wrap(m_offset + 1);
             return t;
         }
 
@@ -66,12 +69,12 @@ public:
 
     T& operator[](size_t index)
     {
-        return m_array[wrap(index + m_offset - m_size)];
+        return m_array[wrap(index + m_offset)];
     }
 
     const T& operator[](size_t index)                                      const
     {
-        return m_array[wrap(index + m_offset - m_size)];
+        return m_array[wrap(index + m_offset)];
     }
 
     class iterator 
@@ -174,9 +177,9 @@ public:
     {
         public:
             typedef iterator self_type;
-            typedef T value_type;
-            typedef T& reference;
-            typedef T* pointer;
+            typedef const T value_type;
+            typedef const T& reference;
+            typedef const T* pointer;
             typedef std::bidirectional_iterator_tag iterator_category;
             typedef ptrdiff_t difference_type;
             const_iterator(size_t ind, const circular_buffer<T, CAPACITY>& data) :

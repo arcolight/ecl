@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
     (void)(argv);
 
     std::srand(std::time(0));
-    int random_variable = std::rand();
+    int random_variable = 18;
 
     size_t count = random_variable % (CB_SIZE*2) + 1;
 
@@ -65,6 +65,7 @@ int main(int argc, char* argv[])
     for(uint8_t i = 1; i < count + 1; ++i) {
         std::cout << (uint32_t)i << " ";
         cb.push(i);
+        dump(cb);
     }
     std::cout << "|" << std::endl;
 
