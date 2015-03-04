@@ -13,6 +13,9 @@ Class for serialization and deserialization of bitfield-like structures.
 Main problem in bitfields is compiler-specific implementation and ending problems.
 bitfield class architecture independent. Of course, at cost of complexity.
 
+### scope_guard
+RAII idiom. Class provides mechanism to define execution of some code on scope exit.
+
 ### command processor & command
 Simple classes suitable for composing command processors on embedded systems.
 Commands can be arranged as tree.

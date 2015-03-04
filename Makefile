@@ -6,6 +6,7 @@ SECURE = -D_FORTIFY_SOURCE=2 -ftrapv -Wformat-security -fPIE -Wl,-z,relro,-z,now
 CXXFLAGS = -std=c++11 -Wall -Wextra -pedantic -Wswitch -fPIC -fno-rtti -fno-exceptions $(SECURE) $(OPTIMIZATION) $(DEBUG)
 
 FSM = fsm
+SG = scope_guard
 CB = cb
 BF = bitfield
 SINGLETON = singleton
@@ -40,6 +41,7 @@ gen_web_res:
 gcc: gen_web_res
 	@mkdir -p $(BIN_DIR)
 	g++ $(CXXFLAGS) $(GCC_SPECIFIC) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(FSM).cpp -o $(BIN_DIR)/test_$(FSM)$(GCC_TGT)
+	g++ $(CXXFLAGS) $(GCC_SPECIFIC) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(SG).cpp -o $(BIN_DIR)/test_$(SG)$(GCC_TGT)
 	g++ $(CXXFLAGS) $(GCC_SPECIFIC) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(CB).cpp -o $(BIN_DIR)/test_$(CB)$(GCC_TGT)
 	g++ $(CXXFLAGS) $(GCC_SPECIFIC) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(BF).cpp -o $(BIN_DIR)/test_$(BF)$(GCC_TGT)
 	g++ $(CXXFLAGS) $(GCC_SPECIFIC) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(SINGLETON).cpp -o $(BIN_DIR)/test_$(SINGLETON)$(GCC_TGT)
