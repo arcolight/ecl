@@ -35,11 +35,11 @@ public:
             return false;
         }
 
-        return call_internal<0, T, RESOURCES...>(st, req);
+        return call_internal<T, RESOURCES...>(st, req);
     }
 
 private:
-    template<size_t COUNT, typename T, typename RES, typename... TAIL>
+    template<typename T, typename RES, typename... TAIL>
     bool call_internal(T& st, const request* req)
     {
         if(RES::check_resource(req))
@@ -48,15 +48,12 @@ private:
             return true;
         }
 
-        return call_internal<COUNT + 1, T, TAIL...>(st, req);
+        return call_internal<T, TAIL...>(st, req);
     }
 
-    template<size_t COUNT, typename T>
+    template<typename T>
     bool call_internal(T& st, const request* req)
     {
-        static_assert((COUNT == sizeof...(RESOURCES)), 
-                      "Variadic template instantiation error!");
-
         this->PAGE_404::template exec<T>(st, req);
 
         return false;
