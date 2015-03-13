@@ -8,6 +8,7 @@
 #include <ecl/name_type.hpp>
 #include <ecl/command.hpp>
 #include <ecl/command_processor.hpp>
+#include <ecl/stream.hpp>
 
 #define MAX_TOKENS 64
 
@@ -229,6 +230,8 @@ public:
     }
 };
 
+typedef ecl::stream<1024> help_stream_t;
+
 int main(int argc, char* argv[])
 {
     (void)argc;
@@ -270,11 +273,18 @@ int main(int argc, char* argv[])
 
         if(proc.init(ac, (const uint8_t** const)av))
         {
-            proc.dispatch();
+            if(!proc.dispatch())
+            {
+                help_stream_t st;
+                proc.help(st);
+                std::cout << st << std::endl;
+            }
         }
         else
         {
-            std::cout << "Init failed!" << std::endl;
+            help_stream_t st;
+            proc.help(st);
+            std::cout << st << std::endl;
         }
     }
 }

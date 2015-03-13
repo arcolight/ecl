@@ -90,6 +90,17 @@ public:
         return NAME::name();
     }
 
+    template<typename ST>
+    static void show_help(ST& st, size_t indent)
+    {
+        for(size_t i = 0; i < indent; ++i)
+        {
+            st << " ";
+        }
+
+        st << name() << "\n\r";
+    }
+
 protected:
     uint8_t         m_argc;
     const uint8_t** m_argv;

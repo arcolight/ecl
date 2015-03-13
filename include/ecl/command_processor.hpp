@@ -38,6 +38,24 @@ public:
         return NAME::name();
     }
 
+    template<typename ST>
+    static void help(ST& st)
+    {
+        show_help_internal<ST, commands...>(st, 0);
+    }
+
+    template<typename ST>
+    static void show_help(ST& st, size_t& indent)
+    {
+        for(size_t i = 0; i < indent; ++i)
+        {
+            st << " ";
+        }
+        st << name() << "\n\r";
+
+        show_help_internal<ST, commands...>(st, indent + 2);
+    }
+
 private:
     template<size_t COUNT, typename cmd, typename... tail>
     bool call(const char* const  nm,
@@ -71,6 +89,21 @@ private:
         (void)(argv);
 
         return false;
+    }
+
+    template<typename ST, typename cmd, typename... tail>
+    static void show_help_internal(ST& st, size_t indent)
+    {
+        cmd::show_help(st, indent);
+
+        show_help_internal<ST, tail...>(st, indent);
+    }
+
+    template<typename ST>
+    static void show_help_internal(ST& st, size_t indent)
+    {
+        (void)st;
+        (void)indent;
     }
 
     uint8_t         m_argc;
