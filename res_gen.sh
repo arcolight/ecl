@@ -1,12 +1,12 @@
 #!/bin/sh
 
-BASE=$(dirname $0)
-TARGET=$(dirname $1)
-
 if [ $# -lt 2 ] ; then
     echo "Usage: ./res_gen.sh RES_FILE HEADER_FILE";
     exit 1
 fi
+
+BASE=$(dirname $0)
+TARGET=$(dirname $1)
 
 RES_FILE=$1
 if [ ! -f $RES_FILE ] ; then
