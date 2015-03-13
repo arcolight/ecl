@@ -85,7 +85,7 @@ public:
         return true;
     }
 
-    constexpr static const char* const name()
+    constexpr static const char* name()
     {
         return NAME::name();
     }

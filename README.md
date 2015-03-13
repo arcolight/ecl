@@ -19,7 +19,6 @@ RAII idiom. Class provides mechanism to define execution of some code on scope e
 ### command processor & command
 Simple classes suitable for composing command processors on embedded systems.
 Commands can be arranged as tree.
-No demo at now.
 
 ### json
 JSON serializer.

@@ -33,7 +33,7 @@ public:
                                     m_argv + 1);
     }
 
-    constexpr static const char* const name()
+    constexpr static const char* name()
     {
         return NAME::name();
     }
