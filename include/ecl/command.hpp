@@ -107,11 +107,7 @@ public:
     static void show_help(ST& st, size_t indent, size_t indent_increment = DEFAULT_INDENT_INCREMENT)
     {
         (void)indent_increment;
-        for(size_t i = 0; i < indent; ++i)
-        {
-            st << " ";
-        }
-
+        print_indent(st, indent);
         st << name() << "\n\r";
     }
 
