@@ -13,8 +13,21 @@
 #define RECEIVER_CAPACITY 32
 #endif
 
+#ifndef DEFAULT_INDENT_INCREMENT
+#define DEFAULT_INDENT_INCREMENT 4
+#endif
+
 namespace ecl
 {
+
+template<typename ST>
+static void print_indent(ST& st, size_t indent)
+{
+    for(size_t i = 0; i < indent; ++i)
+    {
+        st << " ";
+    }
+}
 
 namespace detail 
 {
@@ -91,8 +104,9 @@ public:
     }
 
     template<typename ST>
-    static void show_help(ST& st, size_t indent)
+    static void show_help(ST& st, size_t indent, size_t indent_increment = DEFAULT_INDENT_INCREMENT)
     {
+        (void)indent_increment;
         for(size_t i = 0; i < indent; ++i)
         {
             st << " ";

@@ -12,7 +12,7 @@
 
 #define MAX_TOKENS 64
 
-ECL_DECL_NAME_TYPE(menu)
+ECL_DECL_NAME_TYPE(proc)
 ECL_DECL_NAME_TYPE(sub)
 ECL_DECL_NAME_TYPE(cmd1)
 ECL_DECL_NAME_TYPE(cmd2)
@@ -32,6 +32,14 @@ struct command_quit : public ecl::command<quit, command_quit>
         }
 
         return true;
+    }
+
+    template<typename ST>
+    static void show_help(ST& st, size_t indent, size_t indent_increment = DEFAULT_INDENT_INCREMENT)
+    {
+        (void)indent_increment;
+        print_indent(st, indent);
+        st << name() << " <exit code>" << "\n\r";
     }
 
     int m_exit_code { 0 };
@@ -117,7 +125,7 @@ struct command_5    : public ecl::command<cmd5, command_5>
     std::vector<std::string> m_args;
 };
 
-typedef ecl::command_processor< menu,
+typedef ecl::command_processor< proc,
     command_quit,
     command_1,
     command_2,

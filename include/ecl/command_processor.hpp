@@ -39,21 +39,18 @@ public:
     }
 
     template<typename ST>
-    static void help(ST& st)
+    static void help(ST& st, size_t indent_increment = DEFAULT_INDENT_INCREMENT)
     {
-        show_help_internal<ST, commands...>(st, 0);
+        show_help<ST>(st, 0, indent_increment);
     }
 
     template<typename ST>
-    static void show_help(ST& st, size_t& indent)
+    static void show_help(ST& st, size_t indent, size_t indent_increment = DEFAULT_INDENT_INCREMENT)
     {
-        for(size_t i = 0; i < indent; ++i)
-        {
-            st << " ";
-        }
+        print_indent(st, indent);
         st << name() << "\n\r";
 
-        show_help_internal<ST, commands...>(st, indent + 2);
+        show_help_internal<ST, commands...>(st, indent + indent_increment, indent_increment);
     }
 
 private:
@@ -64,7 +61,7 @@ private:
     {
         static_assert((cmd::name() != nullptr), "cmd::name is empty!");
 
-        if(0 == strncmp(cmd::name(), nm, strlen(cmd::name())))
+        if((strlen(cmd::name()) == strlen(nm)) && (0 == strcmp(cmd::name(), nm)))
         {
             cmd c;
 
@@ -92,18 +89,19 @@ private:
     }
 
     template<typename ST, typename cmd, typename... tail>
-    static void show_help_internal(ST& st, size_t indent)
+    static void show_help_internal(ST& st, size_t indent, size_t indent_increment)
     {
-        cmd::show_help(st, indent);
+        cmd::show_help(st, indent, indent_increment);
 
-        show_help_internal<ST, tail...>(st, indent);
+        show_help_internal<ST, tail...>(st, indent, indent_increment);
     }
 
     template<typename ST>
-    static void show_help_internal(ST& st, size_t indent)
+    static void show_help_internal(ST& st, size_t indent, size_t indent_increment)
     {
         (void)st;
         (void)indent;
+        (void)indent_increment;
     }
 
     uint8_t         m_argc;
