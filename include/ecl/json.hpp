@@ -74,7 +74,44 @@ private:
     template<typename STREAM>
     void stringify(STREAM& st, const char* val)                            const
     {
-        st << "\"" << val << "\"";
+        st << "\"";
+
+        for(size_t i = 0; i < strlen(val); ++i)
+        {
+            if(val[i] == '"'  || 
+               val[i] == '\\' ||
+               val[i] == '/')
+            {
+                st << "\\";
+                st << val[i];
+            }
+            else if(val[i] == '\b')
+            {
+                st << "\\b";
+            }
+            else if(val[i] == '\f')
+            {
+                st << "\\f";
+            }
+            else if(val[i] == '\n')
+            {
+                st << "\\n";
+            }
+            else if(val[i] == '\r')
+            {
+                st << "\\r";
+            }
+            else if(val[i] == '\t')
+            {
+                st << "\\t";
+            }
+            else
+            {
+                st << val[i];
+            }
+        }
+
+        st << "\"";
     }
 };
 
@@ -96,7 +133,6 @@ protected:
     void serialize(STREAM& st)                                             const
     {
         st << '[';
-
 
         for(size_t i = 0; i < COUNT; ++i)
         {

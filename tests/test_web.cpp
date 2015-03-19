@@ -71,7 +71,7 @@ public:
         (void)(req);
         m_doc.f<json_1>() = !m_doc.f<json_1>();
         m_doc.f<json_2>() = m_counter++;
-        m_doc.f<json_3>() = "Test json string";
+        m_doc.f<json_3>() = "Test json string with \"escaped\" \\characters/.\n\r\tCR LF TAB.";
 
         m_doc.serialize(st);
         st << "\r\n";
@@ -115,15 +115,11 @@ int main(int argc, char* argv[])
 void start_server()
 {
     int status;
-    struct addrinfo host_info;       // The struct that getaddrinfo() fills up with data.
-    struct addrinfo *host_info_list; // Pointer to the to the linked list of host_info's.
+    struct addrinfo  host_info;
+    struct addrinfo* host_info_list;
 
     static server_t server;
 
-    // The MAN page of getaddrinfo() states "All  the other fields in the structure pointed
-    // to by hints must contain either 0 or a null pointer, as appropriate." When a struct
-    // is created in c++, it will be given a block of memory. This memory is not nessesary
-    // empty. Therefor we use the memset function to make sure all fields are NULL.
     memset(&host_info, 0, sizeof host_info);
 
     std::cout << "Setting up the structs..."  << std::endl;
@@ -138,12 +134,14 @@ void start_server()
     // (translated into human readable text by the gai_gai_strerror function).
     if (status != 0)  std::cout << "getaddrinfo error" << gai_strerror(status) ;
 
-
     std::cout << "Creating a socket..."  << std::endl;
     int socketfd ; // The socket descripter
     socketfd = socket(host_info_list->ai_family, host_info_list->ai_socktype,
                       host_info_list->ai_protocol);
-    if (socketfd == -1)  std::cout << "socket error " ;
+    if (socketfd == -1)
+    {
+        std::cout << "socket error ";
+    }
 
     std::cout << "Binding socket..."  << std::endl;
     // we use to make the setsockopt() function to make sure the port is not in use
@@ -177,10 +175,17 @@ void start_server()
         ssize_t bytes_recieved;
         bytes_recieved = recv(new_sd, buffer, 1024, 0);
         // If no data arrives, the program will just wait here until some data arrives.
-        if (bytes_recieved == 0) std::cout << "host shut down." << std::endl ;
-        if (bytes_recieved == -1)std::cout << "recieve error!" << std::endl ;
-        std::cout << bytes_recieved << " bytes recieved :" << std::endl ;
-        buffer[bytes_recieved] = '\0';
+        if (bytes_recieved == 0) 
+        {
+            std::cout << "host shut down." << std::endl;
+        }
+        else if (bytes_recieved == -1)
+        {
+            std::cout << "recieve error!" << std::endl;
+        }
+
+        std::cout << bytes_recieved << " bytes recieved :" << std::endl;
+        buffer[bytes_recieved] = 0;
         std::cout << buffer << std::endl;
 
         server.process_request(buffer, bytes_recieved);
