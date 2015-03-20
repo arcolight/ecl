@@ -118,6 +118,7 @@ public:
     stream& operator<< (const end& end)
     {
         (void)(end);
+        flush();
         reset();
         return *this;
     }

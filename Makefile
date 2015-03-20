@@ -16,7 +16,7 @@ CMD = command_processor
 WEB = web
 STATIC_MAP = static_map
 JSON = json
-CE_MD5 = constexpr_md5
+LOG = logger
 
 INCLUDE_DIR = ./include
 TESTS_DIR = ./tests
@@ -27,7 +27,7 @@ WEB_RES_GEN_DIR = ./tests/web_resources
 GCC_TGT = _gcc_x86
 CLANG_TGT = _clang_x86
 GCC_ARM_TGT = _gcc_arm
-GCC_ARM_NONE_TGT = _gcc_arm_none
+GCC_ARM_NONE_TGT = _gcc_arm_none_eabi
 
 all: gcc clang
 
@@ -50,8 +50,8 @@ gcc: gen_web_res
 	g++ $(CXXFLAGS) $(GCC_SPECIFIC) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(JSON).cpp -o $(BIN_DIR)/test_$(JSON)$(GCC_TGT)
 	g++ $(CXXFLAGS) $(GCC_SPECIFIC) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(STR_CONST).cpp -o $(BIN_DIR)/test_$(STR_CONST)$(GCC_TGT)
 	g++ $(CXXFLAGS) $(GCC_SPECIFIC) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(CMD).cpp -o $(BIN_DIR)/test_$(CMD)$(GCC_TGT)
+	g++ $(CXXFLAGS) $(GCC_SPECIFIC) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(LOG).cpp -o $(BIN_DIR)/test_$(LOG)$(GCC_TGT)
 	g++ $(CXXFLAGS) $(GCC_SPECIFIC) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(WEB).cpp -o $(BIN_DIR)/test_$(WEB)$(GCC_TGT)
-#	g++ $(CXXFLAGS) $(GCC_SPECIFIC) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(CE_MD5).cpp -o $(BIN_DIR)/test_$(CE_MD5)$(GCC_TGT)
 
 clang: gen_web_res
 	@mkdir -p $(BIN_DIR)
@@ -63,8 +63,8 @@ clang: gen_web_res
 	clang++ $(CXXFLAGS) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(JSON).cpp -o $(BIN_DIR)/test_$(JSON)$(CLANG_TGT)
 	clang++ $(CXXFLAGS) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(STR_CONST).cpp -o $(BIN_DIR)/test_$(STR_CONST)$(CLANG_TGT)
 	clang++ $(CXXFLAGS) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(CMD).cpp -o $(BIN_DIR)/test_$(CMD)$(CLANG_TGT)
+	clang++ $(CXXFLAGS) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(LOG).cpp -o $(BIN_DIR)/test_$(LOG)$(CLANG_TGT)
 	clang++ $(CXXFLAGS) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(WEB).cpp -o $(BIN_DIR)/test_$(WEB)$(CLANG_TGT)
-#	clang++ $(CXXFLAGS) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(CE_MD5).cpp -o $(BIN_DIR)/test_$(CE_MD5)$(CLANG_TGT)
 
 gcc_arm_none_eabi:
 	@mkdir -p $(BIN_DIR)
@@ -76,8 +76,8 @@ gcc_arm_none_eabi:
 	arm-none-eabi-g++ $(CXXFLAGS) $(GCC_SPECIFIC) $(ARM_LD_FLAGS) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(JSON).cpp -o $(BIN_DIR)/test_$(JSON)$(GCC_ARM_NONE_TGT)
 	arm-none-eabi-g++ $(CXXFLAGS) $(GCC_SPECIFIC) $(ARM_LD_FLAGS) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(STR_CONST).cpp -o $(BIN_DIR)/test_$(STR_CONST)$(GCC_ARM_NONE_TGT)
 	arm-none-eabi-g++ $(CXXFLAGS) $(GCC_SPECIFIC) $(ARM_LD_FLAGS) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(CMD).cpp -o $(BIN_DIR)/test_$(CMD)$(GCC_ARM_NONE_TGT)
+	arm-none-eabi-g++ $(CXXFLAGS) $(GCC_SPECIFIC) $(ARM_LD_FLAGS) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(LOG).cpp -o $(BIN_DIR)/test_$(LOG)$(GCC_ARM_NONE_TGT)
 #	arm-none-eabi-g++ $(CXXFLAGS) $(GCC_SPECIFIC) $(ARM_LD_FLAGS) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(WEB).cpp -o $(BIN_DIR)/test_$(WEB)$(GCC_ARM_NONE_TGT)
-#	arm-none-eabi-g++ $(CXXFLAGS) $(GCC_SPECIFIC) $(ARM_LD_FLAGS) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(CE_MD5).cpp -o $(BIN_DIR)/test_$(CE_MD5)$(GCC_ARM_NONE_TGT)
 
 clean:
 	$(RM) -r $(BIN_DIR)
