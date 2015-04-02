@@ -8,7 +8,7 @@
 namespace ecl
 {
 
-template<typename T, size_t CAPACITY>
+template<typename T, size_t CAPACITY, bool ERASE_ELEMENTS = false>
 class circular_buffer
 {
 public:
@@ -24,6 +24,14 @@ public:
 
     void clear()
     {
+        if(ERASE_ELEMENTS)
+        {
+            for(auto& c: m_array)
+            {
+                c = T();
+            }
+        }
+
         m_offset = 0;
         m_size = 0;
     }
@@ -55,7 +63,10 @@ public:
     T pop()
     {
         T t = m_array[m_offset];
-        m_array[m_offset] = T();
+        if(ERASE_ELEMENTS)
+        {
+            m_array[m_offset] = T();
+        }
 
         if(m_size != 0)
         {
@@ -77,6 +88,80 @@ public:
         return m_array[wrap(index + m_offset)];
     }
 
+    bool is_empty()                                                        const
+    {
+        return (m_size == 0);
+    }
+
+    T& front()
+    {
+        return operator [](0);
+    }
+
+    const T& front()                                                       const
+    {
+        return operator [](0);
+    }
+
+    T& back()
+    {
+        if(is_empty())
+        {
+            return front();
+        }
+
+        return operator [](m_size - 1);
+    }
+
+    const T& back()                                                        const
+    {
+        if(is_empty())
+        {
+            return front();
+        }
+
+        return operator [](m_size - 1);
+    }
+
+    void drop_front(size_t count)
+    {
+        if (m_size <= count)
+        {
+            clear();
+            return;
+        }
+
+        if(ERASE_ELEMENTS)
+        {
+            for(size_t i = 0; i < count; ++i)
+            {
+                m_array[wrap(m_offset + i)] = T();
+            }
+        }
+
+        m_offset = wrap(m_offset + count);
+        m_size -= count;
+    }
+
+    void drop_back(size_t count)
+    {
+        if (m_size <= count)
+        {
+            clear();
+            return;
+        }
+
+        if(ERASE_ELEMENTS)
+        {
+            for(size_t i = 0; i < count; ++i)
+            {
+                m_array[wrap(m_offset + m_size - i - 1)] = T();
+            }
+        }
+
+        m_size -= count;
+    }
+
     class iterator 
     {
         public:
@@ -86,7 +171,9 @@ public:
             typedef T* pointer;
             typedef std::bidirectional_iterator_tag iterator_category;
             typedef ptrdiff_t difference_type;
-            iterator(size_t ind, circular_buffer<T, CAPACITY>& data) :
+            iterator(size_t ind, circular_buffer<T, 
+                                                 CAPACITY,
+                                                 ERASE_ELEMENTS>& data) :
                 index_(ind),
                 data_(data)
             {}
@@ -169,8 +256,8 @@ public:
             }
 
         private:
-            size_t                        index_;
-            circular_buffer<T, CAPACITY>& data_;
+            size_t                                        index_;
+            circular_buffer<T, CAPACITY, ERASE_ELEMENTS>& data_;
     };
 
     class const_iterator 
@@ -182,7 +269,10 @@ public:
             typedef const T* pointer;
             typedef std::bidirectional_iterator_tag iterator_category;
             typedef ptrdiff_t difference_type;
-            const_iterator(size_t ind, const circular_buffer<T, CAPACITY>& data) :
+            const_iterator(size_t ind,
+                           const circular_buffer<T,
+                                                 CAPACITY,
+                                                 ERASE_ELEMENTS>& data) :
                 index_(ind), 
                 data_(data)
             {}
@@ -265,8 +355,8 @@ public:
             }
 
         private:
-            size_t                              index_;
-            const circular_buffer<T, CAPACITY>& data_;
+            size_t                                              index_;
+            const circular_buffer<T, CAPACITY, ERASE_ELEMENTS>& data_;
     };
 
     typedef std::reverse_iterator<iterator> reverse_iterator;
