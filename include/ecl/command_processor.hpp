@@ -26,11 +26,13 @@ public:
         return true;
     }
 
-    bool dispatch()
+    template<typename ST>
+    bool dispatch(ST& st)
     {
-        return call<0, commands...>((const char* const)m_argv[0],
-                                    m_argc - 1,
-                                    m_argv + 1);
+        return call<ST, commands...>(st,
+                                     (const char* const)m_argv[0],
+                                     m_argc - 1,
+                                     m_argv + 1);
     }
 
     constexpr static const char* name()
@@ -54,8 +56,9 @@ public:
     }
 
 private:
-    template<size_t COUNT, typename cmd, typename... tail>
-    bool call(const char* const  nm,
+    template<typename ST, typename cmd, typename... tail>
+    bool call(ST& st,
+              const char* const  nm,
               const uint8_t      argc,
               const uint8_t**    argv)                                     const
     {
@@ -67,23 +70,28 @@ private:
 
             if( ! c.init(argc, argv) )
             {
+                c.show_help(st, 0);
                 return false;
             }
 
-            return c.dispatch();
+            return c.dispatch(st);
         }
 
-        return call<COUNT + 1, tail...>(nm, argc, argv);
+        return call<ST, tail...>(st, nm, argc, argv);
     }
 
-    template<size_t COUNT>
-    bool call(const char* const nm,
+    template<typename ST>
+    bool call(ST& st,
+              const char* const nm,
               const uint8_t     argc,
               const uint8_t**   argv)                                      const
     {
+        (void)(st);
         (void)(nm);
         (void)(argc);
         (void)(argv);
+
+//        help(st);
 
         return false;
     }

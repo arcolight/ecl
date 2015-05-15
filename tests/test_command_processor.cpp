@@ -279,18 +279,18 @@ int main(int argc, char* argv[])
             av[i] = tokens[i].data();
         }
 
+        help_stream_t st;
+
         if(proc.init(ac, (const uint8_t** const)av))
         {
-            if(!proc.dispatch())
+            if(!proc.dispatch(st))
             {
-                help_stream_t st;
-                proc.help(st);
+//                proc.help(st);
                 std::cout << st << std::endl;
             }
         }
         else
         {
-            help_stream_t st;
             proc.help(st);
             std::cout << st << std::endl;
         }
