@@ -8,6 +8,16 @@
 #include <cstring>
 #include <cstdio>
 
+/*
+ * JSON string size impacts size calculations only.
+ * In serialialization whole string will be serialized.
+ * If serialized size of JSON document bigger than stream size,
+ * stream flush callback will be called.
+*/
+#ifndef JSON_STRING_SIZE
+#define JSON_STRING_SIZE 8
+#endif
+
 namespace ecl
 {
 
@@ -15,27 +25,27 @@ namespace json
 {
 
 template<typename T>
-struct val_size             { constexpr static size_t size() { return T::size(); } };
+struct val_size             { constexpr static size_t size() { return T::size();        } };
 template<>
-struct val_size<bool>       { constexpr static size_t size() { return 5;         } };
+struct val_size<bool>       { constexpr static size_t size() { return 5;                } };
 template<>
-struct val_size<const char*>{ constexpr static size_t size() { return 8;         } };
+struct val_size<const char*>{ constexpr static size_t size() { return JSON_STRING_SIZE; } };
 template<>
-struct val_size<int8_t>     { constexpr static size_t size() { return 4;         } };
+struct val_size<int8_t>     { constexpr static size_t size() { return 4;                } };
 template<>
-struct val_size<uint8_t>    { constexpr static size_t size() { return 3;         } };
+struct val_size<uint8_t>    { constexpr static size_t size() { return 3;                } };
 template<>
-struct val_size<int16_t>    { constexpr static size_t size() { return 6;         } };
+struct val_size<int16_t>    { constexpr static size_t size() { return 6;                } };
 template<>
-struct val_size<uint16_t>   { constexpr static size_t size() { return 5;         } };
+struct val_size<uint16_t>   { constexpr static size_t size() { return 5;                } };
 template<>
-struct val_size<int32_t>    { constexpr static size_t size() { return 11;        } };
+struct val_size<int32_t>    { constexpr static size_t size() { return 11;               } };
 template<>
-struct val_size<uint32_t>   { constexpr static size_t size() { return 10;        } };
+struct val_size<uint32_t>   { constexpr static size_t size() { return 10;               } };
 template<>
-struct val_size<int64_t>    { constexpr static size_t size() { return 21;        } };
+struct val_size<int64_t>    { constexpr static size_t size() { return 21;               } };
 template<>
-struct val_size<uint64_t>   { constexpr static size_t size() { return 20;        } };
+struct val_size<uint64_t>   { constexpr static size_t size() { return 20;               } };
 
 template<typename NAME, typename T>
 class node
