@@ -301,7 +301,7 @@ public:
 
     constexpr static size_t size()
     {
-        return size_<1, NODES...>();
+        return size_<2, NODES...>(); // 2 for '{' and '}'
     }
 
     template<typename STREAM, typename T>
@@ -318,6 +318,8 @@ public:
             st << '{';
 
             serialize_internal<STREAM, NODES...>(st);
+
+            st << '}';
         }
     }
 
@@ -325,13 +327,19 @@ private:
     template<size_t SIZE, typename NODE, typename NODE_NEXT, typename... TAIL>
     constexpr static size_t size_()
     {
-        return size_<SIZE + NODE::size() + 1, NODE_NEXT, TAIL...>();
+        return size_<SIZE + NODE::size() + 1, NODE_NEXT, TAIL...>(); // 1 for ','
     }
 
     template<size_t SIZE, typename NODE>
     constexpr static size_t size_()
     {
-        return SIZE + NODE::size() + 1;
+        return size_<SIZE + NODE::size()>();
+    }
+
+    template<size_t SIZE>
+    constexpr static size_t size_()
+    {
+        return SIZE; // '}' already counted.
     }
 
     template<typename STREAM, typename NODE, typename NODE_NEXT, typename... TAIL>
@@ -349,7 +357,13 @@ private:
     {
         this->NODE::serialize(st);
 
-        st << '}';
+        serialize_internal<STREAM>(st);
+    }
+
+    template<typename STREAM>
+    void serialize_internal(STREAM& st)                                    const
+    {
+        (void)st;
     }
 
     bool m_enabled { true };
