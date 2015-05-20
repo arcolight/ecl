@@ -25,12 +25,12 @@ typedef object<
     node<level1,
         object<
             node<name1, bool>,
-            node<name3, const char*>,
+            node<name3, string<12>>,
             node<level2, array<
                 object<
                     node<ar_item1, bool>,
                     node<ar_item2, int32_t>,
-                    node<ar_item3, const char*>
+                    node<ar_item3, string<32>>
                 >, 8>
             >
         >
@@ -44,6 +44,7 @@ int main(int argc, char* argv[])
     (void)argv;
 
     document_t doc;
+    document_t doc_2;
 
     bool  val1 = doc.f<name1>();
     bool& val2 = doc.f<name1>();
@@ -91,7 +92,30 @@ int main(int argc, char* argv[])
 
     std::cout << "Serialized count: " << st.count() << std::endl;
     std::cout << st << std::endl;
-    st << ecl::reset();
+//    st << ecl::reset();
+
+    const char* ser_ptr = st;
+    bool deser_result = doc_2.deserialize(ser_ptr);
+    std::cout << "deserialization result: " << (deser_result ? "true" : "false") << std::endl;
+
+    std::cout << "doc_2<name1>: " << (doc_2.f<name1>() ? "true" : "false") << std::endl;
+    std::cout << "doc_2<level1><name1>: " << (doc_2.f<level1>().f<name1>() ? "true" : "false") << std::endl;
+
+    for(auto& i: doc_2.f<level1>().f<level2>())
+    {
+        std::cout << "doc_2<level1><level2><ar_item1>: " << (i.f<ar_item1>() ? "true" : "false") << std::endl;
+        std::cout << "doc_2<level1><level2><ar_item2>: " << i.f<ar_item2>() << std::endl;
+        std::cout << "doc_2<level1><level2><ar_item3>: " << i.f<ar_item3>() << std::endl;
+    }
+
+    std::cout << "doc_2 size: " << document_t::size() << std::endl;
+
+    ecl::stream<document_t::size()> st2;
+    doc_2.serialize(st2);
+
+    std::cout << "Serialized count: " << st2.count() << std::endl;
+    std::cout << st2 << std::endl;
+    st2 << ecl::reset();
 
     return 0;
 }
