@@ -78,7 +78,7 @@ private:
     template<typename STREAM, typename V_T>
     void stringify(STREAM& st, const V_T& val)                             const
     {
-        st << val;        
+        st << val;
     }
 
     template<typename STREAM>
@@ -88,7 +88,7 @@ private:
 
         for(size_t i = 0; i < strlen(val); ++i)
         {
-            if(val[i] == '"'  || 
+            if(val[i] == '"'  ||
                val[i] == '\\' ||
                val[i] == '/')
             {
@@ -230,7 +230,7 @@ private:
     {
         constexpr static bool value
         {
-            std::is_same<NAME, typename N_NAME::name_t>::value 
+            std::is_same<NAME, typename N_NAME::name_t>::value
         };
     };
 
@@ -248,14 +248,14 @@ private:
               class...>
     struct filter;
 
-    template <template <class, class> class Pred, 
+    template <template <class, class> class Pred,
               typename Val,
               template <class...> class Variadic>
     struct filter<Pred, Val, Variadic>
     {
         using type = Variadic<>;
     };
-     
+
     template <template <class, class> class Pred,
               typename Val,
               template <class...> class Variadic,
@@ -268,7 +268,7 @@ private:
         {
             using type = Variadic<Head, Tail...>;
         };
-     
+
         using type = typename std::conditional<
             Pred<Val, T>::value,
             typename cons<T, typename filter<Pred, Val, Variadic, Ts...>::type>::type,
@@ -356,5 +356,5 @@ private:
 };
 
 } // namespace json
-    
+
 } // namespace ecl
