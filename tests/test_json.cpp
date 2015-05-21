@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include <string>
+#include <limits>
 
 #define ECL_WITH_STD_STRING
 
@@ -40,7 +41,7 @@ typedef object<
         >
     >,
     node<name5, bool>
-> document_t;
+> document_ecl_t;
 
 typedef object<
     node<name1, bool>,
@@ -61,93 +62,86 @@ typedef object<
     node<name5, bool>
 > document_std_t;
 
+template<typename T>
+static void fill_document(T& doc)
+{
+    doc.template f<name1>() = true;
+    doc.template f<name2>() = std::numeric_limits<int32_t>::max();
+    doc.template f<level1>().template f<name1>() = false;
+    doc.template f<level1>().template f<name3>() = "name3 node";
+
+    int32_t ctr = -3;
+
+    for(auto& i: doc.template f<level1>().template f<level2>())
+    {
+        i.template f<ar_item1>() = true;
+        i.template f<ar_item2>() = ctr;
+        i.template f<ar_item3>() = "item3";
+        ctr++;
+    }
+
+    doc.template f<name5>() = true;
+}
+
+template<typename T>
+static void dump_document(T& doc, std::string& prefix)
+{
+    std::cout << prefix << "doc<name1>: " << (doc.template f<name1>() ? "true" : "false") << std::endl;
+    std::cout << prefix << "doc<name2>: " << doc.template f<name2>() << std::endl;
+    std::cout << prefix << "doc<level1><name1>: " << (doc.template f<level1>().template f<name1>() ? "true" : "false") << std::endl;
+    std::cout << prefix << "doc<level1><name3>: " << doc.template f<level1>().template f<name3>() << std::endl;
+
+    for(auto& i: doc.template f<level1>().template f<level2>())
+    {
+        std::cout << prefix << "doc<level1><level2><ar_item1>: " << (i.template f<ar_item1>() ? "true" : "false") << std::endl;
+        std::cout << prefix << "doc<level1><level2><ar_item2>: " << i.template f<ar_item2>() << std::endl;
+        std::cout << prefix << "doc<level1><level2><ar_item3>: " << i.template f<ar_item3>() << std::endl;
+    }
+
+    std::cout << prefix << "doc<name5>: " << (doc.template f<name5>() ? "true" : "false") << std::endl;
+}
+
 int main(int argc, char* argv[])
 {
     (void)argc;
     (void)argv;
 
-    document_t doc;
-    document_t doc_2;
+    document_ecl_t doc_ecl;
+    document_ecl_t doc_ecl_2;
     document_std_t doc_std;
+    document_std_t doc_std_2;
 
-    bool  val1 = doc.f<name1>();
-    bool& val2 = doc.f<name1>();
-    val2 = true;
+    std::string ecl_prefix = "[ECL] ";
+    std::string std_prefix = "[STD] ";
 
-    std::cout << "val1: " << (val1 ? "true" : "false") << std::endl;
-    std::cout << "val2: " << (val2 ? "true" : "false") << std::endl;
+    std::cout << ecl_prefix << "document size: " << document_ecl_t::size() << std::endl;
+    std::cout << std_prefix << "document size: " << document_std_t::size() << std::endl;
 
-    doc.f<level1>().f<name3>() = "name3 node";
-    doc.f<name2>() = 0;
+    ecl::stream<document_ecl_t::size()> st_ecl;
+    ecl::stream<document_std_t::size()> st_std;
 
-    doc.f<name1>() = true;
-    std::cout << "doc<name1>: " << (doc.f<name1>() ? "true" : "false") << std::endl;
+    fill_document(doc_ecl);
+    dump_document(doc_ecl, ecl_prefix);
 
-    doc.f<name1>() = false;
-    std::cout << "doc<name1>: " << (doc.f<name1>() ? "true" : "false") << std::endl;
+    fill_document(doc_std);
+    dump_document(doc_std, std_prefix);
 
-    doc.f<level1>().f<name1>() = true;
-    std::cout << "doc<level1><name1>: " << (doc.f<level1>().f<name1>() ? "true" : "false") << std::endl;
+    doc_ecl.serialize(st_ecl);
+    doc_std.serialize(st_std);
 
-    int32_t ctr = 0;
+    std::cout << ecl_prefix << "Serialized count: " << st_ecl.count() << std::endl;
+    std::cout << st_ecl << std::endl;
 
-    for(auto& i: doc.f<level1>().f<level2>())
-    {
-        i.f<ar_item1>() = true;
-        i.f<ar_item2>() = ctr;
-        i.f<ar_item3>() = "item3";
-        ctr++;
-    }
+    std::cout << std_prefix << "Serialized count: " << st_std.count() << std::endl;
+    std::cout << st_std << std::endl;
 
-    for(auto& i: doc.f<level1>().f<level2>())
-    {
-        std::cout << "doc<level1><level2><ar_item1>: " << (i.f<ar_item1>() ? "true" : "false") << std::endl;
-        std::cout << "doc<level1><level2><ar_item2>: " << i.f<ar_item2>() << std::endl;
-        std::cout << "doc<level1><level2><ar_item3>: " << i.f<ar_item3>() << std::endl;
-    }
+    bool deser_result = doc_ecl_2.deserialize(st_ecl);
+    std::cout << ecl_prefix << "deserialization result: " << (deser_result ? "true" : "false") << std::endl;
+    dump_document(doc_ecl_2, ecl_prefix);
 
-    doc.f<name5>() = false;
-
-    std::cout << "doc size: " << document_t::size() << std::endl;
-
-    ecl::stream<document_t::size()> st;
-
-    doc.serialize(st);
-
-    std::cout << "Serialized count: " << st.count() << std::endl;
-    std::cout << st << std::endl;
-
-    bool deser_result = doc_2.deserialize(st);
-    std::cout << "deserialization result: " << (deser_result ? "true" : "false") << std::endl;
-
-    std::cout << "doc_2<name1>: " << (doc_2.f<name1>() ? "true" : "false") << std::endl;
-    std::cout << "doc_2<level1><name1>: " << (doc_2.f<level1>().f<name1>() ? "true" : "false") << std::endl;
-
-    for(auto& i: doc_2.f<level1>().f<level2>())
-    {
-        std::cout << "doc_2<level1><level2><ar_item1>: " << (i.f<ar_item1>() ? "true" : "false") << std::endl;
-        std::cout << "doc_2<level1><level2><ar_item2>: " << i.f<ar_item2>() << std::endl;
-        std::cout << "doc_2<level1><level2><ar_item3>: " << i.f<ar_item3>() << std::endl;
-    }
-
-    std::cout << "doc_2 size: " << document_t::size() << std::endl;
-
-    ecl::stream<document_t::size()> st2;
-    doc_2.serialize(st2);
-
-    std::cout << "Serialized count: " << st2.count() << std::endl;
-    std::cout << st2 << std::endl;
-    st2 << ecl::reset();
-
-    ecl::stream<document_std_t::size()> st3;
-
-    doc_std.f<level1>().f<name3>() = "name3 node";
-    doc_std.serialize(st3);
-
-    std::cout << "Serialized count: " << st3.count() << std::endl;
-    std::cout << st3 << std::endl;
-
-    doc_std.deserialize(st3);
+    deser_result = doc_std_2.deserialize(st_std);
+    std::cout << std_prefix << "deserialization result: " << (deser_result ? "true" : "false") << std::endl;
+    dump_document(doc_std_2, std_prefix);
 
     return 0;
 }

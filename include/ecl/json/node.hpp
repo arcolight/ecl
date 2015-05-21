@@ -124,6 +124,15 @@ private:
 
         st << "\"";
     }
+
+#ifdef ECL_WITH_STD_STRING
+    template<typename STREAM>
+    void stringify(STREAM& st, const std::string& str)                     const
+    {
+        stringify(st, str.data());
+    }
+#endif
+
 };
 
 } // namespace json
