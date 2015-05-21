@@ -19,7 +19,13 @@ public:
         return 2 + OBJ::size() * COUNT + (COUNT - 1); // 2 for '[' and ']'
     }
 
-    bool deserialize(const char*& s)
+    bool deserialize(const char* s)
+    {
+        const char* ptr = s;
+        return deserialize_ref(ptr);
+    }
+
+    bool deserialize_ref(const char*& s)
     {
         if(*s != '[')
         {

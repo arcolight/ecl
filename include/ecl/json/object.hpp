@@ -59,7 +59,10 @@ private:
 
         using type = typename std::conditional<
             Pred<Val, T>::value,
-            typename cons<T, typename filter<Pred, Val, Variadic, Ts...>::type>::type,
+            typename cons<T, typename filter<Pred,
+                                             Val,
+                                             Variadic,
+                                             Ts...>::type>::type,
             typename filter<Pred, Val, Variadic, Ts...>::type >::type;
     };
 
@@ -82,9 +85,17 @@ public:
     }
 
     template<typename NAME>
-    typename std::tuple_element<0, typename filter<name_predicate, NAME, std::tuple, NODES...>::type>::type::value_t& f()
+    typename std::tuple_element<0,
+        typename filter<name_predicate,
+                        NAME,
+                        std::tuple,
+                        NODES...>::type>::type::value_t& f()
     {
-        return this->std::tuple_element<0, typename filter<name_predicate, NAME, std::tuple, NODES...>::type>::type::m_val;
+        return this->std::tuple_element<0,
+            typename filter<name_predicate,
+                            NAME,
+                            std::tuple,
+                            NODES...>::type>::type::m_val;
     }
 
     constexpr static size_t size()
@@ -136,7 +147,7 @@ public:
     bool deserialize(const char* s)
     {
         const char* ptr = s;
-        return deserialize(ptr);
+        return deserialize_ref(ptr);
     }
 
 private:

@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <cstring>
 #include <cstdio>
+#include <cstdlib>
 #include <cinttypes>
 
 namespace ecl
@@ -186,7 +187,7 @@ struct val_deserializer_numeric_signed
     static bool parse(const char*& s, T& val)
     {
         char* end = nullptr;
-        val = static_cast<T>(strtoimax(s, &end, 10));
+        val = static_cast<T>(strtoll(s, &end, 10));
         s = end;
         return true;
     }
@@ -198,7 +199,7 @@ struct val_deserializer_numeric_unsigned
     static bool parse(const char*& s, T& val)
     {
         char* end = nullptr;
-        val = static_cast<T>(strtoumax(s, &end, 10));
+        val = static_cast<T>(strtoull(s, &end, 10));
         s = end;
         return true;
     }
@@ -212,6 +213,40 @@ struct val_deserializer
         return val.deserialize_ref(s);
     }
 };
+
+#ifdef ECL_WITH_STD_STRING
+template<>
+struct val_deserializer<std::string>
+{
+    static bool parse(const char*& s, std::string& val)
+    {
+        if(*s != '"')
+        {
+            return false;
+        }
+        s++;
+
+        for(size_t i = 0; i < strlen(s); ++i)
+        {
+            if(*s == '"')
+            {
+                s++;
+                break;
+            }
+
+            if(*s == '\\' && *(s + 1) == '"')
+            {
+                s++;
+            }
+
+            val.push_back(*s);
+            s++;
+        }
+
+        return true;
+    }
+};
+#endif
 
 template<>
 struct val_deserializer<bool>
