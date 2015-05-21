@@ -55,7 +55,7 @@ private:
     typedef ecl::json::object<
         ecl::json::node<json_1, bool>,
         ecl::json::node<json_2, uint32_t>,
-        ecl::json::node<json_3, const char*>
+        ecl::json::node<json_3, ecl::json::string<64>>
     > document_t;
 public:
     template<typename T>
@@ -64,7 +64,7 @@ public:
         ecl::web::constants::write_status_line(st, req->ver, ecl::web::OK);
 
         st << ecl::web::constants::get_header_name(ecl::web::CONTENT_TYPE)
-           << ":" 
+           << ":"
            << ecl::web::constants::get_content_type(ecl::web::APPLICATION_JSON) << "\r\n";
         st << "\r\n";
 
@@ -175,7 +175,7 @@ void start_server()
         ssize_t bytes_recieved;
         bytes_recieved = recv(new_sd, buffer, 1024, 0);
         // If no data arrives, the program will just wait here until some data arrives.
-        if (bytes_recieved == 0) 
+        if (bytes_recieved == 0)
         {
             std::cout << "host shut down." << std::endl;
         }
