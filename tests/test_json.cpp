@@ -1,5 +1,9 @@
 #include <iostream>
 
+#include <string>
+
+#define ECL_WITH_STD_STRING
+
 #include <ecl/json.hpp>
 #include <ecl/stream.hpp>
 #include <ecl/name_type.hpp>
@@ -38,6 +42,25 @@ typedef object<
     node<name5, bool>
 > document_t;
 
+typedef object<
+    node<name1, bool>,
+    node<name2, int32_t>,
+    node<level1,
+        object<
+            node<name1, bool>,
+            node<name3, std::string>,
+            node<level2, array<
+                object<
+                    node<ar_item1, bool>,
+                    node<ar_item2, int32_t>,
+                    node<ar_item3, std::string>
+                >, 8>
+            >
+        >
+    >,
+    node<name5, bool>
+> document_std_t;
+
 int main(int argc, char* argv[])
 {
     (void)argc;
@@ -45,6 +68,7 @@ int main(int argc, char* argv[])
 
     document_t doc;
     document_t doc_2;
+    document_std_t doc_std;
 
     bool  val1 = doc.f<name1>();
     bool& val2 = doc.f<name1>();
@@ -92,10 +116,8 @@ int main(int argc, char* argv[])
 
     std::cout << "Serialized count: " << st.count() << std::endl;
     std::cout << st << std::endl;
-//    st << ecl::reset();
 
-    const char* ser_ptr = st;
-    bool deser_result = doc_2.deserialize(ser_ptr);
+    bool deser_result = doc_2.deserialize(st);
     std::cout << "deserialization result: " << (deser_result ? "true" : "false") << std::endl;
 
     std::cout << "doc_2<name1>: " << (doc_2.f<name1>() ? "true" : "false") << std::endl;
@@ -116,6 +138,16 @@ int main(int argc, char* argv[])
     std::cout << "Serialized count: " << st2.count() << std::endl;
     std::cout << st2 << std::endl;
     st2 << ecl::reset();
+
+    ecl::stream<document_std_t::size()> st3;
+
+    doc_std.f<level1>().f<name3>() = "name3 node";
+    doc_std.serialize(st3);
+
+    std::cout << "Serialized count: " << st3.count() << std::endl;
+    std::cout << st3 << std::endl;
+
+    doc_std.deserialize(st3);
 
     return 0;
 }

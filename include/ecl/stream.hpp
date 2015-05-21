@@ -8,6 +8,10 @@
 
 #include <type_traits>
 
+#ifdef ECL_WITH_STD_STRING
+#include <string>
+#endif
+
 #include "sized_data.h"
 
 namespace ecl
@@ -52,7 +56,7 @@ class stream{
 public:
     explicit stream(const base   def_base = base::d,
                     const align  def_align = align::l,
-                    const size_t def_width = 8) : 
+                    const size_t def_width = 8) :
         m_def_base(def_base),
         m_def_align(def_align),
         m_def_width(def_width)
@@ -180,7 +184,7 @@ private:
 
     void reset()
     {
-        for(auto &c: m_buf) 
+        for(auto &c: m_buf)
         {
             c = 0;
         }
@@ -195,9 +199,9 @@ private:
     template<typename T>
     void print_num_signed(const T& val)
     {
-        if(val < 0) 
+        if(val < 0)
         {
-            if(base::d == m_base) 
+            if(base::d == m_base)
             {
                 print_val('-');
                 print_num_unsigned(-val);
@@ -219,7 +223,7 @@ private:
     {
         T tmp = val;
 
-        for(auto &c : m_num_buf) 
+        for(auto &c : m_num_buf)
         {
             c = 0;
         }
@@ -250,7 +254,7 @@ private:
             ++p;
         } while(0 != tmp);
 
-        for(uint8_t i = 0; i < (p / 2); ++i) 
+        for(uint8_t i = 0; i < (p / 2); ++i)
         {
             char t = m_num_buf[p - i - 1];
             m_num_buf[p - i - 1] = m_num_buf[i];
@@ -259,6 +263,13 @@ private:
 
         print_val((const char* const)m_num_buf);
     }
+
+#ifdef ECL_WITH_STD_STRING
+    void print_val(const std::string& str)
+    {
+        print_val(str.data());
+    }
+#endif
 
     void print_val(const int8_t& val)
     {
@@ -312,11 +323,11 @@ private:
 
     void print_val(const bool& val)
     {
-        if(val) 
+        if(val)
         {
             print_val("true");
         }
-        else 
+        else
         {
             print_val("false");
         }
@@ -335,7 +346,7 @@ private:
             return;
         }
 
-        for(size_t i = 0; (val[i] != 0) && (m_count < BUFFER_SIZE + 1); ++i) 
+        for(size_t i = 0; (val[i] != 0) && (m_count < BUFFER_SIZE + 1); ++i)
         {
             if(m_count == BUFFER_SIZE)
             {
@@ -370,17 +381,17 @@ private:
         T f = 0.0;
         f = std::modf(val, &i);
 
-        if((i < 0.0) || (f < 0.0)) 
+        if((i < 0.0) || (f < 0.0))
         {
             print_val('-');
         }
 
-        if(i < 0.0) 
+        if(i < 0.0)
         {
             i = -i;
         }
 
-        if(f < 0.0) 
+        if(f < 0.0)
         {
             f = -f;
         }
@@ -399,7 +410,7 @@ private:
     // can be used for all bases till 16.
     const char* m_alphabet = R"(0123456789abcdef)";
 
-    char         m_num_buf[66]; // (u)int64_t in binary mode takes 64 characters 
+    char         m_num_buf[66]; // (u)int64_t in binary mode takes 64 characters
     uint8_t      m_buf[BUFFER_SIZE + 1];
     size_t       m_count { 0 };
 
