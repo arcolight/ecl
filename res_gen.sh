@@ -22,6 +22,11 @@ STRUCT_NAME=res_$RES_NAME_PROG
 STRUCT_NAME_TPD=res_${RES_NAME_PROG}_t
 
 OUT_DIR=$2
+if [ ! -d $OUT_DIR ]; then
+    echo "Creating directory $OUT_DIR";
+    mkdir -p $OUT_DIR
+fi
+
 HEADER_NAME=$RES_NAME_PROG.h
 HEADER_FILE=$OUT_DIR/$HEADER_NAME
 
@@ -43,6 +48,8 @@ echo "} ${STRUCT_NAME_TPD};"                                                    
 echo ""                                                                            >> $HEADER_FILE
 echo "#endif // $HEADER_GUARD_DEF"                                                 >> $HEADER_FILE
 
+echo " * $HEADER_FILE generated"
+
 sed -i -e 's/  0x/        0x/'                            $HEADER_FILE
 sed -i -e 's/};/    };/'                                  $HEADER_FILE
 sed -i -e 's/unsigned int/\n    static constexpr size_t/' $HEADER_FILE
@@ -50,6 +57,8 @@ sed -i -e 's/unsigned int/\n    static constexpr size_t/' $HEADER_FILE
 echo "#include \"$HEADER_NAME\""                           >  $SOURCE_FILE
 echo ""                                                    >> $SOURCE_FILE
 echo "constexpr unsigned char ${STRUCT_NAME_TPD}::data[];" >> $SOURCE_FILE
+
+echo " * $SOURCE_FILE generated"
 
 # echo -n "extern constexpr " > $HEADER_DIR/$HEADER_NAME
 # cd $RES_DIR
