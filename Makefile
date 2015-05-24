@@ -21,8 +21,10 @@ LOG = logger
 INCLUDE_DIR = ./include
 TESTS_DIR = ./tests
 BIN_DIR = ./bin
+WEB_DEF_PAGES_DIR=./web_def_pages
 WEB_RES_SRC_DIR = ./tests/web_resources_src
 WEB_RES_GEN_DIR = ./tests/web_resources
+WEB_GEN_SOURCES = $(WEB_RES_GEN_DIR)/400_html.cpp $(WEB_RES_GEN_DIR)/404_html.cpp $(WEB_RES_GEN_DIR)/500_html.cpp $(WEB_RES_GEN_DIR)/favicon_png.cpp $(WEB_RES_GEN_DIR)/icon_png.cpp $(WEB_RES_GEN_DIR)/index_html.cpp $(WEB_RES_GEN_DIR)/jquery_js.cpp $(WEB_RES_GEN_DIR)/style_css.cpp 
 
 GCC_TGT = _gcc_x86
 CLANG_TGT = _clang_x86
@@ -33,11 +35,14 @@ all: gcc clang
 
 gen_web_res:
 	@mkdir -p $(WEB_RES_GEN_DIR)
-	./res_gen.sh $(WEB_RES_SRC_DIR)/index.html  $(WEB_RES_GEN_DIR)/index.h
-	./res_gen.sh $(WEB_RES_SRC_DIR)/style.css   $(WEB_RES_GEN_DIR)/style.h
-	./res_gen.sh $(WEB_RES_SRC_DIR)/icon.png    $(WEB_RES_GEN_DIR)/icon.h
-	./res_gen.sh $(WEB_RES_SRC_DIR)/favicon.png $(WEB_RES_GEN_DIR)/favicon.h
-	./res_gen.sh $(WEB_RES_SRC_DIR)/jquery.js   $(WEB_RES_GEN_DIR)/jquery.h
+	./res_gen.sh $(WEB_DEF_PAGES_DIR)/400.html  $(WEB_RES_GEN_DIR)/
+	./res_gen.sh $(WEB_DEF_PAGES_DIR)/404.html  $(WEB_RES_GEN_DIR)/
+	./res_gen.sh $(WEB_DEF_PAGES_DIR)/500.html  $(WEB_RES_GEN_DIR)/
+	./res_gen.sh $(WEB_RES_SRC_DIR)/index.html  $(WEB_RES_GEN_DIR)/
+	./res_gen.sh $(WEB_RES_SRC_DIR)/style.css   $(WEB_RES_GEN_DIR)/
+	./res_gen.sh $(WEB_RES_SRC_DIR)/icon.png    $(WEB_RES_GEN_DIR)/
+	./res_gen.sh $(WEB_RES_SRC_DIR)/favicon.png $(WEB_RES_GEN_DIR)/
+	./res_gen.sh $(WEB_RES_SRC_DIR)/jquery.js   $(WEB_RES_GEN_DIR)/
 
 gcc: gen_web_res
 	@mkdir -p $(BIN_DIR)
@@ -51,7 +56,7 @@ gcc: gen_web_res
 	g++ $(CXXFLAGS) $(GCC_SPECIFIC) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(STR_CONST).cpp -o $(BIN_DIR)/test_$(STR_CONST)$(GCC_TGT)
 	g++ $(CXXFLAGS) $(GCC_SPECIFIC) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(CMD).cpp -o $(BIN_DIR)/test_$(CMD)$(GCC_TGT)
 	g++ $(CXXFLAGS) $(GCC_SPECIFIC) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(LOG).cpp -o $(BIN_DIR)/test_$(LOG)$(GCC_TGT)
-	g++ $(CXXFLAGS) $(GCC_SPECIFIC) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(WEB).cpp -o $(BIN_DIR)/test_$(WEB)$(GCC_TGT)
+	g++ $(CXXFLAGS) $(GCC_SPECIFIC) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(WEB).cpp $(WEB_GEN_SOURCES) -o $(BIN_DIR)/test_$(WEB)$(GCC_TGT)
 
 clang: gen_web_res
 	@mkdir -p $(BIN_DIR)
@@ -65,7 +70,7 @@ clang: gen_web_res
 	clang++ $(CXXFLAGS) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(STR_CONST).cpp -o $(BIN_DIR)/test_$(STR_CONST)$(CLANG_TGT)
 	clang++ $(CXXFLAGS) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(CMD).cpp -o $(BIN_DIR)/test_$(CMD)$(CLANG_TGT)
 	clang++ $(CXXFLAGS) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(LOG).cpp -o $(BIN_DIR)/test_$(LOG)$(CLANG_TGT)
-	clang++ $(CXXFLAGS) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(WEB).cpp -o $(BIN_DIR)/test_$(WEB)$(CLANG_TGT)
+	clang++ $(CXXFLAGS) -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(WEB).cpp $(WEB_GEN_SOURCES) -o $(BIN_DIR)/test_$(WEB)$(CLANG_TGT)
 
 gcc_arm_none_eabi:
 	@mkdir -p $(BIN_DIR)

@@ -1,12 +1,13 @@
 #!/bin/sh
 
 if [ $# -lt 2 ] ; then
-    echo "Usage: ./res_gen.sh RES_FILE HEADER_FILE";
+    echo "Usage: ./res_gen.sh RES_FILE OUT_DIR";
     exit 1
 fi
 
 BASE=$(dirname $0)
-TARGET=$(dirname $1)
+HEADER_EXT=h
+SOURCE_EXT=cpp
 
 RES_FILE=$1
 if [ ! -f $RES_FILE ] ; then
@@ -15,12 +16,46 @@ if [ ! -f $RES_FILE ] ; then
 fi
 RES_NAME=$(basename $RES_FILE)
 RES_DIR=$(pwd -P)/$(dirname $RES_FILE)
-HEADER_FILE=$2
-HEADER_NAME=$(basename $HEADER_FILE)
-HEADER_DIR=$(pwd -P)/$(dirname $HEADER_FILE)
 
-echo -n "extern constexpr " > $HEADER_DIR/$HEADER_NAME
-cd $RES_DIR
-xxd -i $RES_NAME >> $HEADER_DIR/$HEADER_NAME
-cd $BASE
-sed -i -e 's/^unsigned int/const unsigned int/' $HEADER_DIR/$HEADER_NAME
+RES_NAME_PROG=$(echo $RES_NAME | tr '.' '_')
+STRUCT_NAME=res_$RES_NAME_PROG
+STRUCT_NAME_TPD=res_${RES_NAME_PROG}_t
+
+OUT_DIR=$2
+HEADER_NAME=$RES_NAME_PROG.h
+HEADER_FILE=$OUT_DIR/$HEADER_NAME
+
+SOURCE_NAME=$RES_NAME_PROG.cpp
+SOURCE_FILE=$OUT_DIR/$SOURCE_NAME
+
+HEADER_GUARD_PREF="WEB_RES_GENERATED"
+HEADER_GUARD_DEF=$HEADER_GUARD_PREF\_$(echo $HEADER_NAME | tr '.' '_' | tr [:lower:] [:upper:])
+echo "#ifndef $HEADER_GUARD_DEF"                                                   >  $HEADER_FILE
+echo "#define $HEADER_GUARD_DEF"                                                   >> $HEADER_FILE
+echo ""                                                                            >> $HEADER_FILE
+echo "#include <cstddef>"                                                          >> $HEADER_FILE
+echo ""                                                                            >> $HEADER_FILE
+echo "typedef struct $STRUCT_NAME"                                                 >> $HEADER_FILE
+echo "{"                                                                           >> $HEADER_FILE
+echo -n "    static constexpr "                                                    >> $HEADER_FILE
+xxd -i $RES_FILE | sed 's/[a-z_0-9]*_len/size/' | sed 's/[a-z_0-9]*\[\]/data\[\]/' >> $HEADER_FILE
+echo "} ${STRUCT_NAME_TPD};"                                                       >> $HEADER_FILE
+echo ""                                                                            >> $HEADER_FILE
+echo "#endif // $HEADER_GUARD_DEF"                                                 >> $HEADER_FILE
+
+sed -i -e 's/  0x/        0x/'                            $HEADER_FILE
+sed -i -e 's/};/    };/'                                  $HEADER_FILE
+sed -i -e 's/unsigned int/\n    static constexpr size_t/' $HEADER_FILE
+
+echo "#include \"$HEADER_NAME\""                           >  $SOURCE_FILE
+echo ""                                                    >> $SOURCE_FILE
+echo "constexpr unsigned char ${STRUCT_NAME_TPD}::data[];" >> $SOURCE_FILE
+
+# echo -n "extern constexpr " > $HEADER_DIR/$HEADER_NAME
+# cd $RES_DIR
+# xxd -i $RES_NAME >> $HEADER_DIR/$HEADER_NAME
+# cd $BASE
+# sed -i -e 's/^unsigned int/const unsigned int/' $HEADER_DIR/$HEADER_NAME
+
+
+# xxd -i web_def_pages/400.html | grep len | sed 's/[a-z_0-9]*_len/size/'

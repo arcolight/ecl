@@ -17,8 +17,7 @@ namespace ecl
 namespace web
 {
 
-template<size_t              SIZE,
-         const uint8_t     (&DATA)[SIZE],
+template<typename            RES_DATA,
          content_type_header TYPE,
          status_code         CODE,
          typename...         NAME
@@ -42,7 +41,7 @@ public:
            << ":" 
            << constants::get_content_type(TYPE) << "\r\n";
         st << "\r\n";
-        st << const_sized_data { DATA, SIZE } << "\r\n";
+        st << const_sized_data { RES_DATA::data, RES_DATA::size } << "\r\n";
     }
 
     static bool check_resource(const request* req)

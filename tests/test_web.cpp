@@ -6,21 +6,20 @@
 #include <netdb.h>
 #include <unistd.h>
 
-#include <ecl/web/resource.hpp>
-#include <ecl/web/resource_table.hpp>
-#include <ecl/web/server.hpp>
-#include <ecl/web/cgi.hpp>
-#include <ecl/web/default_pages.hpp>
-
 #include <ecl/str_const.hpp>
 #include <ecl/name_type.hpp>
 #include <ecl/json.hpp>
+#include <ecl/web.hpp>
 
-#include "web_resources/index.h"
-#include "web_resources/style.h"
-#include "web_resources/jquery.h"
-#include "web_resources/icon.h"
-#include "web_resources/favicon.h"
+#include "web_resources/index_html.h"
+#include "web_resources/style_css.h"
+#include "web_resources/jquery_js.h"
+#include "web_resources/icon_png.h"
+#include "web_resources/favicon_png.h"
+
+#include "web_resources/400_html.h"
+#include "web_resources/404_html.h"
+#include "web_resources/500_html.h"
 
 ECL_DECL_NAME_TYPE_STRING(index_name_1,  "/")
 ECL_DECL_NAME_TYPE_STRING(index_name_2,  "/index.html")
@@ -29,6 +28,11 @@ ECL_DECL_NAME_TYPE_STRING(favicon_name,  "/favicon.png")
 ECL_DECL_NAME_TYPE_STRING(style_name,    "/etc/style.css")
 ECL_DECL_NAME_TYPE_STRING(jquery_name,   "/etc/js/jquery.js")
 ECL_DECL_NAME_TYPE_STRING(info_name,     "/info")
+
+
+ECL_DECL_NAME_TYPE_STRING(page_400_name, "/400.html")
+ECL_DECL_NAME_TYPE_STRING(page_404_name, "/404.html")
+ECL_DECL_NAME_TYPE_STRING(page_500_name, "/500.html")
 
 int new_sd = 0;
 
@@ -84,14 +88,14 @@ private:
 
 typedef ecl::web::server<
             ecl::web::resource_table<
-                ecl::web::default_page_400,
-                ecl::web::default_page_404,
-                ecl::web::default_page_500,
-                ecl::web::resource<index_html_len,  index_html,  ecl::web::TEXT_HTML,       ecl::web::OK, index_name_1, index_name_2>,
-                ecl::web::resource<icon_png_len,    icon_png,    ecl::web::IMAGE_PNG,       ecl::web::OK, icon_name>,
-                ecl::web::resource<favicon_png_len, favicon_png, ecl::web::IMAGE_PNG,       ecl::web::OK, favicon_name>,
-                ecl::web::resource<style_css_len,   style_css,   ecl::web::TEXT_CSS,        ecl::web::OK, style_name>,
-                ecl::web::resource<jquery_js_len,   jquery_js,   ecl::web::TEXT_JAVASCRIPT, ecl::web::OK, jquery_name>,
+                ecl::web::resource<res_400_html_t,    ecl::web::TEXT_HTML,       ecl::web::BAD_REQUEST,           page_400_name>,
+                ecl::web::resource<res_404_html_t,    ecl::web::TEXT_HTML,       ecl::web::NOT_FOUND,             page_404_name>,
+                ecl::web::resource<res_500_html_t,    ecl::web::TEXT_HTML,       ecl::web::INTERNAL_SERVER_ERROR, page_500_name>,
+                ecl::web::resource<res_index_html_t,  ecl::web::TEXT_HTML,       ecl::web::OK,                    index_name_1, index_name_2>,
+                ecl::web::resource<res_icon_png_t,    ecl::web::IMAGE_PNG,       ecl::web::OK,                    icon_name>,
+                ecl::web::resource<res_favicon_png_t, ecl::web::IMAGE_PNG,       ecl::web::OK,                    favicon_name>,
+                ecl::web::resource<res_style_css_t,   ecl::web::TEXT_CSS,        ecl::web::OK,                    style_name>,
+                ecl::web::resource<res_jquery_js_t,   ecl::web::TEXT_JAVASCRIPT, ecl::web::OK,                    jquery_name>,
                 info<info_name>
             >
 > server_t;
