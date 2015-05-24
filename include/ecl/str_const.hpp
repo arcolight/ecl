@@ -1,5 +1,5 @@
-#ifndef ECL_STR_CONST
-#define ECL_STR_CONST
+#ifndef ECL_STR_CONST_HPP
+#define ECL_STR_CONST_HPP
 
 #include <cstdlib>
 
@@ -48,4 +48,4 @@ private:
 
 } // namespace ecl
 
-#endif // ECL_STR_CONST
+#endif // ECL_STR_CONST_HPP

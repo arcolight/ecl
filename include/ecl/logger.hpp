@@ -1,4 +1,6 @@
-#pragma once
+#ifndef ECL_LOGGER_HPP
+#define ECL_LOGGER_HPP
+
 #include "stream.hpp"
 
 namespace ecl
@@ -80,3 +82,5 @@ private:
 };
     
 } // namespace ecl
+
+#endif // ECL_LOGGER_HPP

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ECL_WEB_CGI_HPP
+#define ECL_WEB_CGI_HPP
 
 #include "request.hpp"
 
@@ -40,3 +41,5 @@ public:
 } // namespace web
 
 } // namespace ecl
+
+#endif // ECL_WEB_CGI_HPP

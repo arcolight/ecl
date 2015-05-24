@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ECL_JSON_ARRAY_HPP
+#define ECL_JSON_ARRAY_HPP
 
 #include <array>
 
@@ -149,3 +150,5 @@ protected:
 } // namespace json
 
 } // namespace ecl
+
+#endif // ECL_JSON_ARRAY_HPP

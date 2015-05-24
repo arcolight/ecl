@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ECL_WEB_HEADERS
+#define ECL_WEB_HEADERS
 
 namespace ecl
 {
@@ -21,3 +22,5 @@ struct header
 } // namespace web
 
 } // namespace ecl
+
+#endif // ECL_WEB_HEADERS

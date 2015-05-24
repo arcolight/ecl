@@ -1,5 +1,5 @@
-#ifndef ECL_CB_HPP
-#define ECL_CB_HPP
+#ifndef ECL_CIRCULAR_BUFFER_HPP
+#define ECL_CIRCULAR_BUFFER_HPP
 
 #include <cstddef>
 #include <type_traits>
@@ -415,4 +415,4 @@ private:
 
 } // namespace ecl
 
-#endif // ECL_CB_HPP
+#endif // ECL_CIRCULAR_BUFFER_HPP

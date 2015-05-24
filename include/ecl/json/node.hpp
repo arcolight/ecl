@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ECL_JSON_NODE_HPP
+#define ECL_JSON_NODE_HPP
 
 #include "helpers.hpp"
 
@@ -138,3 +139,5 @@ private:
 } // namespace json
 
 } // namespace ecl
+
+#endif // ECL_JSON_NODE_HPP

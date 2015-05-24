@@ -1,5 +1,5 @@
-#ifndef SCOPE_GUARD_HPP_
-#define SCOPE_GUARD_HPP_
+#ifndef ECL_SCOPE_GUARD_HPP
+#define ECL_SCOPE_GUARD_HPP
 
 #include <functional>
 #include <utility>
@@ -16,7 +16,6 @@ class scope_guard
     scope_guard& operator=(const scope_guard&&) = delete;
 
 public:
-
     explicit scope_guard(std::function<void()> &&action) :
         m_action(std::forward<decltype(m_action)>(action))
     {
@@ -34,4 +33,4 @@ private:
 
 } // namespace ecl
 
-#endif /* SCOPE_GUARD_HPP_ */
+#endif // ECL_SCOPE_GUARD_HPP */

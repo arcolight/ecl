@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ECL_WEB_DEFAULT_PAGES
+#define ECL_WEB_DEFAULT_PAGES
 
 #include <ecl/name_type.hpp>
 #include "constants.hpp"
@@ -53,3 +54,5 @@ typedef resource<sizeof(default_page_500_data),
 } // namespace web
 
 } // namespace ecl
+
+#endif // ECL_WEB_DEFAULT_PAGES

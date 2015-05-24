@@ -83,7 +83,6 @@ private:
 };
 
 typedef ecl::web::server<
-            1024,
             ecl::web::resource_table<
                 ecl::web::default_page_400,
                 ecl::web::default_page_404,
@@ -94,8 +93,7 @@ typedef ecl::web::server<
                 ecl::web::resource<style_css_len,   style_css,   ecl::web::TEXT_CSS,        ecl::web::OK, style_name>,
                 ecl::web::resource<jquery_js_len,   jquery_js,   ecl::web::TEXT_JAVASCRIPT, ecl::web::OK, jquery_name>,
                 info<info_name>
-            >,
-            write_sock
+            >
 > server_t;
 
 char buffer[1024];
@@ -188,7 +186,9 @@ void start_server()
         buffer[bytes_recieved] = 0;
         std::cout << buffer << std::endl;
 
-        server.process_request(buffer, bytes_recieved);
+        ecl::stream<1024, write_sock> out_stream;
+        server.process_request(buffer, bytes_recieved, out_stream);
+        out_stream.flush();
 
         close(new_sd);
     }

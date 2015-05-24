@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ECL_WEB_RESOURCE_TABLE
+#define ECL_WEB_RESOURCE_TABLE
 
 #include <cstring>
 #include "request.hpp"
@@ -63,3 +64,5 @@ private:
 } // namespace web
 
 } // namespace ecl
+
+#endif // ECL_WEB_RESOURCE_TABLE

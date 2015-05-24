@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ECL_WEB_SERVER_HPP
+#define ECL_WEB_SERVER_HPP
 
 #include "request_parser.hpp"
 
@@ -10,23 +11,18 @@ namespace ecl
 namespace web
 {
 
-template<size_t STREAM_SIZE,
-         typename RESOURCES,
-         flush_function_t F>
+template<typename RESOURCES>
 class server
 {
 public:
-    typedef RESOURCES              resources_t;
-    typedef stream<STREAM_SIZE, F> stream_t;
+    typedef RESOURCES resources_t;
 
-    void process_request(char* req_raw, size_t size)
+    template<typename STREAM>
+    void process_request(char* req_raw, size_t size, STREAM& st)
     {
-        m_resources.template call<stream_t>(m_stream, m_parser.parse(req_raw, size));
-
-        m_stream.flush();
+        m_resources.template call<STREAM>(st, m_parser.parse(req_raw, size));
     }
 
-    stream_t       m_stream    {};
     resources_t    m_resources {};
     request_parser m_parser    {};
 };
@@ -34,3 +30,5 @@ public:
 } // namespace web
     
 } // namespace ecl
+
+#endif // ECL_WEB_SERVER_HPP

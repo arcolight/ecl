@@ -1,5 +1,5 @@
-#ifndef ECL_FIELD_H
-#define ECL_FIELD_H
+#ifndef ECL_BIT_FIELD_HPP
+#define ECL_BIT_FIELD_HPP
 
 #include <cstdint>
 #include <cstdlib>
@@ -189,4 +189,4 @@ private:
 
 } // namespace ecl
 
-#endif //ECL_FIELD_H
+#endif //ECL_BIT_FIELD_HPP

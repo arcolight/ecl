@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ECL_JSON_HELPERS_HPP
+#define ECL_JSON_HELPERS_HPP
 
 #include <cstdint>
 #include <cstring>
@@ -348,3 +349,5 @@ struct val_deserializer<uint64_t>
 } // namespace json
 
 } // namespace ecl
+
+#endif // ECL_JSON_HELPERS_HPP

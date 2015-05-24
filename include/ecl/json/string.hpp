@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ECL_JSON_STRING_HPP
+#define ECL_JSON_STRING_HPP
 
 #include <cstdio>
 #include <cstring>
@@ -144,3 +145,5 @@ public:
 } // namespace json
 
 } // namespace ecl
+
+#endif // ECL_JSON_STRING_HPP

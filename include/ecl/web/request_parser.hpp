@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ECL_WEB_REQUEST_PARSER_HPP
+#define ECL_WEB_REQUEST_PARSER_HPP
 
 #include <cstring>
 
@@ -78,3 +79,5 @@ private:
 } // namespace web
 
 } // namespace ecl
+
+#endif // ECL_WEB_REQUEST_PARSER_HPP

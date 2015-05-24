@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ECL_WEB_RESOURCE_HPP
+#define ECL_WEB_RESOURCE_HPP
 
 #include <cstdint>
 #include <cstring>
@@ -72,3 +73,5 @@ public:
 } // namespace web
 
 } // namespace ecl
+
+#endif // ECL_WEB_RESOURCE_HPP

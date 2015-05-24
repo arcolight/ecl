@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ECL_WEB_REQUEST_HPP
+#define ECL_WEB_REQUEST_HPP
 
 #include "constants.hpp"
 #include "headers.hpp"
@@ -50,3 +51,5 @@ struct request
 } // namespace web
 
 } // namespace ecl
+
+#endif // ECL_WEB_REQUEST_HPP

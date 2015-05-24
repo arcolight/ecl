@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ECL_WEB_PARSER_FSM_HPP
+#define ECL_WEB_PARSER_FSM_HPP
 
 #include <ecl/fsm.hpp>
 
@@ -182,3 +183,5 @@ private:
 } // namespace web
 
 } // namespace ecl
+
+#endif // ECL_WEB_PARSER_FSM_HPP

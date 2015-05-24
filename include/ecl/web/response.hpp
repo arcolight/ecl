@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ECL_WEB_RESPONSE_HPP
+#define ECL_WEB_RESPONSE_HPP
 
 #include "constants.hpp"
 
@@ -18,3 +19,5 @@ struct response
 } // namespace web
     
 } // namespace ecl
+
+#endif // ECL_WEB_RESPONSE_HPP

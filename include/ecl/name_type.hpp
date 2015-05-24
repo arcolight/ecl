@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ECL_NAME_TYPE_HPP
+#define ECL_NAME_TYPE_HPP
 
 #include "str_const.hpp"
 
@@ -34,3 +35,5 @@ struct nm                                     \
 };
 
 } //namespace ecl
+
+#endif // ECL_NAME_TYPE_HPP

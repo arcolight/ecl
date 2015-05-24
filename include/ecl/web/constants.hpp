@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ECL_WEB_CONSTANTS_HPP
+#define ECL_WEB_CONSTANTS_HPP
 
 namespace ecl
 {
@@ -179,3 +180,4 @@ struct constants
     
 } // namespace ecl
 
+#endif // ECL_WEB_CONSTANTS_HPP

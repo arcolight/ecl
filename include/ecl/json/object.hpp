@@ -1,4 +1,5 @@
-#pragma once
+#ifndef ECL_JSON_OBJECT_HPP
+#define ECL_JSON_OBJECT_HPP
 
 #include <type_traits>
 #include <tuple>
@@ -235,3 +236,5 @@ private:
 } // namespace json
 
 } // namespace ecl
+
+#endif // ECL_JSON_OBJECT_HPP
