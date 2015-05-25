@@ -271,4 +271,3 @@ state_machine<derived, state_t, init>::transition_table<rows...>::transition_tab
 } // namespace ecl
 
 #endif // ECL_FSM_HPP
-

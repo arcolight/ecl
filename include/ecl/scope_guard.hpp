@@ -9,11 +9,11 @@ namespace ecl
 
 class scope_guard
 {
-    scope_guard() = delete;
-    scope_guard(const scope_guard&) = delete;
-    scope_guard(const scope_guard&&) = delete;
-    scope_guard& operator=(const scope_guard&) = delete;
-    scope_guard& operator=(const scope_guard&&) = delete;
+    scope_guard()                                                      = delete;
+    scope_guard(const scope_guard&)                                    = delete;
+    scope_guard(const scope_guard&&)                                   = delete;
+    scope_guard& operator=(const scope_guard&)                         = delete;
+    scope_guard& operator=(const scope_guard&&)                        = delete;
 
 public:
     explicit scope_guard(std::function<void()> &&action) :
