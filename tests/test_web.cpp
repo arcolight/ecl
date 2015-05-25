@@ -18,6 +18,7 @@
 #include "web_resources/favicon_png.h"
 
 #include "web_resources/400_html.h"
+#include "web_resources/403_html.h"
 #include "web_resources/404_html.h"
 #include "web_resources/500_html.h"
 
@@ -31,7 +32,7 @@ ECL_DECL_NAME_TYPE_STRING(info_name,     "/info")
 ECL_DECL_NAME_TYPE_STRING(auth_name,     "/auth")
 
 ECL_DECL_NAME_TYPE_STRING(page_400_name, "/400.html")
-ECL_DECL_NAME_TYPE_STRING(page_404_name, "/403.html")
+ECL_DECL_NAME_TYPE_STRING(page_403_name, "/403.html")
 ECL_DECL_NAME_TYPE_STRING(page_404_name, "/404.html")
 ECL_DECL_NAME_TYPE_STRING(page_500_name, "/500.html")
 
@@ -98,7 +99,7 @@ public:
 typedef ecl::web::server<
             ecl::web::resource_table<
                 ecl::web::resource<res_400_html_t,    ecl::web::TEXT_HTML,       ecl::web::BAD_REQUEST,           page_400_name>,
-                ecl::web::resource<res_403_html_t,    ecl::web::TEXT_HTML,       ecl::web::NOT_FOUND,             page_403_name>,
+//                ecl::web::resource<res_403_html_t,    ecl::web::TEXT_HTML,       ecl::web::FORBIDDEN,             page_403_name>,
                 ecl::web::resource<res_404_html_t,    ecl::web::TEXT_HTML,       ecl::web::NOT_FOUND,             page_404_name>,
                 ecl::web::resource<res_500_html_t,    ecl::web::TEXT_HTML,       ecl::web::INTERNAL_SERVER_ERROR, page_500_name>,
                 ecl::web::resource<res_index_html_t,  ecl::web::TEXT_HTML,       ecl::web::OK,                    index_name_1, index_name_2>,
