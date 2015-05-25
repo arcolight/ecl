@@ -28,9 +28,10 @@ ECL_DECL_NAME_TYPE_STRING(favicon_name,  "/favicon.png")
 ECL_DECL_NAME_TYPE_STRING(style_name,    "/etc/style.css")
 ECL_DECL_NAME_TYPE_STRING(jquery_name,   "/etc/js/jquery.js")
 ECL_DECL_NAME_TYPE_STRING(info_name,     "/info")
-
+ECL_DECL_NAME_TYPE_STRING(auth_name,     "/auth")
 
 ECL_DECL_NAME_TYPE_STRING(page_400_name, "/400.html")
+ECL_DECL_NAME_TYPE_STRING(page_404_name, "/403.html")
 ECL_DECL_NAME_TYPE_STRING(page_404_name, "/404.html")
 ECL_DECL_NAME_TYPE_STRING(page_500_name, "/500.html")
 
@@ -40,12 +41,6 @@ void write_sock(const char* const buf, size_t size)
 {
     std::cout << buf;
     send(new_sd, buf, size, 0);
-}
-
-void write_stdout(const char* const buf, size_t size)
-{
-    (void)(size);
-    std::cout << buf;
 }
 
 ECL_DECL_NAME_TYPE(json_1)
@@ -86,9 +81,24 @@ private:
     uint32_t   m_counter { 0 };
 };
 
+template<typename... NAME>
+class auth : public ecl::web::cgi<NAME...>
+{
+public:
+    template<typename T>
+    void exec(T& st, const ecl::web::request* req)
+    {
+        std::cout << req->uri << std::endl;
+        std::cout << req->uri_param << std::endl;
+
+        ecl::web::constants::write_status_line(st, req->ver, ecl::web::OK);
+    }
+};
+
 typedef ecl::web::server<
             ecl::web::resource_table<
                 ecl::web::resource<res_400_html_t,    ecl::web::TEXT_HTML,       ecl::web::BAD_REQUEST,           page_400_name>,
+                ecl::web::resource<res_403_html_t,    ecl::web::TEXT_HTML,       ecl::web::NOT_FOUND,             page_403_name>,
                 ecl::web::resource<res_404_html_t,    ecl::web::TEXT_HTML,       ecl::web::NOT_FOUND,             page_404_name>,
                 ecl::web::resource<res_500_html_t,    ecl::web::TEXT_HTML,       ecl::web::INTERNAL_SERVER_ERROR, page_500_name>,
                 ecl::web::resource<res_index_html_t,  ecl::web::TEXT_HTML,       ecl::web::OK,                    index_name_1, index_name_2>,
@@ -96,7 +106,8 @@ typedef ecl::web::server<
                 ecl::web::resource<res_favicon_png_t, ecl::web::IMAGE_PNG,       ecl::web::OK,                    favicon_name>,
                 ecl::web::resource<res_style_css_t,   ecl::web::TEXT_CSS,        ecl::web::OK,                    style_name>,
                 ecl::web::resource<res_jquery_js_t,   ecl::web::TEXT_JAVASCRIPT, ecl::web::OK,                    jquery_name>,
-                info<info_name>
+                info<info_name>,
+                auth<auth_name>
             >
 > server_t;
 

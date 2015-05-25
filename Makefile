@@ -36,6 +36,7 @@ all: gcc clang
 gen_web_res:
 	@mkdir -p $(WEB_RES_GEN_DIR)
 	./res_gen.sh $(WEB_DEF_PAGES_DIR)/400.html  $(WEB_RES_GEN_DIR)/
+	./res_gen.sh $(WEB_DEF_PAGES_DIR)/403.html  $(WEB_RES_GEN_DIR)/
 	./res_gen.sh $(WEB_DEF_PAGES_DIR)/404.html  $(WEB_RES_GEN_DIR)/
 	./res_gen.sh $(WEB_DEF_PAGES_DIR)/500.html  $(WEB_RES_GEN_DIR)/
 	./res_gen.sh $(WEB_RES_SRC_DIR)/index.html  $(WEB_RES_GEN_DIR)/

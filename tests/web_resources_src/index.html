@@ -19,16 +19,16 @@
 					    	$.each(data,function(k,v){
 					    		$('#'+k).text(v);
 					    	});
-	   				  	setTimeout(updateJson, 1000);
+	   				  	setTimeout(updateJson, 5000);
    					  }
 					});
 				}
 				updateJson();
 			});
 		</script>
+
 	</head>
 	<body>
-
 		<div id="wrapper">
 			<div id="container">
 				<div id="header">
@@ -38,12 +38,17 @@
 					</div>
 				</div>
 				<div class="content">
+					<form action="auth" method="POST">
+					<input type="password" name="pass" value="" />
+					<input type="submit" name="pass_send" value="send" /><br>
+					</form> 
+				</div>
+				<div class="content">
 					<b>JSON value1: </b><span id="json_1">--</span><br>
 					<b>JSON value2: </b><span id="json_2">--</span><br>
 					<b>JSON value3: </b><span id="json_3">--</span><br>
 				</div>
 			</div>
 		</div>
-
 	</body>
 </html>
