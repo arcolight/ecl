@@ -1,7 +1,7 @@
 #ifndef ECL_COMMAND_PROCESSOR_HPP
 #define ECL_COMMAND_PROCESSOR_HPP
 
-#include "command.hpp"
+#include <ecl/command.hpp>
 
 #include <cstring>
 

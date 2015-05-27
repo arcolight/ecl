@@ -3,12 +3,12 @@
 
 #include <ecl/fsm.hpp>
 
-#include "request.hpp"
+#include <ecl/web/request.hpp>
 
 namespace ecl
 {
 
-namespace web 
+namespace web
 {
 
 enum class parser_state
@@ -26,7 +26,7 @@ struct event_line
     explicit event_line(char* l) : line(l)
     {}
 
-    char* line { nullptr }; 
+    char* line { nullptr };
 };
 struct empty_line {};
 struct end_of_req {};
@@ -56,7 +56,7 @@ class parser_fsm : public state_machine<parser_fsm,
         }
 
         char* version_str = strchr(uri_str + 1, ' ');
-        if(nullptr == version_str) 
+        if(nullptr == version_str)
         {
             return false;
         }
@@ -111,13 +111,13 @@ class parser_fsm : public state_machine<parser_fsm,
         char* name = e.line;
         if(nullptr == name)
         {
-            return false; 
+            return false;
         }
 
         char* value = strchr(name, ':');
-        if(nullptr == value) 
+        if(nullptr == value)
         {
-            return false; 
+            return false;
         }
 
         *value = 0x00; ++value;

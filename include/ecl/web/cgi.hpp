@@ -1,12 +1,12 @@
 #ifndef ECL_WEB_CGI_HPP
 #define ECL_WEB_CGI_HPP
 
-#include "request.hpp"
+#include <ecl/web/request.hpp>
 
 namespace ecl
 {
 
-namespace web 
+namespace web
 {
 
 template<typename... NAME>
@@ -34,7 +34,7 @@ public:
     static bool check_resource_internal(const request* req)
     {
         (void)(req);
-        return false;        
+        return false;
     }
 };
 

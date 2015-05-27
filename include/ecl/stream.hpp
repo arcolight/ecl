@@ -4,7 +4,7 @@
 #include <cstdlib>
 #include <cstdint>
 #include <cmath>
-#include <ctype.h>
+#include <cctype>
 
 #include <type_traits>
 
@@ -12,7 +12,7 @@
 #include <string>
 #endif
 
-#include "sized_data.h"
+#include <ecl/sized_data.h>
 
 namespace ecl
 {

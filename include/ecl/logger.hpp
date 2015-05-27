@@ -1,7 +1,7 @@
 #ifndef ECL_LOGGER_HPP
 #define ECL_LOGGER_HPP
 
-#include "stream.hpp"
+#include <ecl/stream.hpp>
 
 namespace ecl
 {
@@ -19,7 +19,7 @@ private:
 
 public:
     logger(const LEVELS def_level) : m_level(def_level) {}
-    
+
     logger& operator() (const LEVELS& l)
     {
         m_enabled = false;
@@ -80,7 +80,7 @@ private:
     stream_t m_stream;
     bool     m_enabled { false };
 };
-    
+
 } // namespace ecl
 
 #endif // ECL_LOGGER_HPP

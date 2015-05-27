@@ -1,7 +1,7 @@
 #ifndef ECL_JSON_NODE_HPP
 #define ECL_JSON_NODE_HPP
 
-#include "helpers.hpp"
+#include <ecl/json/helpers.hpp>
 
 namespace ecl
 {

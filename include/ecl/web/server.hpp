@@ -1,9 +1,8 @@
 #ifndef ECL_WEB_SERVER_HPP
 #define ECL_WEB_SERVER_HPP
 
-#include "request_parser.hpp"
-
 #include <ecl/stream.hpp>
+#include <ecl/web/request_parser.hpp>
 
 namespace ecl
 {
@@ -28,7 +27,7 @@ public:
 };
 
 } // namespace web
-    
+
 } // namespace ecl
 
 #endif // ECL_WEB_SERVER_HPP

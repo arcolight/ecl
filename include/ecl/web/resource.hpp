@@ -8,8 +8,8 @@
 #include <tuple>
 
 #include <ecl/sized_data.h>
-#include "request.hpp"
-#include "constants.hpp"
+#include <ecl/web/request.hpp>
+#include <ecl/web/constants.hpp>
 
 namespace ecl
 {
@@ -38,7 +38,7 @@ public:
         }
 
         st << constants::get_header_name(CONTENT_TYPE)
-           << ":" 
+           << ":"
            << constants::get_content_type(TYPE) << "\r\n";
         st << "\r\n";
         st << const_sized_data { RES_DATA::data, RES_DATA::size } << "\r\n";
@@ -65,7 +65,7 @@ public:
     static bool check_resource_internal(const request* req)
     {
         (void)(req);
-        return false;        
+        return false;
     }
 };
 

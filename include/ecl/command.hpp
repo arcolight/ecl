@@ -7,14 +7,16 @@
 
 #include <array>
 
-#include "singleton.hpp"
+#include <ecl/singleton.hpp>
 
 #ifndef RECEIVER_CAPACITY
 #define RECEIVER_CAPACITY 32
+// #pragma message ("[ECL command.hpp] Defaulting to receiver capacity = " )
 #endif
 
 #ifndef DEFAULT_INDENT_INCREMENT
 #define DEFAULT_INDENT_INCREMENT 4
+// #pragma message "[ECL command.hpp] Defaulting to indent increment = 4"
 #endif
 
 namespace ecl
@@ -29,9 +31,9 @@ static void print_indent(ST& st, size_t indent)
     }
 }
 
-namespace detail 
+namespace detail
 {
-    
+
 template<typename cmd>
 class i_receiver
 {
@@ -72,7 +74,7 @@ protected:
 
 private:
     typedef ecl::singleton<
-                std::array<detail::i_receiver<cmd>*, RECEIVER_CAPACITY> 
+                std::array<detail::i_receiver<cmd>*, RECEIVER_CAPACITY>
             > array_singleton;
 };
 

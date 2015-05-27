@@ -2,7 +2,7 @@
 #define ECL_WEB_RESOURCE_TABLE
 
 #include <cstring>
-#include "request.hpp"
+#include <ecl/web/request.hpp>
 
 namespace ecl
 {

@@ -1,7 +1,7 @@
 #ifndef ECL_NAME_TYPE_HPP
 #define ECL_NAME_TYPE_HPP
 
-#include "str_const.hpp"
+#include <ecl/str_const.hpp>
 
 namespace ecl
 {

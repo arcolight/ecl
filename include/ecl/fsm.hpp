@@ -3,7 +3,7 @@
 
 #include <cstddef>
 
-#include "singleton.hpp"
+#include <ecl/singleton.hpp>
 
 namespace ecl
 {
@@ -45,7 +45,7 @@ protected:
 
         void add(transition_info_t* const ti)
         {
-            if(nullptr == m_list) 
+            if(nullptr == m_list)
             {
                 m_list = ti;
                 return;
@@ -73,14 +73,14 @@ protected:
                 {
                     bool transition = true;
 
-                    if(nullptr != entry->guard) 
+                    if(nullptr != entry->guard)
                     {
                         transition = (fsm.*(entry->guard))(e);
                     }
 
-                    if(transition) 
+                    if(transition)
                     {
-                        if(nullptr != entry->action) 
+                        if(nullptr != entry->action)
                         {
                             (fsm.*(entry->action))(e);
                         }
@@ -140,7 +140,7 @@ protected:
     template<state_t state,
              on_enter_t on_enter = nullptr,
              on_exit_t on_exit = nullptr>
-    class scb 
+    class scb
     {
     protected:
         constexpr static state_t    cb_state()    { return state;    }
@@ -173,9 +173,9 @@ protected:
         template<size_t CNT, typename callback, typename... tail>
         static void on_exit_chain(derived& fsm, const state_t s)
         {
-            if(callback::cb_state() == s) 
+            if(callback::cb_state() == s)
             {
-                if(nullptr != callback::cb_on_exit()) 
+                if(nullptr != callback::cb_on_exit())
                 {
                     (fsm.*(callback::cb_on_exit()))();
                 }
@@ -197,7 +197,7 @@ protected:
         {
             if(callback::cb_state() == s)
             {
-                if(nullptr != callback::cb_on_enter()) 
+                if(nullptr != callback::cb_on_enter())
                 {
                     (fsm.*(callback::cb_on_enter()))();
                 }
@@ -221,12 +221,12 @@ public:
              typename callback_table_t>
     state_t transition(const event_t& e);
 
-    state_t state()                                                        const 
+    state_t state()                                                        const
     {
-        return m_state; 
+        return m_state;
     }
 
-    void reset()    
+    void reset()
     {
         m_state = m_s_init_state;
     }

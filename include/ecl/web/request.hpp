@@ -1,11 +1,12 @@
 #ifndef ECL_WEB_REQUEST_HPP
 #define ECL_WEB_REQUEST_HPP
 
-#include "constants.hpp"
-#include "headers.hpp"
+#include <ecl/web/constants.hpp>
+#include <ecl/web/headers.hpp>
 
 #ifndef MAX_HEADERS_COUNT
 #define MAX_HEADERS_COUNT 64
+// #pragma message "[ECL web/headers.hpp] Defaulting to Max headers coubtn = 64"
 #endif
 
 namespace ecl

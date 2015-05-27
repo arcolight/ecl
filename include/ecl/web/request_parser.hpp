@@ -5,12 +5,12 @@
 
 #include <algorithm>
 
-#include "parser_fsm.hpp"
+#include <ecl/web/parser_fsm.hpp>
 
 namespace ecl
 {
 
-namespace web 
+namespace web
 {
 
 class request_parser
