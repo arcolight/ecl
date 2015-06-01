@@ -144,7 +144,7 @@ public:
     }
 
 protected:
-    array_t m_val;
+    array_t m_val { { } };
 };
 
 } // namespace json

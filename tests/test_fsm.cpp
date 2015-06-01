@@ -87,11 +87,11 @@ public:
 struct play {};
 struct open_close {};
 struct cd_detected { 
-    cd_detected(char const* const name, std::vector<float> const& tracks_duration) :
+    cd_detected(std::string name, std::vector<float> const& tracks_duration) :
     m_name(name), m_tracks(tracks_duration)
     {}
 
-    const char* const     m_name;
+    std::string        m_name;
     std::vector<float> m_tracks;
 };
 struct pause {};

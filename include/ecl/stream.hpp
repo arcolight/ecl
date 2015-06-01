@@ -418,10 +418,10 @@ private:
     const align  m_def_align;
     const size_t m_def_width;
 
-    base         m_base;
-    align        m_align;
-    size_t       m_width;
-    cs           m_case;
+    base         m_base  { m_def_base  };
+    align        m_align { m_def_align };
+    size_t       m_width { m_def_width };
+    cs           m_case  { cs::lower   };
 };
 
 } // namespace ecl

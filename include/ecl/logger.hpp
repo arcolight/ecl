@@ -77,7 +77,7 @@ private:
     }
 
     LEVELS   m_level;
-    stream_t m_stream;
+    stream_t m_stream {};
     bool     m_enabled { false };
 };
 

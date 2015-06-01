@@ -178,10 +178,8 @@ public:
                 data_(data)
             {}
 
-            self_type operator++()
+            self_type& operator++()
             {
-                self_type i = *this;
-
                 if(CAPACITY == index_)
                 {
                     index_ = 0;
@@ -191,7 +189,7 @@ public:
                     ++index_;
                 }
 
-                return i;
+                return *this;
             }
 
             self_type operator++(int junk)
@@ -210,10 +208,8 @@ public:
                 return *this;
             }
 
-            self_type operator--()
+            self_type& operator--()
             {
-                self_type i = *this;
-
                 if(0 == index_)
                 {
                     index_ = CAPACITY;
@@ -223,7 +219,7 @@ public:
                     --index_;
                 }
 
-                return i;
+                return *this;
             }
 
             self_type operator--(int junk)
@@ -263,7 +259,7 @@ public:
     class const_iterator 
     {
         public:
-            typedef iterator self_type;
+            typedef const_iterator self_type;
             typedef const T value_type;
             typedef const T& reference;
             typedef const T* pointer;
@@ -277,10 +273,8 @@ public:
                 data_(data)
             {}
 
-            self_type operator++() 
+            self_type& operator++() 
             {
-                self_type i = *this;
-
                 if(CAPACITY == index_)
                 {
                     index_ = 0;
@@ -290,7 +284,7 @@ public:
                     ++index_;
                 }
 
-                return i;
+                return *this;
             }
 
             self_type operator++(int junk)
@@ -309,10 +303,8 @@ public:
                 return *this;
             }
 
-            self_type operator--()
+            self_type& operator--()
             {
-                self_type i = *this;
-
                 if(0 == index_)
                 {
                     index_ = CAPACITY;
@@ -322,7 +314,7 @@ public:
                     --index_;
                 }
 
-                return i;
+                return *this;
             }
 
             self_type operator--(int junk)

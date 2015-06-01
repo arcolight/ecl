@@ -139,7 +139,7 @@ public:
         return m_val.data();
     }
 
-    std::array<char, SIZE + 1> m_val; // 1 for '0'
+    std::array<char, SIZE + 1> m_val { { } }; // 1 for '0'
 };
 
 } // namespace json

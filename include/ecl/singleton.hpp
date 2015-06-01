@@ -10,8 +10,6 @@ template<typename T>
 class singleton : public T
 {
 public:
-    virtual ~singleton() {}
-
     static T& instance();
 
     // For really lazy people :)

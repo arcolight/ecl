@@ -78,7 +78,7 @@ public:
     }
 
 private:
-    document_t m_doc;
+    document_t m_doc {};
     uint32_t   m_counter { 0 };
 };
 

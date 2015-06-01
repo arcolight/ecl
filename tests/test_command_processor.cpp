@@ -58,7 +58,7 @@ struct command_1    : public ecl::command<cmd1, command_1>
         return true;
     }
 
-    std::vector<std::string> m_args;
+    std::vector<std::string> m_args {};
 };
 
 struct command_2    : public ecl::command<cmd2, command_2> 
@@ -74,7 +74,7 @@ struct command_2    : public ecl::command<cmd2, command_2>
         return true;
     }
 
-    std::vector<std::string> m_args;
+    std::vector<std::string> m_args {};
 };
 
 struct command_3    : public ecl::command<cmd3, command_3> 
@@ -90,7 +90,7 @@ struct command_3    : public ecl::command<cmd3, command_3>
         return true;
     }
 
-    std::vector<std::string> m_args;
+    std::vector<std::string> m_args {};
 };
 
 struct command_4    : public ecl::command<cmd4, command_4> 
@@ -106,7 +106,7 @@ struct command_4    : public ecl::command<cmd4, command_4>
         return true;
     }
 
-    std::vector<std::string> m_args;
+    std::vector<std::string> m_args {};
 };
 
 struct command_5    : public ecl::command<cmd5, command_5> 
@@ -122,7 +122,7 @@ struct command_5    : public ecl::command<cmd5, command_5>
         return true;
     }
 
-    std::vector<std::string> m_args;
+    std::vector<std::string> m_args {};
 };
 
 typedef ecl::command_processor< proc,

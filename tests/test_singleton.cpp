@@ -5,6 +5,8 @@
 class test_class_1
 {
 public:
+    virtual ~test_class_1() {}
+    
     void hello()
     {
         std::cout << "test_class_1 at " << this << std::endl;
@@ -16,6 +18,8 @@ protected:
 class test_class_2
 {
 public:
+    virtual ~test_class_2() {}
+    
     void hello()
     {
         std::cout << "test_class_2 at " << this << std::endl;
@@ -27,6 +31,8 @@ protected:
 class test_class_ns
 {
 public:
+    virtual ~test_class_ns() {}
+    
     void hello()                                                       const
     {
         std::cout << "test_class_ns at " << this << std::endl;

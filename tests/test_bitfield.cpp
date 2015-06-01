@@ -7,24 +7,24 @@
 // #include <gtest/gtest.h>
 
 struct test_struct {
-    uint8_t  f0;
-    uint16_t f1;
-    uint32_t f2;
-    uint8_t  f3;
-    uint8_t  f4;
-    uint8_t  f5;
-    uint8_t  f6;
-    uint8_t  f7;
-    uint8_t  f8;
-    uint64_t f9;
-    uint8_t  f10;
-    uint32_t f11;
-    uint64_t f12;
+    uint8_t  f0  { 0 };
+    uint16_t f1  { 0 };
+    uint32_t f2  { 0 };
+    uint8_t  f3  { 0 };
+    uint8_t  f4  { 0 };
+    uint8_t  f5  { 0 };
+    uint8_t  f6  { 0 };
+    uint8_t  f7  { 0 };
+    uint8_t  f8  { 0 };
+    uint64_t f9  { 0 };
+    uint8_t  f10 { 0 };
+    uint32_t f11 { 0 };
+    uint64_t f12 { 0 };
 };
 
 struct test_struct_2 {
-  uint8_t f0;
-  uint8_t f1;
+  uint8_t f0 { 0 };
+  uint8_t f1 { 0 };
 };
 
 struct test_struct_3 {

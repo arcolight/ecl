@@ -3,7 +3,7 @@ ARM_LD_FLAGS = --specs=rdimon.specs
 OPTIMIZATION = -O2
 DEBUG = -g3
 SECURE = -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 -ftrapv -Wformat-security -fPIE -Wl,-z,relro,-z,now
-CXXFLAGS = -std=c++11 -Wall -Wextra -pedantic -Wswitch -fPIC -fno-rtti -fno-exceptions -fvisibility=hidden $(SECURE) $(OPTIMIZATION) $(DEBUG)
+CXXFLAGS = -std=c++11 -Wall -Wextra -pedantic -Wswitch -Weffc++ -fPIC -fno-rtti -fno-exceptions -fvisibility=hidden $(SECURE) $(OPTIMIZATION) $(DEBUG)
 
 FSM = fsm
 SG = scope_guard

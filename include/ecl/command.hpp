@@ -48,6 +48,8 @@ template<typename cmd>
 class cmd_core
 {
 protected:
+    virtual ~cmd_core() {}
+
     void reg(detail::i_receiver<cmd>* const i)
     {
         for(auto &itf: array_singleton::instance())
@@ -116,8 +118,8 @@ public:
     }
 
 protected:
-    uint8_t         m_argc;
-    const uint8_t** m_argv;
+    uint8_t         m_argc { 0 };
+    const uint8_t** m_argv { nullptr };
 };
 
 template<typename cmd>
