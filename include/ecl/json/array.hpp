@@ -37,6 +37,11 @@ public:
         for(size_t i = 0; i < COUNT; ++i)
         {
             m_val[i].disable();
+        }
+
+        for(size_t i = 0; i < COUNT; ++i)
+        {
+            m_val[i].disable();
             if(!m_val[i].deserialize_ref(s))
             {
                 break;
@@ -47,7 +52,7 @@ public:
             {
                 if(*s != ',')
                 {
-                    return false;
+                    break;
                 }
                 s++;
             }
