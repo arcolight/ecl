@@ -76,7 +76,7 @@ private:
 
 public:
     template<typename STREAM>
-    void serialize(STREAM& st, bool beautify = false, size_t indent = 0)               const
+    void serialize(STREAM& st, bool beautify = false, size_t indent = 0)   const
     {
         st << '[';
         print_beautify(st, beautify, indent + 1);

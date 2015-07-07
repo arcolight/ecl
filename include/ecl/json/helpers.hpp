@@ -7,6 +7,12 @@
 #include <cstdlib>
 #include <cinttypes>
 
+#ifdef ECL_WITH_STD_STRING
+#include <string>
+#endif
+
+#include <ecl/json/string.hpp>
+
 #ifndef ECL_JSON_INDENT_MULTIPLIER
 #define ECL_JSON_INDENT_MULTIPLIER 4
 #endif
@@ -373,6 +379,188 @@ struct val_deserializer<uint64_t>
         return val_deserializer_numeric_unsigned<uint64_t>::parse(s, val);
     }
 };
+
+template<typename T>
+struct val_serializer
+{
+    template<typename STREAM>
+    static void stringify(STREAM& st,
+                          const T& val,
+                          bool beautify,
+                          size_t indent)
+    {
+        val.serialize(st, beautify, indent);
+    }
+};
+
+template<>
+struct val_serializer<const char*>
+{
+    template<typename STREAM>
+    static void stringify(STREAM& st, const char* val, bool beautify, size_t indent)
+    {
+        (void)beautify;
+        (void)indent;
+        st << "\"";
+
+        for(size_t i = 0; i < strlen(val); ++i)
+        {
+            if(val[i] == '"'  ||
+               val[i] == '\\' ||
+               val[i] == '/')
+            {
+                st << "\\";
+                st << val[i];
+            }
+            else if(val[i] == '\b')
+            {
+                st << "\\b";
+            }
+            else if(val[i] == '\f')
+            {
+                st << "\\f";
+            }
+            else if(val[i] == '\n')
+            {
+                st << "\\n";
+            }
+            else if(val[i] == '\r')
+            {
+                st << "\\r";
+            }
+            else if(val[i] == '\t')
+            {
+                st << "\\t";
+            }
+            else
+            {
+                st << val[i];
+            }
+        }
+
+        st << "\"";
+    }
+};
+
+template<>
+struct val_serializer<bool>
+{
+    template<typename STREAM>
+    static void stringify(STREAM& st, const bool& val, bool beautify, size_t indent)
+    {
+        (void)beautify;
+        (void)indent;
+        st << val;
+    }
+};
+
+template<>
+struct val_serializer<int8_t>
+{
+    template<typename STREAM>
+    static void stringify(STREAM& st, const int8_t& val, bool beautify, size_t indent)
+    {
+        (void)beautify;
+        (void)indent;
+        st << val;
+    }
+};
+
+template<>
+struct val_serializer<uint8_t>
+{
+    template<typename STREAM>
+    static void stringify(STREAM& st, const uint8_t& val, bool beautify, size_t indent)
+    {
+        (void)beautify;
+        (void)indent;
+        st << val;
+    }
+};
+
+template<>
+struct val_serializer<int16_t>
+{
+    template<typename STREAM>
+    static void stringify(STREAM& st, const int16_t& val, bool beautify, size_t indent)
+    {
+        (void)beautify;
+        (void)indent;
+        st << val;
+    }
+};
+
+template<>
+struct val_serializer<uint16_t>
+{
+    template<typename STREAM>
+    static void stringify(STREAM& st, const uint16_t& val, bool beautify, size_t indent)
+    {
+        (void)beautify;
+        (void)indent;
+        st << val;
+    }
+};
+
+template<>
+struct val_serializer<int32_t>
+{
+    template<typename STREAM>
+    static void stringify(STREAM& st, const int32_t& val, bool beautify, size_t indent)
+    {
+        (void)beautify;
+        (void)indent;
+        st << val;
+    }
+};
+
+template<>
+struct val_serializer<uint32_t>
+{
+    template<typename STREAM>
+    static void stringify(STREAM& st, const uint32_t& val, bool beautify, size_t indent)
+    {
+        (void)beautify;
+        (void)indent;
+        st << val;
+    }
+};
+
+template<>
+struct val_serializer<int64_t>
+{
+    template<typename STREAM>
+    static void stringify(STREAM& st, const int64_t& val, bool beautify, size_t indent)
+    {
+        (void)beautify;
+        (void)indent;
+        st << val;
+    }
+};
+
+template<>
+struct val_serializer<uint64_t>
+{
+    template<typename STREAM>
+    static void stringify(STREAM& st, const uint64_t& val, bool beautify, size_t indent)
+    {
+        (void)beautify;
+        (void)indent;
+        st << val;
+    }
+};
+
+#ifdef ECL_WITH_STD_STRING
+template<>
+struct val_serializer<std::string>
+{
+    template<typename STREAM>
+    static void stringify(STREAM& st, const std::string& val, bool beautify, size_t indent)
+    {
+        val_serializer<const char*>::stringify(st, val.data(), beautify, indent);
+    }
+};
+#endif
 
 } // namespace json
 

@@ -23,17 +23,28 @@ public:
         m_val.fill('\0');
     }
 
+    string(const char* const ptr)
+    {
+        for(size_t i = 0; i < SIZE; ++i)
+        {
+            m_val[i] = ptr[i];
+        }
+    }
+
     constexpr static size_t size()
     {
         return SIZE;
     }
 
     template<typename STREAM>
-    void serialize(STREAM& st)                                             const
+    void serialize(STREAM& st, bool beautify, size_t indent)               const
     {
+        (void)beautify;
+        (void)indent;
+
         st << "\"";
 
-        for(size_t i = 0; i < strlen(m_val) && i < SIZE; ++i)
+        for(size_t i = 0; i < strlen(m_val.data()) && i < SIZE; ++i)
         {
             if(m_val[i] == '"'  ||
                m_val[i] == '\\' ||

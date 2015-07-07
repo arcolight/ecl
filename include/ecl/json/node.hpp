@@ -25,9 +25,15 @@ protected:
                    bool beautify,
                    size_t indent)                                          const
     {
-        stringify(st, NAME::name(), beautify, indent);
+        val_serializer<const char*>::template stringify<STREAM>(st,
+                                                                NAME::name(),
+                                                                beautify,
+                                                                indent);
         st << ':';
-        stringify(st, m_val, beautify, indent);
+        val_serializer<value_t>::template stringify<STREAM>(st,
+                                                            m_val,
+                                                            beautify,
+                                                            indent);
     }
 
     bool deserialize(const char*& s)
@@ -75,206 +81,6 @@ protected:
     }
 
     value_t m_val { val_initializer<value_t>::value() };
-
-private:
-    template<typename STREAM, typename V_T>
-    void stringify(STREAM& st,
-                   const V_T& val,
-                   bool beautify,
-                   size_t indent)                                          const
-    {
-        val.serialize(st, beautify, indent);
-    }
-
-    template<typename STREAM>
-    void stringify(STREAM& st,
-                   const bool& val,
-                   bool beautify,
-                   size_t indent)                                          const
-    {
-        (void)beautify;
-        (void)indent;
-        st << val;
-    }
-
-    template<typename STREAM>
-    void stringify(STREAM& st,
-                   const int8_t& val,
-                   bool beautify,
-                   size_t indent)                                          const
-    {
-        (void)beautify;
-        (void)indent;
-        st << val;
-    }
-
-    template<typename STREAM>
-    void stringify(STREAM& st,
-                   const uint8_t& val,
-                   bool beautify,
-                   size_t indent)                                          const
-    {
-        (void)beautify;
-        (void)indent;
-        st << val;
-    }
-
-    template<typename STREAM>
-    void stringify(STREAM& st,
-                   const int16_t& val,
-                   bool beautify,
-                   size_t indent)                                          const
-    {
-        (void)beautify;
-        (void)indent;
-        st << val;
-    }
-
-    template<typename STREAM>
-    void stringify(STREAM& st,
-                   const uint16_t& val,
-                   bool beautify,
-                   size_t indent)                                          const
-    {
-        (void)beautify;
-        (void)indent;
-        st << val;
-    }
-
-    template<typename STREAM>
-    void stringify(STREAM& st,
-                   const int32_t& val,
-                   bool beautify,
-                   size_t indent)                                          const
-    {
-        (void)beautify;
-        (void)indent;
-        st << val;
-    }
-
-    template<typename STREAM>
-    void stringify(STREAM& st,
-                   const uint32_t& val,
-                   bool beautify,
-                   size_t indent)                                          const
-    {
-        (void)beautify;
-        (void)indent;
-        st << val;
-    }
-
-    template<typename STREAM>
-    void stringify(STREAM& st,
-                   const int64_t& val,
-                   bool beautify,
-                   size_t indent)                                          const
-    {
-        (void)beautify;
-        (void)indent;
-        st << val;
-    }
-
-    template<typename STREAM>
-    void stringify(STREAM& st,
-                   const uint64_t& val,
-                   bool beautify,
-                   size_t indent)                                          const
-    {
-        (void)beautify;
-        (void)indent;
-        st << val;
-    }
-
-    template<typename STREAM>
-    void stringify(STREAM& st,
-                   const float& val,
-                   bool beautify,
-                   size_t indent)                                          const
-    {
-        (void)beautify;
-        (void)indent;
-        st << val;
-    }
-
-    template<typename STREAM>
-    void stringify(STREAM& st,
-                   const double& val,
-                   bool beautify,
-                   size_t indent)                                          const
-    {
-        (void)beautify;
-        (void)indent;
-        st << val;
-    }
-
-    template<typename STREAM, size_t N>
-    void stringify(STREAM& st,
-                   const ecl::json::string<N>& str,
-                   bool beautify,
-                   size_t indent)                                          const
-    {
-        stringify(st, str.data(), beautify, indent);
-    }
-
-    template<typename STREAM>
-    void stringify(STREAM& st,
-                   const char* val,
-                   bool beautify,
-                   size_t indent)                                          const
-    {
-        (void)beautify;
-        (void)indent;
-        st << "\"";
-
-        for(size_t i = 0; i < strlen(val); ++i)
-        {
-            if(val[i] == '"'  ||
-               val[i] == '\\' ||
-               val[i] == '/')
-            {
-                st << "\\";
-                st << val[i];
-            }
-            else if(val[i] == '\b')
-            {
-                st << "\\b";
-            }
-            else if(val[i] == '\f')
-            {
-                st << "\\f";
-            }
-            else if(val[i] == '\n')
-            {
-                st << "\\n";
-            }
-            else if(val[i] == '\r')
-            {
-                st << "\\r";
-            }
-            else if(val[i] == '\t')
-            {
-                st << "\\t";
-            }
-            else
-            {
-                st << val[i];
-            }
-        }
-
-        st << "\"";
-    }
-
-#ifdef ECL_WITH_STD_STRING
-    template<typename STREAM>
-    void stringify(STREAM& st,
-                   const std::string& str,
-                   bool beautify,
-                   size_t indent)                                          const
-    {
-        stringify(st, str.data(), beautify, indent);
-    }
-#endif
-
 };
 
 } // namespace json
