@@ -23,17 +23,20 @@ protected:
     template<typename STREAM>
     void serialize(STREAM& st,
                    bool beautify,
-                   size_t indent)                                          const
+                   size_t indent,
+                   size_t indent_increment)                                const
     {
         val_serializer<const char*>::template stringify<STREAM>(st,
                                                                 NAME::name(),
                                                                 beautify,
-                                                                indent);
+                                                                indent,
+                                                                indent_increment);
         st << ':';
         val_serializer<value_t>::template stringify<STREAM>(st,
                                                             m_val,
                                                             beautify,
-                                                            indent);
+                                                            indent,
+                                                            indent_increment);
     }
 
     bool deserialize(const char*& s)

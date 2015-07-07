@@ -37,10 +37,14 @@ public:
     }
 
     template<typename STREAM>
-    void serialize(STREAM& st, bool beautify, size_t indent)               const
+    void serialize(STREAM& st, 
+                   bool beautify,
+                   size_t indent,
+                   size_t indent_increment)                                const
     {
         (void)beautify;
         (void)indent;
+        (void)indent_increment;
 
         st << "\"";
 

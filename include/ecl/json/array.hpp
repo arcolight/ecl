@@ -76,26 +76,29 @@ private:
 
 public:
     template<typename STREAM>
-    void serialize(STREAM& st, bool beautify = false, size_t indent = 0)   const
+    void serialize(STREAM& st,
+                   bool beautify = false,
+                   size_t indent = 0,
+                   size_t indent_increment = ECL_DEFAULT_INDENT_INCREMENT) const
     {
         st << '[';
-        print_beautify(st, beautify, indent + 1);
+        print_beautify(st, beautify, indent + 1, indent_increment);
 
         for(size_t i = 0; i < COUNT; ++i)
         {
-            m_val[i].serialize(st, beautify, indent + 1);
+            m_val[i].serialize(st, beautify, indent + 1, indent_increment);
 
             if(i != COUNT - 1)
             {
                 if(m_val[i + 1].is_enabled())
                 {
                     st << ',';
-                    print_beautify(st, beautify, indent + 1);
+                    print_beautify(st, beautify, indent + 1, indent_increment);
                 }
             }
         }
 
-        print_beautify(st, beautify, indent);
+        print_beautify(st, beautify, indent, indent_increment);
         st << ']';
     }
 

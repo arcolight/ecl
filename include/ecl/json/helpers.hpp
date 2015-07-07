@@ -13,8 +13,8 @@
 
 #include <ecl/json/string.hpp>
 
-#ifndef ECL_JSON_INDENT_MULTIPLIER
-#define ECL_JSON_INDENT_MULTIPLIER 4
+#ifndef ECL_DEFAULT_INDENT_INCREMENT
+#define ECL_DEFAULT_INDENT_INCREMENT 4
 #endif
 
 namespace ecl
@@ -24,12 +24,15 @@ namespace json
 {
 
 template<typename STREAM>
-void print_beautify(STREAM& st, bool beautify, size_t indent)
+void print_beautify(STREAM& st, 
+                    bool beautify,
+                    size_t indent,
+                    size_t indent_increment)
 {
     if(beautify)
     {
         st << '\n';
-        for(size_t i = 0; i < indent * ECL_JSON_INDENT_MULTIPLIER; ++i)
+        for(size_t i = 0; i < indent * indent_increment; ++i)
         {
             st << ' ';
         }
@@ -387,9 +390,10 @@ struct val_serializer
     static void stringify(STREAM& st,
                           const T& val,
                           bool beautify,
-                          size_t indent)
+                          size_t indent,
+                          size_t indent_increment)
     {
-        val.serialize(st, beautify, indent);
+        val.serialize(st, beautify, indent, indent_increment);
     }
 };
 
@@ -397,10 +401,16 @@ template<>
 struct val_serializer<const char*>
 {
     template<typename STREAM>
-    static void stringify(STREAM& st, const char* val, bool beautify, size_t indent)
+    static void stringify(STREAM& st,
+                          const char* val,
+                          bool beautify,
+                          size_t indent,
+                          size_t indent_increment)
     {
         (void)beautify;
         (void)indent;
+        (void)indent_increment;
+
         st << "\"";
 
         for(size_t i = 0; i < strlen(val); ++i)
@@ -446,10 +456,15 @@ template<>
 struct val_serializer<bool>
 {
     template<typename STREAM>
-    static void stringify(STREAM& st, const bool& val, bool beautify, size_t indent)
+    static void stringify(STREAM& st, 
+                          const bool& val,
+                          bool beautify,
+                          size_t indent,
+                          size_t indent_increment)
     {
         (void)beautify;
         (void)indent;
+        (void)indent_increment;
         st << val;
     }
 };
@@ -458,10 +473,15 @@ template<>
 struct val_serializer<int8_t>
 {
     template<typename STREAM>
-    static void stringify(STREAM& st, const int8_t& val, bool beautify, size_t indent)
+    static void stringify(STREAM& st, 
+                          const int8_t& val, 
+                          bool beautify, 
+                          size_t indent,
+                          size_t indent_increment)
     {
         (void)beautify;
         (void)indent;
+        (void)indent_increment;
         st << val;
     }
 };
@@ -470,10 +490,15 @@ template<>
 struct val_serializer<uint8_t>
 {
     template<typename STREAM>
-    static void stringify(STREAM& st, const uint8_t& val, bool beautify, size_t indent)
+    static void stringify(STREAM& st, 
+                          const uint8_t& val, 
+                          bool beautify, 
+                          size_t indent,
+                          size_t indent_increment)
     {
         (void)beautify;
         (void)indent;
+        (void)indent_increment;
         st << val;
     }
 };
@@ -482,10 +507,15 @@ template<>
 struct val_serializer<int16_t>
 {
     template<typename STREAM>
-    static void stringify(STREAM& st, const int16_t& val, bool beautify, size_t indent)
+    static void stringify(STREAM& st, 
+                          const int16_t& val, 
+                          bool beautify, 
+                          size_t indent,
+                          size_t indent_increment)
     {
         (void)beautify;
         (void)indent;
+        (void)indent_increment;
         st << val;
     }
 };
@@ -494,10 +524,15 @@ template<>
 struct val_serializer<uint16_t>
 {
     template<typename STREAM>
-    static void stringify(STREAM& st, const uint16_t& val, bool beautify, size_t indent)
+    static void stringify(STREAM& st, 
+                          const uint16_t& val, 
+                          bool beautify, 
+                          size_t indent,
+                          size_t indent_increment)
     {
         (void)beautify;
         (void)indent;
+        (void)indent_increment;
         st << val;
     }
 };
@@ -506,10 +541,15 @@ template<>
 struct val_serializer<int32_t>
 {
     template<typename STREAM>
-    static void stringify(STREAM& st, const int32_t& val, bool beautify, size_t indent)
+    static void stringify(STREAM& st, 
+                          const int32_t& val, 
+                          bool beautify, 
+                          size_t indent,
+                          size_t indent_increment)
     {
         (void)beautify;
         (void)indent;
+        (void)indent_increment;
         st << val;
     }
 };
@@ -518,10 +558,15 @@ template<>
 struct val_serializer<uint32_t>
 {
     template<typename STREAM>
-    static void stringify(STREAM& st, const uint32_t& val, bool beautify, size_t indent)
+    static void stringify(STREAM& st, 
+                          const uint32_t& val, 
+                          bool beautify, 
+                          size_t indent,
+                          size_t indent_increment)
     {
         (void)beautify;
         (void)indent;
+        (void)indent_increment;
         st << val;
     }
 };
@@ -530,10 +575,15 @@ template<>
 struct val_serializer<int64_t>
 {
     template<typename STREAM>
-    static void stringify(STREAM& st, const int64_t& val, bool beautify, size_t indent)
+    static void stringify(STREAM& st, 
+                          const int64_t& val, 
+                          bool beautify, 
+                          size_t indent,
+                          size_t indent_increment)
     {
         (void)beautify;
         (void)indent;
+        (void)indent_increment;
         st << val;
     }
 };
@@ -542,10 +592,15 @@ template<>
 struct val_serializer<uint64_t>
 {
     template<typename STREAM>
-    static void stringify(STREAM& st, const uint64_t& val, bool beautify, size_t indent)
+    static void stringify(STREAM& st, 
+                          const uint64_t& val, 
+                          bool beautify, 
+                          size_t indent,
+                          size_t indent_increment)
     {
         (void)beautify;
         (void)indent;
+        (void)indent_increment;
         st << val;
     }
 };
@@ -555,9 +610,17 @@ template<>
 struct val_serializer<std::string>
 {
     template<typename STREAM>
-    static void stringify(STREAM& st, const std::string& val, bool beautify, size_t indent)
+    static void stringify(STREAM& st, const 
+                          std::string& val, 
+                          bool beautify, 
+                          size_t indent,
+                          size_t indent_increment)
     {
-        val_serializer<const char*>::stringify(st, val.data(), beautify, indent);
+        val_serializer<const char*>::stringify(st, 
+                                               val.data(),
+                                               beautify,
+                                               indent,
+                                               indent_increment);
     }
 };
 #endif
