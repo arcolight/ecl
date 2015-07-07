@@ -1,3 +1,11 @@
+/**
+ * @file
+ *
+ * @brief Bit field class.
+ * @details Bit field class. Endianness independent. Compiler independent.
+ *
+ * @ingroup ecl
+ */
 #ifndef ECL_BIT_FIELD_HPP
 #define ECL_BIT_FIELD_HPP
 
@@ -10,11 +18,21 @@
 namespace ecl
 {
 
+/**
+ * @brief Field class.
+ * @details Field class. Describes one field in bit-field. Should be used as
+ * template argument for @ref bit_field class.
+ *
+ * @tparam S Base struct type.
+ * @tparam T Type of the field.
+ * @tparam S::*P Name of the field in the base struct S.
+ * @tparam SIZE Size in bits(!).
+ */
 template<typename S, typename T, T S::*P, size_t SIZE>
 class field : public virtual S
 {
 public:
-    constexpr field() 
+    constexpr field()
     {
         static_assert((sizeof(T) * 8 >= SIZE), "field size > sizeof(var)");
     }
@@ -38,11 +56,21 @@ protected:
     }
 };
 
+/**
+ * @brief bit_field class.
+ * @details bit_field class. Bit field class can pack struct into byte array,
+ * according to fields definition, allowing to work with fields like with the
+ * struct fields.
+ *
+ * @tparam SIZE Size of bit field in bytes(!). compile time check for adequacy.
+ * @tparam BASE Base struct type.
+ * @tparam FIELDS List of the fields.
+ */
 template <size_t SIZE, typename BASE, typename... FIELDS>
 class bit_field final : public FIELDS...
 {
 public:
-    typedef struct packed_data 
+    typedef struct packed_data
     {
         uint8_t data[SIZE];
     } packed_data_t;
@@ -74,9 +102,17 @@ public:
         return *this;
     }
 
+    /**
+     * @brief Set fields from byte array.
+     * @details Set fields from byte array. Unpack array according to fields
+     * definitions and set appropriate fields.
+     *
+     * @param data Pointer to byte array.
+     * @attention No size check fir @ref data !
+     */
     void set_data(const uint8_t* const data)
     {
-        for(size_t i = 0; i < SIZE; ++i) 
+        for(size_t i = 0; i < SIZE; ++i)
         {
             m_array[i] = data[i];
         }
@@ -95,6 +131,11 @@ public:
         return m_array;
     }
 
+    /**
+     * @brief Unpacks internal byte array to fields.
+     * @details Unpacks internal byte array to fields.
+     * @return Pointer to base struct.
+     */
     BASE* unpack()
     {
         unpack_<0, FIELDS...>(m_array - 1);
@@ -170,7 +211,7 @@ private:
         for(size_t i = 0; i < F::size(); ++i)
         {
             size_t shift = (OFFSET + i) % 8;
-            if(0 == shift) 
+            if(0 == shift)
             {
                 ++array;
             }

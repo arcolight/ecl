@@ -5,6 +5,8 @@ DEBUG = -g3
 SECURE = -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 -ftrapv -Wformat-security -fPIE -Wl,-z,relro,-z,now
 CXXFLAGS = -std=c++11 -Wall -Wextra -pedantic -Wswitch -Wnon-virtual-dtor -fPIC -fno-rtti -fno-exceptions -fvisibility=hidden $(SECURE) $(OPTIMIZATION) $(DEBUG)
 
+DOXYGEN_CONFIG = doxygen.config
+
 FSM = fsm
 SG = scope_guard
 CB = cb
@@ -24,7 +26,7 @@ BIN_DIR = ./bin
 WEB_DEF_PAGES_DIR=./web_def_pages
 WEB_RES_SRC_DIR = ./tests/web_resources_src
 WEB_RES_GEN_DIR = ./tests/web_resources
-WEB_GEN_SOURCES = $(WEB_RES_GEN_DIR)/400_html.cpp $(WEB_RES_GEN_DIR)/403_html.cpp $(WEB_RES_GEN_DIR)/404_html.cpp $(WEB_RES_GEN_DIR)/500_html.cpp $(WEB_RES_GEN_DIR)/favicon_png.cpp $(WEB_RES_GEN_DIR)/icon_png.cpp $(WEB_RES_GEN_DIR)/index_html.cpp $(WEB_RES_GEN_DIR)/jquery_js.cpp $(WEB_RES_GEN_DIR)/style_css.cpp 
+WEB_GEN_SOURCES = $(WEB_RES_GEN_DIR)/400_html.cpp $(WEB_RES_GEN_DIR)/403_html.cpp $(WEB_RES_GEN_DIR)/404_html.cpp $(WEB_RES_GEN_DIR)/500_html.cpp $(WEB_RES_GEN_DIR)/favicon_png.cpp $(WEB_RES_GEN_DIR)/icon_png.cpp $(WEB_RES_GEN_DIR)/index_html.cpp $(WEB_RES_GEN_DIR)/jquery_js.cpp $(WEB_RES_GEN_DIR)/style_css.cpp
 
 GCC_TGT = _gcc_x86
 CLANG_TGT = _clang_x86
@@ -86,6 +88,9 @@ gcc_arm_none_eabi:
 	arm-none-eabi-g++ $(CXXFLAGS) $(GCC_SPECIFIC) $(ARM_LD_FLAGS) -Wl,-Map=$(BIN_DIR)/$(CMD)$(GCC_ARM_NONE_TGT).map -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(CMD).cpp -o $(BIN_DIR)/test_$(CMD)$(GCC_ARM_NONE_TGT)
 	arm-none-eabi-g++ $(CXXFLAGS) $(GCC_SPECIFIC) $(ARM_LD_FLAGS) -Wl,-Map=$(BIN_DIR)/$(LOG)$(GCC_ARM_NONE_TGT).map -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(LOG).cpp -o $(BIN_DIR)/test_$(LOG)$(GCC_ARM_NONE_TGT)
 #	arm-none-eabi-g++ $(CXXFLAGS) $(GCC_SPECIFIC) $(ARM_LD_FLAGS) -Wl,-Map=$(BIN_DIR)/$(WEB)$(GCC_ARM_NONE_TGT).map -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(WEB).cpp -o $(BIN_DIR)/test_$(WEB)$(GCC_ARM_NONE_TGT)
+
+doxygen:
+	doxygen $(DOXYGEN_CONFIG)
 
 clean:
 	$(RM) -r $(BIN_DIR)

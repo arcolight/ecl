@@ -1,3 +1,11 @@
+/**
+ * @file
+ *
+ * @brief JSON object class template.
+ *
+ * @ingroup json ecl
+ * @{
+ */
 #ifndef ECL_JSON_OBJECT_HPP
 #define ECL_JSON_OBJECT_HPP
 
@@ -12,6 +20,29 @@ namespace ecl
 namespace json
 {
 
+/**
+ * @brief JSON object class.
+ * @details JSON object class. Top-level class is always object.
+ * also objects can be value in key-value pair or element of array:
+ * @code
+ * {
+ *     ...
+ *     "val_name":{
+ *          ...
+ *     }
+ *     ...
+ *     "ar_name":[
+ *         {
+ *             ...
+ *         },
+ *         {
+ *             ...
+ *         }
+ *     ]
+ * }
+ * @endcode
+ * @tparam NODES Internal key-value pairs (See @ref node) list.
+ */
 template<typename... NODES>
 class object : public NODES...
 {
@@ -26,7 +57,6 @@ private:
     };
 
     template <typename, typename> struct cons;
-
     template <typename  T, typename ...Args>
     struct cons<T, std::tuple<Args...>>
     {
@@ -72,11 +102,19 @@ private:
 public:
     constexpr object() {}
 
+    /**
+     * @brief Object disabling.
+     * @details Object disabling. It will not be serialized.
+     */
     void disable()
     {
         m_enabled = false;
     }
 
+    /**
+     * @brief Object enabling.
+     * @details Object enabling. It will be serialized.
+     */
     void enable()
     {
         m_enabled = true;
@@ -87,6 +125,15 @@ public:
         return m_enabled;
     }
 
+    /**
+     * @brief Field accessor.
+     * @details Field accessor. Returns reference to field, that associated with
+     * name NAME. Search happening in compile-time. If NAME is wrong,
+     * compilation will be failed.
+     *
+     * @tparam NAME name type, that used for search element.
+     * @return Reference to value with name NAME.
+     */
     template<typename NAME>
     typename std::tuple_element<0,
         typename filter<name_predicate,
@@ -101,11 +148,28 @@ public:
                             NODES...>::type>::type::m_val;
     }
 
+    /**
+     * @brief Serialized size in chars.
+     * @details Calculates maximum size of serialized object in characters.
+     * @return Serialized size in chars.
+     */
     constexpr static size_t size()
     {
         return size_<2, NODES...>(); // 2 for '{' and '}'
     }
 
+    /**
+     * @brief  Serialization to stream object.
+     * @details Serialization to stream object.
+     *
+     * @tparam STREAM Stream type. Tested with ecl::stream.
+     * Probably std:: streams should work.
+     * @param st Reference to stream object.
+     * @param beautify true - human readable format.
+     * false - no new lines, no spaces.
+     * @param indent base indent.
+     * @param indent_increment Count of spaces on each indent level.
+     */
     template<typename STREAM>
     void serialize(STREAM& st,
                    bool beautify = false,
@@ -115,44 +179,62 @@ public:
         if(m_enabled)
         {
             st << '{';
-            print_beautify(st, beautify, indent + 1, indent_increment);
+            details::print_beautify(st, beautify, indent + 1, indent_increment);
 
-            serialize_internal<STREAM, NODES...>(st, 
+            serialize_internal<STREAM, NODES...>(st,
                                                  beautify,
                                                  indent + 1,
                                                  indent_increment);
 
-            print_beautify(st, beautify, indent, indent_increment);
+            details::print_beautify(st, beautify, indent, indent_increment);
             st << '}';
         }
     }
 
+    /**
+     * @brief Deserialization from reference to char pointer.
+     * @details Deserialization from reference to char pointer. Used inside JSON
+     * objects, but can be used from client code. Pointer will be moved to last
+     * successfully parsed position in string.
+     *
+     * @param s reference to serialized JSON string.
+     * @return true - deserialization successful, false - unsuccessful.
+     */
     bool deserialize_ref(const char*& s)
     {
-        spaces_rollup(s);
+        details::spaces_rollup(s);
         if(*s != '{')
         {
             return false;
         }
         s++;
-        spaces_rollup(s);
+        details::spaces_rollup(s);
 
         if(!deserialize_internal<NODES...>(s))
         {
             return false;
         }
 
-        spaces_rollup(s);
+        details::spaces_rollup(s);
         if(*s != '}')
         {
             return false;
         }
         s++;
-        spaces_rollup(s);
+        details::spaces_rollup(s);
 
         return true;
     }
 
+    /**
+     * @brief Deserialization from char pointer.
+     * @details Deserialization from char pointer.
+     * @attention If deserialization fails, all valid fields will be changed,
+     * document will be partialy changed.
+     *
+     * @param s serialized JSON string.
+     * @return true - deserialization successful, false - unsuccessful.
+     */
     bool deserialize(const char* s)
     {
         const char* ptr = s;
@@ -180,7 +262,7 @@ private:
 
     // Serialization
     template<typename STREAM, typename NODE, typename NEXT, typename... TAIL>
-    void serialize_internal(STREAM& st, 
+    void serialize_internal(STREAM& st,
                             bool beautify,
                             size_t indent,
                             size_t indent_increment)                       const
@@ -188,7 +270,7 @@ private:
         this->NODE::serialize(st, beautify, indent, indent_increment);
 
         st << ',';
-        print_beautify(st, beautify, indent, indent_increment);
+        details::print_beautify(st, beautify, indent, indent_increment);
 
         serialize_internal<STREAM, NEXT, TAIL...>(st,
                                                   beautify,
@@ -228,7 +310,7 @@ private:
             return false;
         }
 
-        spaces_rollup(s);
+        details::spaces_rollup(s);
         if(*s != ',')
         {
             return false;
@@ -261,5 +343,9 @@ private:
 } // namespace json
 
 } // namespace ecl
+
+/**
+ * @}
+ */
 
 #endif // ECL_JSON_OBJECT_HPP

@@ -1,3 +1,10 @@
+/**
+ * @file
+ *
+ * @brief JSON all-in-one include file.
+ *
+ * @defgroup json Classes related to JSON serialization and deserialization
+ */
 #ifndef ECL_JSON_HPP
 #define ECL_JSON_HPP
 

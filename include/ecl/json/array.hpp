@@ -1,3 +1,10 @@
+/**
+ * @file
+ *
+ * @brief JSON array class template.
+ *
+ * @ingroup json ecl
+ */
 #ifndef ECL_JSON_ARRAY_HPP
 #define ECL_JSON_ARRAY_HPP
 
@@ -10,26 +17,56 @@ namespace ecl
 namespace json
 {
 
+/**
+ * @brief JSON array class.
+ * @details JSON array class. Uses std::array as internal container.
+ * Elements can be 'enabled' or 'disabled'. If element 'disabled' it will not be
+ * serialized.
+ *
+ * @tparam OBJ JSON object type. Type of array element.
+ * @tparam COUNT Elements count.
+ */
 template<typename OBJ, size_t COUNT>
 class array
 {
 public:
     constexpr array() {}
 
+    /**
+     * @brief Maximum serialized size in characters.
+     * @details Maximum serialized size in characters.
+     * @return Maximum serialized size in characters.
+     */
     constexpr static size_t size()
     {
         return 2 + OBJ::size() * COUNT + (COUNT - 1); // 2 for '[' and ']'
     }
 
+    /**
+     * @brief Deserialization from char pointer.
+     * @details Deserialization from char pointer.
+     *
+     * @param s serialized JSON string.
+     * @return true - deserialization successful, false - unsuccessful.
+     */
     bool deserialize(const char* s)
     {
         const char* ptr = s;
         return deserialize_ref(ptr);
     }
 
+    /**
+     * @brief Deserialization from reference to char pointer.
+     * @details Deserialization from reference to char pointer. Used inside JSON
+     * objects, but can be used from client code. Pointer will be moved to last
+     * successfully parsed position in string.
+     *
+     * @param s reference to serialized JSON string.
+     * @return true - deserialization successful, false - unsuccessful.
+     */
     bool deserialize_ref(const char*& s)
     {
-        spaces_rollup(s);
+        details::spaces_rollup(s);
         if(*s != '[')
         {
             return false;
@@ -52,7 +89,7 @@ public:
 
             if(i != COUNT - 1)
             {
-                spaces_rollup(s);
+                details::spaces_rollup(s);
                 if(*s != ',')
                 {
                     break;
@@ -61,7 +98,7 @@ public:
             }
         }
 
-        spaces_rollup(s);
+        details::spaces_rollup(s);
         if(*s != ']')
         {
             return false;
@@ -75,6 +112,18 @@ private:
     typedef std::array<OBJ, COUNT> array_t;
 
 public:
+    /**
+     * @brief  Serialization to stream object.
+     * @details Serialization to stream object.
+     *
+     * @tparam STREAM Stream type. Tested with ecl::stream.
+     * Probably std:: streams should work.
+     * @param st Reference to stream object.
+     * @param beautify true - human readable format.
+     * false - no new lines, no spaces.
+     * @param indent base indent.
+     * @param indent_increment Count of spaces on each indent level.
+     */
     template<typename STREAM>
     void serialize(STREAM& st,
                    bool beautify = false,
@@ -82,7 +131,7 @@ public:
                    size_t indent_increment = ECL_DEFAULT_INDENT_INCREMENT) const
     {
         st << '[';
-        print_beautify(st, beautify, indent + 1, indent_increment);
+        details::print_beautify(st, beautify, indent + 1, indent_increment);
 
         for(size_t i = 0; i < COUNT; ++i)
         {
@@ -93,12 +142,12 @@ public:
                 if(m_val[i + 1].is_enabled())
                 {
                     st << ',';
-                    print_beautify(st, beautify, indent + 1, indent_increment);
+                    details::print_beautify(st, beautify, indent + 1, indent_increment);
                 }
             }
         }
 
-        print_beautify(st, beautify, indent, indent_increment);
+        details::print_beautify(st, beautify, indent, indent_increment);
         st << ']';
     }
 
