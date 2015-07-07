@@ -2,6 +2,7 @@
 #define ECL_JSON_NODE_HPP
 
 #include <ecl/json/helpers.hpp>
+#include <ecl/json/object.hpp>
 
 namespace ecl
 {
@@ -20,15 +21,18 @@ public:
 
 protected:
     template<typename STREAM>
-    void serialize(STREAM& st)                                             const
+    void serialize(STREAM& st,
+                   bool beautify,
+                   size_t indent)                                          const
     {
-        stringify(st, NAME::name());
+        stringify(st, NAME::name(), beautify, indent);
         st << ':';
-        stringify(st, m_val);
+        stringify(st, m_val, beautify, indent);
     }
 
     bool deserialize(const char*& s)
     {
+        spaces_rollup(s);
         if(*s != '"')
         {
             return false;
@@ -41,12 +45,14 @@ protected:
         }
         s += NAME::size();
 
+        spaces_rollup(s);
         if(*s != '"')
         {
             return false;
         }
         s++;
 
+        spaces_rollup(s);
         if(*s != ':')
         {
             return false;
@@ -72,20 +78,152 @@ protected:
 
 private:
     template<typename STREAM, typename V_T>
-    void stringify(STREAM& st, const V_T& val)                             const
+    void stringify(STREAM& st,
+                   const V_T& val,
+                   bool beautify,
+                   size_t indent)                                          const
     {
+        val.serialize(st, beautify, indent);
+    }
+
+    template<typename STREAM>
+    void stringify(STREAM& st,
+                   const bool& val,
+                   bool beautify,
+                   size_t indent)                                          const
+    {
+        (void)beautify;
+        (void)indent;
+        st << val;
+    }
+
+    template<typename STREAM>
+    void stringify(STREAM& st,
+                   const int8_t& val,
+                   bool beautify,
+                   size_t indent)                                          const
+    {
+        (void)beautify;
+        (void)indent;
+        st << val;
+    }
+
+    template<typename STREAM>
+    void stringify(STREAM& st,
+                   const uint8_t& val,
+                   bool beautify,
+                   size_t indent)                                          const
+    {
+        (void)beautify;
+        (void)indent;
+        st << val;
+    }
+
+    template<typename STREAM>
+    void stringify(STREAM& st,
+                   const int16_t& val,
+                   bool beautify,
+                   size_t indent)                                          const
+    {
+        (void)beautify;
+        (void)indent;
+        st << val;
+    }
+
+    template<typename STREAM>
+    void stringify(STREAM& st,
+                   const uint16_t& val,
+                   bool beautify,
+                   size_t indent)                                          const
+    {
+        (void)beautify;
+        (void)indent;
+        st << val;
+    }
+
+    template<typename STREAM>
+    void stringify(STREAM& st,
+                   const int32_t& val,
+                   bool beautify,
+                   size_t indent)                                          const
+    {
+        (void)beautify;
+        (void)indent;
+        st << val;
+    }
+
+    template<typename STREAM>
+    void stringify(STREAM& st,
+                   const uint32_t& val,
+                   bool beautify,
+                   size_t indent)                                          const
+    {
+        (void)beautify;
+        (void)indent;
+        st << val;
+    }
+
+    template<typename STREAM>
+    void stringify(STREAM& st,
+                   const int64_t& val,
+                   bool beautify,
+                   size_t indent)                                          const
+    {
+        (void)beautify;
+        (void)indent;
+        st << val;
+    }
+
+    template<typename STREAM>
+    void stringify(STREAM& st,
+                   const uint64_t& val,
+                   bool beautify,
+                   size_t indent)                                          const
+    {
+        (void)beautify;
+        (void)indent;
+        st << val;
+    }
+
+    template<typename STREAM>
+    void stringify(STREAM& st,
+                   const float& val,
+                   bool beautify,
+                   size_t indent)                                          const
+    {
+        (void)beautify;
+        (void)indent;
+        st << val;
+    }
+
+    template<typename STREAM>
+    void stringify(STREAM& st,
+                   const double& val,
+                   bool beautify,
+                   size_t indent)                                          const
+    {
+        (void)beautify;
+        (void)indent;
         st << val;
     }
 
     template<typename STREAM, size_t N>
-    void stringify(STREAM& st, const string<N>& str)                       const
+    void stringify(STREAM& st,
+                   const ecl::json::string<N>& str,
+                   bool beautify,
+                   size_t indent)                                          const
     {
-        stringify(st, str.data());
+        stringify(st, str.data(), beautify, indent);
     }
 
     template<typename STREAM>
-    void stringify(STREAM& st, const char* val)                            const
+    void stringify(STREAM& st,
+                   const char* val,
+                   bool beautify,
+                   size_t indent)                                          const
     {
+        (void)beautify;
+        (void)indent;
         st << "\"";
 
         for(size_t i = 0; i < strlen(val); ++i)
@@ -128,9 +266,12 @@ private:
 
 #ifdef ECL_WITH_STD_STRING
     template<typename STREAM>
-    void stringify(STREAM& st, const std::string& str)                     const
+    void stringify(STREAM& st,
+                   const std::string& str,
+                   bool beautify,
+                   size_t indent)                                          const
     {
-        stringify(st, str.data());
+        stringify(st, str.data(), beautify, indent);
     }
 #endif
 

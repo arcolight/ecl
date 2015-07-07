@@ -4,6 +4,8 @@
 #include <type_traits>
 #include <tuple>
 
+#include <ecl/json/helpers.hpp>
+
 namespace ecl
 {
 
@@ -111,36 +113,42 @@ public:
     }
 
     template<typename STREAM>
-    void serialize(STREAM& st)                                             const
+    void serialize(STREAM& st, bool beautify = false, size_t indent = 0)   const
     {
         if(m_enabled)
         {
             st << '{';
+            print_beautify(st, beautify, indent + 1);
 
-            serialize_internal<STREAM, NODES...>(st);
+            serialize_internal<STREAM, NODES...>(st, beautify, indent + 1);
 
+            print_beautify(st, beautify, indent);
             st << '}';
         }
     }
 
     bool deserialize_ref(const char*& s)
     {
+        spaces_rollup(s);
         if(*s != '{')
         {
             return false;
         }
         s++;
+        spaces_rollup(s);
 
         if(!deserialize_internal<NODES...>(s))
         {
             return false;
         }
 
+        spaces_rollup(s);
         if(*s != '}')
         {
             return false;
         }
         s++;
+        spaces_rollup(s);
 
         return true;
     }
@@ -172,27 +180,30 @@ private:
 
     // Serialization
     template<typename STREAM, typename NODE, typename NEXT, typename... TAIL>
-    void serialize_internal(STREAM& st)                                    const
+    void serialize_internal(STREAM& st, bool beautify, size_t indent)      const
     {
-        this->NODE::serialize(st);
+        this->NODE::serialize(st, beautify, indent);
 
         st << ',';
+        print_beautify(st, beautify, indent);
 
-        serialize_internal<STREAM, NEXT, TAIL...>(st);
+        serialize_internal<STREAM, NEXT, TAIL...>(st, beautify, indent);
     }
 
     template<typename STREAM, typename NODE>
-    void serialize_internal(STREAM& st)                                    const
+    void serialize_internal(STREAM& st, bool beautify, size_t indent)      const
     {
-        this->NODE::serialize(st);
+        this->NODE::serialize(st, beautify, indent);
 
-        serialize_internal<STREAM>(st);
+        serialize_internal<STREAM>(st, beautify, indent);
     }
 
     template<typename STREAM>
-    void serialize_internal(STREAM& st)                                    const
+    void serialize_internal(STREAM& st, bool beautify, size_t indent)      const
     {
         (void)st;
+        (void)beautify;
+        (void)indent;
     }
 
     // Deserialization
@@ -204,6 +215,7 @@ private:
             return false;
         }
 
+        spaces_rollup(s);
         if(*s != ',')
         {
             return false;

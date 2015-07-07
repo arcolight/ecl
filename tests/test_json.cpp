@@ -117,7 +117,7 @@ int main(int argc, char* argv[])
     std::cout << ecl_prefix << "document size: " << document_ecl_t::size() << std::endl;
     std::cout << std_prefix << "document size: " << document_std_t::size() << std::endl;
 
-    ecl::stream<document_ecl_t::size()> st_ecl;
+    ecl::stream<document_ecl_t::size()*8> st_ecl;
     ecl::stream<document_std_t::size()> st_std;
 
     fill_document(doc_ecl);
@@ -126,7 +126,7 @@ int main(int argc, char* argv[])
     fill_document(doc_std);
     dump_document(doc_std, std_prefix);
 
-    doc_ecl.serialize(st_ecl);
+    doc_ecl.serialize(st_ecl, true);
     doc_std.serialize(st_std);
 
     std::cout << ecl_prefix << "Serialized count: " << st_ecl.count() << std::endl;

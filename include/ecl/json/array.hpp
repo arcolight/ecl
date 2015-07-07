@@ -2,6 +2,7 @@
 #define ECL_JSON_ARRAY_HPP
 
 #include <array>
+#include <ecl/json/helpers.hpp>
 
 namespace ecl
 {
@@ -28,6 +29,7 @@ public:
 
     bool deserialize_ref(const char*& s)
     {
+        spaces_rollup(s);
         if(*s != '[')
         {
             return false;
@@ -50,6 +52,7 @@ public:
 
             if(i != COUNT - 1)
             {
+                spaces_rollup(s);
                 if(*s != ',')
                 {
                     break;
@@ -58,6 +61,7 @@ public:
             }
         }
 
+        spaces_rollup(s);
         if(*s != ']')
         {
             return false;
@@ -69,33 +73,30 @@ public:
 
 private:
     typedef std::array<OBJ, COUNT> array_t;
-protected:
+
+public:
     template<typename STREAM>
-    void serialize(STREAM& st)                                             const
+    void serialize(STREAM& st, bool beautify = false, size_t indent = 0)               const
     {
         st << '[';
+        print_beautify(st, beautify, indent + 1);
 
         for(size_t i = 0; i < COUNT; ++i)
         {
-            m_val[i].serialize(st);
+            m_val[i].serialize(st, beautify, indent + 1);
 
             if(i != COUNT - 1)
             {
                 if(m_val[i + 1].is_enabled())
                 {
                     st << ',';
+                    print_beautify(st, beautify, indent + 1);
                 }
             }
         }
 
+        print_beautify(st, beautify, indent);
         st << ']';
-    }
-
-public:
-    template<typename STREAM, typename T>
-    static void print(STREAM& st, const T& val)
-    {
-        val.serialize(st);
     }
 
     typename array_t::iterator begin()

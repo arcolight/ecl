@@ -6,6 +6,8 @@
 
 #include <array>
 
+#include <ecl/json/helpers.hpp>
+
 namespace ecl
 {
 
@@ -77,6 +79,7 @@ public:
 
     bool deserialize_ref(const char*& s)
     {
+        spaces_rollup(s);
         if(*s != '"')
         {
             return false;
@@ -85,12 +88,14 @@ public:
 
         for(size_t i = 0; i < SIZE; ++i)
         {
+            spaces_rollup(s);
             if(*s == '"')
             {
                 s++;
                 break;
             }
 
+            spaces_rollup(s);
             if(*s == '\\' && *(s + 1) == '"')
             {
                 s++;

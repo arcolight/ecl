@@ -7,11 +7,39 @@
 #include <cstdlib>
 #include <cinttypes>
 
+#ifndef ECL_JSON_INDENT_MULTIPLIER
+#define ECL_JSON_INDENT_MULTIPLIER 4
+#endif
+
 namespace ecl
 {
 
 namespace json
 {
+
+template<typename STREAM>
+void print_beautify(STREAM& st, bool beautify, size_t indent)
+{
+    if(beautify)
+    {
+        st << '\n';
+        for(size_t i = 0; i < indent * ECL_JSON_INDENT_MULTIPLIER; ++i)
+        {
+            st << ' ';
+        }
+    }
+}
+
+void spaces_rollup(const char*& s)
+{
+    while(*s == ' '  ||
+          *s == '\n' ||
+          *s == '\r' ||
+          *s == '\t')
+    {
+        ++s;
+    }
+}
 
 template<typename T>
 struct val_size
