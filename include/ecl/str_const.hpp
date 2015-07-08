@@ -1,3 +1,12 @@
+/**
+ * @file
+ *
+ * @brief Constant string class.
+ * @details Constant string class. Can be assigned only at construction.
+ * Can be used for compile time string size calculation.
+ *
+ * @ingroup ecl
+ */
 #ifndef ECL_STR_CONST_HPP
 #define ECL_STR_CONST_HPP
 
@@ -8,11 +17,17 @@
 namespace ecl
 {
 
+/**
+ * @brief Constant string class.
+ * @details Scott Schurr's constant string class.
+ * Can be used for compile time string size calculation.
+ *
+ */
 class str_const
 {
 public:
     template<std::size_t N>
-    constexpr str_const(const char(&a)[N]) : 
+    constexpr str_const(const char(&a)[N]) :
         m_p(a), m_sz(N-1)
     {}
 
@@ -20,17 +35,35 @@ public:
         :m_p(str), m_sz(N)
     {}
 
+    /**
+     * @brief Access by index operator.
+     * @details Access by index operator.
+     *
+     * @param n index
+     * @return n-th char in string. If n out of bound, returns 0.
+     */
     constexpr char operator[](std::size_t n)                               const
     {
         // Don't use throw. In embedded systems we have no exceptions.
         return (n < m_sz) ? m_p[n] : 0;
     }
 
+    /**
+     * @brief String size.
+     * @details String size.
+     * @return String length in characters.
+     */
     constexpr std::size_t size()                                           const
     {
-        return m_sz; 
+        return m_sz;
     }
 
+    /**
+     * @brief char* cast operator.
+     * @details char* cast operator.
+     *
+     * @return Pointer to constant string.
+     */
     constexpr operator const char*()                                       const
     {
         return m_p;

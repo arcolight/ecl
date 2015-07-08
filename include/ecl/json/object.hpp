@@ -22,7 +22,7 @@ namespace json
 
 /**
  * @brief JSON object class.
- * @details JSON object class. Top-level class is always object.
+ * @details Top-level class is always object.
  * also objects can be value in key-value pair or element of array:
  * @code
  * {
@@ -104,7 +104,7 @@ public:
 
     /**
      * @brief Object disabling.
-     * @details Object disabling. It will not be serialized.
+     * @details If object disabled, it will not be serialized.
      */
     void disable()
     {
@@ -113,7 +113,7 @@ public:
 
     /**
      * @brief Object enabling.
-     * @details Object enabling. It will be serialized.
+     * @details If object enabled, it will be serialized.
      */
     void enable()
     {
@@ -127,7 +127,7 @@ public:
 
     /**
      * @brief Field accessor.
-     * @details Field accessor. Returns reference to field, that associated with
+     * @details Returns reference to field, that associated with
      * name NAME. Search happening in compile-time. If NAME is wrong,
      * compilation will be failed.
      *
@@ -160,7 +160,6 @@ public:
 
     /**
      * @brief  Serialization to stream object.
-     * @details Serialization to stream object.
      *
      * @tparam STREAM Stream type. Tested with ecl::stream.
      * Probably std:: streams should work.

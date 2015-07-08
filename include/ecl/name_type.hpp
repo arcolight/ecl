@@ -1,3 +1,12 @@
+/**
+ * @file
+ *
+ * @brief Macro for declare name types.
+ * @details Macro for declare structs, that can be used as name types in
+ * @ref ecl::command_processor or @ref ecl::json::object
+ *
+ * @ingroup ecl
+ */
 #ifndef ECL_NAME_TYPE_HPP
 #define ECL_NAME_TYPE_HPP
 

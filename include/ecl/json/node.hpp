@@ -61,7 +61,6 @@ public:
 protected:
     /**
      * @brief  Serialization to stream object.
-     * @details Serialization to stream object.
      *
      * @tparam STREAM Stream type. Tested with ecl::stream.
      * Probably std:: streams should work.
@@ -92,7 +91,6 @@ protected:
 
     /**
      * @brief Deserialization from char pointer.
-     * @details Deserialization from char pointer.
      *
      * @param s serialized JSON string.
      * @return true - deserialization successful, false - unsuccessful.

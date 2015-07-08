@@ -1,3 +1,13 @@
+/**
+ * @file
+ *
+ * @brief Stream class.
+ * @details Stream class with fixed size buffer and overflow-callback.
+ * Can be used for data serialization.
+ * Suitable for embedded devices.
+ *
+ * @ingroup ecl
+ */
 #ifndef ECL_STREAM_HPP
 #define ECL_STREAM_HPP
 
@@ -17,6 +27,16 @@
 namespace ecl
 {
 
+/**
+ * @brief Numeric system base.
+ * @code
+ * h - hex
+ * d - decimal
+ * o - octal
+ * b - binary
+ * @endcode
+ *
+ */
 typedef enum class base {
     h,
     d,
@@ -24,21 +44,23 @@ typedef enum class base {
     b
 } base;
 
-typedef enum class align {
-    l,
-    r
-} align;
-
-typedef enum class options {
-    e, // exponent for float
-    s  // signed for numeric
-} opt;
-
+/**
+ * @brief Alpha case.
+ * @code
+ * lower - lower
+ * upper - upper
+ * @endcode
+ *
+ */
 typedef enum class alpha_case {
     lower,
     upper
 } cs;
 
+/**
+ * @brief Field width.
+ *
+ */
 typedef struct width
 {
     width(size_t w) : m_w(w) {}
@@ -46,72 +68,118 @@ typedef struct width
     size_t m_w;
 } wd;
 
+/**
+ * @brief end object
+ *
+ */
 struct end {};
+/**
+ * @brief reset object
+ *
+ */
 struct reset {};
 
+/**
+ * @brief typedef for overflow callback.
+ *
+ * @param buf pointer to buffer.
+ * @param size size of data.
+ *
+ * @return void
+ */
 typedef void(*flush_function_t)(const char* const buf, size_t size);
 
+/**
+ * @brief Stream class.
+ * @details Have fixed-size buffer. Have oveflow callback.
+ *
+ * @tparam BUFFER_SIZE Size of internal buffer in bytes.
+ * @tparam FLUSH_F_PTR = nullptr Pointer to @ref flush_function_t
+ * that will be called on internal buffer overflow.
+ */
 template<size_t BUFFER_SIZE, flush_function_t FLUSH_F_PTR = nullptr>
 class stream{
 public:
     explicit stream(const base   def_base = base::d,
-                    const align  def_align = align::l,
                     const size_t def_width = 8) :
         m_def_base(def_base),
-        m_def_align(def_align),
         m_def_width(def_width)
     {
         reset();
     }
 
+    /**
+     * @brief Numeric system base change.
+     *
+     * @param b @ref base object
+     */
     stream& operator() (const base& b)
     {
         m_base = b;
         return *this;
     }
 
-    stream& operator() (const align& a)
-    {
-        m_align = a;
-        return *this;
-    }
-
+    /**
+     * @brief Field width change.
+     *
+     * @param w @ref width object.
+     */
     stream& operator() (const size_t w)
     {
         m_width = w;
         return *this;
     }
 
+    /**
+     * @brief Alpha case change.
+     *
+     * @param c @ref cs object
+     */
     stream& operator() (const cs& c)
     {
         m_case = c;
         return *this;
     }
 
+    /**
+     * @brief Field width change.
+     *
+     * @param w @ref width object.
+     */
     stream& operator() (const width& w)
     {
         m_width = w.m_w;
         return *this;
     }
 
+    /**
+     * @brief Field width change.
+     *
+     * @param w @ref width object.
+     */
     stream& operator<< (const width& w)
     {
         m_width = w.m_w;
         return *this;
     }
 
+    /**
+     * @brief Numeric system base change.
+     *
+     * @param b @ref base object
+     */
     stream& operator<< (const base& b)
     {
         m_base = b;
         return *this;
     }
 
-    stream& operator<< (const align& a)
-    {
-        m_align = a;
-        return *this;
-    }
-
+    /**
+     * @brief Stream reset.
+     * @details Reset will cause erasing all characters from stream.
+     *
+     * @param end reset object.
+     */
     stream& operator<< (const reset& r)
     {
         (void)(r);
@@ -119,6 +187,12 @@ public:
         return *this;
     }
 
+    /**
+     * @brief End of stream.
+     * @details End will cause @ref flush and @ref reset.
+     *
+     * @param end end object.
+     */
     stream& operator<< (const end& end)
     {
         (void)(end);
@@ -127,12 +201,24 @@ public:
         return *this;
     }
 
+    /**
+     * @brief @ref sized_data serialization.
+     * @details @ref sized_data serialized as binary.
+     *
+     * @param d reference to @ref sized_data object
+     */
     stream& operator<< (const sized_data& d)
     {
         print_binary(d.ptr, d.size);
         return *this;
     }
 
+    /**
+     * @brief @ref const_sized_data serialization.
+     * @details @ref const_sized_data serialized as binary.
+     *
+     * @param d reference to @ref const_sized_data object
+     */
     stream& operator<< (const const_sized_data& d)
     {
         print_binary(d.ptr, d.size);
@@ -156,11 +242,19 @@ public:
         return (const char*)m_buf;
     }
 
+    /**
+     * @brief Characters count.
+     * @return Count of characters in stream.
+     */
     size_t count()                                                         const
     {
         return m_count;
     }
 
+    /**
+     * @brief Flush stream.
+     * @details Flush stream. If flush callback specified, it would be called.
+     */
     void flush()
     {
         // For GCC 4.7. We can pass nullptr to stream. Check is needed.
@@ -192,7 +286,6 @@ private:
         m_count = 0;
 
         m_base =  m_def_base;
-        m_align = m_def_align;
         m_width = m_def_width;
     }
 
@@ -415,11 +508,9 @@ private:
     size_t       m_count { 0 };
 
     const base   m_def_base;
-    const align  m_def_align;
     const size_t m_def_width;
 
     base         m_base  { m_def_base  };
-    align        m_align { m_def_align };
     size_t       m_width { m_def_width };
     cs           m_case  { cs::lower   };
 };

@@ -34,7 +34,6 @@ public:
 
     /**
      * @brief Maximum serialized size in characters.
-     * @details Maximum serialized size in characters.
      * @return Maximum serialized size in characters.
      */
     constexpr static size_t size()
@@ -44,7 +43,6 @@ public:
 
     /**
      * @brief Deserialization from char pointer.
-     * @details Deserialization from char pointer.
      *
      * @param s serialized JSON string.
      * @return true - deserialization successful, false - unsuccessful.
@@ -114,7 +112,6 @@ private:
 public:
     /**
      * @brief  Serialization to stream object.
-     * @details Serialization to stream object.
      *
      * @tparam STREAM Stream type. Tested with ecl::stream.
      * Probably std:: streams should work.

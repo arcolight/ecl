@@ -1,3 +1,10 @@
+/**
+ * @file
+ *
+ * @brief WEB-server all-in-one include.
+ *
+ * @defgroup web Classes related to simple WEB-server.
+ */
 #ifndef ECL_WEB_HPP
 #define ECL_WEB_HPP
 
