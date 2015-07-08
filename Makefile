@@ -23,6 +23,7 @@ LOG = logger
 INCLUDE_DIR = ./include
 TESTS_DIR = ./tests
 BIN_DIR = ./bin
+DOC_DIR = ./doc
 WEB_DEF_PAGES_DIR=./web_def_pages
 WEB_RES_SRC_DIR = ./tests/web_resources_src
 WEB_RES_GEN_DIR = ./tests/web_resources
@@ -92,6 +93,9 @@ gcc_arm_none_eabi:
 doxygen:
 	doxygen $(DOXYGEN_CONFIG)
 
-clean:
+clean_doc:
+	$(RM) -r $(DOC_DIR)
+
+clean: clean_doc
 	$(RM) -r $(BIN_DIR)
 	$(RM) -r $(WEB_RES_GEN_DIR)
