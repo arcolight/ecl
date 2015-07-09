@@ -55,15 +55,15 @@ class test_fsm : public ecl::state_machine<test_fsm, st, st::s_1>
     typedef test_fsm f;
 
     typedef transition_table<
-//         | Start  | Event |  Next  |  Callback  |     Guard   |
-// --------|--------|-------|--------|------------|-------------|
+//          | Start  |Event|  Next  |   Callback   |    Guard    |
+// ---------|--------|-----|--------|--------------|-------------|
         row< st::s_1, ev_1, st::s_2, &f::on_ev_1,   &f::g_ev_1    >,
         row< st::s_2, ev_2, st::s_3, &f::on_ev_2,   &f::g_ev_2    >,
         row< st::s_3, ev_3, st::s_4, &f::on_ev_3,   &f::g_ev_3    >,
         row< st::s_4, ev_4, st::s_5, &f::on_ev_4,   &f::g_ev_4    >,
         row< st::s_5, ev_5, st::s_1, &f::on_ev_5_1, &f::g_ev_5_1  >,
         row< st::s_5, ev_5, st::s_3, &f::on_ev_5_2, &f::g_ev_5_2  >,
-// --------+--------+-------+--------+------------+-------------|
+// ---------+--------+-----+--------+--------------+-------------|
         row< st::s_2, ev_6, st::s_4, &f::on_ev_6,   &f::g_ev_6    >,
         row< st::s_3, ev_6, st::s_5, &f::on_ev_6                  >,
         row< st::s_5, ev_6, st::s_1, &f::on_ev_6,   &f::g_false   >
@@ -86,7 +86,7 @@ public:
 
 struct play {};
 struct open_close {};
-struct cd_detected { 
+struct cd_detected {
     cd_detected(std::string name, std::vector<float> const& tracks_duration) :
     m_name(name), m_tracks(tracks_duration)
     {}
@@ -110,23 +110,23 @@ class player : public ecl::state_machine<player, player_state, player_state::emp
     void start_playback(play const& e)
     {
         (void)(e);
-        std::cout << "start playback" << std::endl; 
+        std::cout << "start playback" << std::endl;
     }
 
     void open_drawer(open_close const& e)
-    { 
-        (void)(e); 
-        std::cout << "open drawer" << std::endl; 
+    {
+        (void)(e);
+        std::cout << "open drawer" << std::endl;
     }
 
     void close_drawer(open_close const& e)
-    { 
-        (void)(e); 
-        std::cout << "close drawer" << std::endl; 
+    {
+        (void)(e);
+        std::cout << "close drawer" << std::endl;
     }
 
     void store_cd_info(cd_detected const& e)
-    { 
+    {
         std::cout << "store cd info:" << std::endl << e.m_name << std::endl;
         for(auto& i: e.m_tracks) {
             std::cout << "Track: " << i << std::endl;
@@ -134,27 +134,27 @@ class player : public ecl::state_machine<player, player_state, player_state::emp
     }
 
     void stop_playback(stop const& e)
-    { 
-        (void)(e); 
-        std::cout << "stop playback" << std::endl; 
+    {
+        (void)(e);
+        std::cout << "stop playback" << std::endl;
     }
 
     void pause_playback(pause const& e)
-    { 
-        (void)(e); 
-        std::cout << "pause playback" << std::endl; 
+    {
+        (void)(e);
+        std::cout << "pause playback" << std::endl;
     }
 
     void resume_playback(play const& e)
-    { 
-        (void)(e); 
-        std::cout << "resume playback" << std::endl; 
+    {
+        (void)(e);
+        std::cout << "resume playback" << std::endl;
     }
 
     void stop_and_open(open_close const& e)
-    { 
-        (void)(e); 
-        std::cout << "stop and open" << std::endl; 
+    {
+        (void)(e);
+        std::cout << "stop and open" << std::endl;
     }
 
     typedef player_state s;
@@ -216,7 +216,7 @@ int main(int argc, char** argv)
 {
     (void)(argc);
     (void)(argv);
-    
+
     test_fsm fsm;
 
     std::cout << std::endl << "Test fsm" << std::endl;
