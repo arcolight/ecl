@@ -100,7 +100,11 @@ private:
     };
 
 public:
-    constexpr object() {}
+    constexpr object()
+    {
+        static_assert(check_names_static<NODES...>(),
+            "There are nodes with the same names in one level!");
+    }
 
     /**
      * @brief Object disabling.
@@ -192,8 +196,8 @@ public:
 
     /**
      * @brief Deserialization from reference to char pointer.
-     * @details Deserialization from reference to char pointer. Used inside JSON
-     * objects, but can be used from client code. Pointer will be moved to last
+     * @details Used inside JSON objects, but can be used from client code.
+     * Pointer will be moved to last
      * successfully parsed position in string.
      *
      * @param s reference to serialized JSON string.
@@ -227,7 +231,6 @@ public:
 
     /**
      * @brief Deserialization from char pointer.
-     * @details Deserialization from char pointer.
      * @attention If deserialization fails, all valid fields will be changed,
      * document will be partialy changed.
      *
@@ -333,6 +336,25 @@ private:
     bool deserialize_internal(const char*& s)
     {
         (void)s;
+        return true;
+    }
+
+    template<typename NODE, typename NEXT, typename... TAIL>
+    constexpr static bool check_names_static()
+    {
+        return (! std::is_same<typename NODE::name_t,
+                               typename NEXT::name_t>::value) &&
+                check_names_static<NEXT, TAIL...>();
+    }
+
+    template<typename NODE>
+    constexpr static bool check_names_static()
+    {
+        return true;
+    }
+
+    constexpr static bool check_names_static()
+    {
         return true;
     }
 
