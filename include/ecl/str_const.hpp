@@ -2,7 +2,7 @@
  * @file
  *
  * @brief Constant string class.
- * @details Constant string class. Can be assigned only at construction.
+ * @details Can be assigned only at construction.
  * Can be used for compile time string size calculation.
  *
  * @ingroup ecl
@@ -37,7 +37,6 @@ public:
 
     /**
      * @brief Access by index operator.
-     * @details Access by index operator.
      *
      * @param n index
      * @return n-th char in string. If n out of bound, returns 0.
@@ -50,7 +49,6 @@ public:
 
     /**
      * @brief String size.
-     * @details String size.
      * @return String length in characters.
      */
     constexpr std::size_t size()                                           const
@@ -60,7 +58,6 @@ public:
 
     /**
      * @brief char* cast operator.
-     * @details char* cast operator.
      *
      * @return Pointer to constant string.
      */

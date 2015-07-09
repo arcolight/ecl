@@ -1,3 +1,10 @@
+/**
+ * @file
+ *
+ * @brief Scope guard class. RAII idiom.
+ *
+ * @ingroup ecl
+ */
 #ifndef ECL_SCOPE_GUARD_HPP
 #define ECL_SCOPE_GUARD_HPP
 
@@ -7,6 +14,10 @@
 namespace ecl
 {
 
+/**
+ * @brief Scope guard class.
+ * @details Allows to execute something at exit of the scope.
+ */
 class scope_guard
 {
     scope_guard()                                                      = delete;
@@ -16,6 +27,11 @@ class scope_guard
     scope_guard& operator=(const scope_guard&&)                        = delete;
 
 public:
+    /**
+     * @brief Constructor
+     *
+     * @param  Callable object.
+     */
     explicit scope_guard(std::function<void()> &&action) :
         m_action(std::forward<decltype(m_action)>(action))
     {

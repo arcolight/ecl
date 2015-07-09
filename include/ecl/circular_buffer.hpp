@@ -1,3 +1,10 @@
+/**
+ * @file
+ *
+ * @brief Circular buffer class.
+ *
+ * @ingroup ecl
+ */
 #ifndef ECL_CIRCULAR_BUFFER_HPP
 #define ECL_CIRCULAR_BUFFER_HPP
 
@@ -8,6 +15,14 @@
 namespace ecl
 {
 
+/**
+ * @brief Circular buffer class.
+ *
+ * @tparam T Type of elements.
+ * @tparam CAPACITY Buffer capacity in elements.
+ * @tparam ERASE_ELEMENTS = false Determines delete or not elements on
+ * @ref clear
+ */
 template<typename T, size_t CAPACITY, bool ERASE_ELEMENTS = false>
 class circular_buffer
 {
@@ -22,6 +37,10 @@ public:
         static_assert(CAPACITY > 0, "Size must be greater than zero!");
     }
 
+    /**
+     * @brief Clear buffer.
+     *
+     */
     void clear()
     {
         if(ERASE_ELEMENTS)
@@ -36,21 +55,34 @@ public:
         m_size = 0;
     }
 
+    /**
+     * @brief Circular buffer capacity.
+     * @return Circular buffer capacity.
+     */
     constexpr static size_t capacity()
     {
         return CAPACITY;
     }
 
+    /**
+     * @brief Circular buffer current size;
+     * @return Current elements count in buffer.
+     */
     size_t size()                                                          const
     {
         return m_size;
     }
 
+    /**
+     * @brief Push elemnt to buffer.
+     *
+     * @param v Element to push.
+     */
     void push(const T& v)
     {
         m_array[wrap(m_offset + m_size)] = v;
 
-        if(m_size < CAPACITY) 
+        if(m_size < CAPACITY)
         {
             ++m_size;
         }
@@ -60,6 +92,11 @@ public:
         }
     }
 
+    /**
+     * @brief Extract element from buffer
+     *
+     * @return Top element.
+     */
     T pop()
     {
         T t = m_array[m_offset];
@@ -162,7 +199,7 @@ public:
         m_size -= count;
     }
 
-    class iterator 
+    class iterator
     {
         public:
             typedef iterator self_type;
@@ -171,7 +208,7 @@ public:
             typedef T* pointer;
             typedef std::bidirectional_iterator_tag iterator_category;
             typedef ptrdiff_t difference_type;
-            iterator(size_t ind, circular_buffer<T, 
+            iterator(size_t ind, circular_buffer<T,
                                                  CAPACITY,
                                                  ERASE_ELEMENTS>& data) :
                 index_(ind),
@@ -256,7 +293,7 @@ public:
             circular_buffer<T, CAPACITY, ERASE_ELEMENTS>& data_;
     };
 
-    class const_iterator 
+    class const_iterator
     {
         public:
             typedef const_iterator self_type;
@@ -269,11 +306,11 @@ public:
                            const circular_buffer<T,
                                                  CAPACITY,
                                                  ERASE_ELEMENTS>& data) :
-                index_(ind), 
+                index_(ind),
                 data_(data)
             {}
 
-            self_type& operator++() 
+            self_type& operator++()
             {
                 if(CAPACITY == index_)
                 {
