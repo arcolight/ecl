@@ -73,8 +73,8 @@ protected:
     template<typename STREAM>
     void serialize(STREAM& st,
                    bool beautify,
-                   size_t indent,
-                   size_t indent_increment)                                const
+                   std::size_t indent,
+                   std::size_t indent_increment)                           const
     {
         details::val_serializer<const char*>::template stringify(st,
                                                                  NAME::name(),
@@ -140,7 +140,7 @@ protected:
      * Used for @ref ecl::json::object serialized size calculation.
      * @return serialized size in chars.
      */
-    constexpr static size_t size()
+    constexpr static std::size_t size()
     {
         return 1 + 2 + NAME::size() + details::val_size<value_t>::size();
     }

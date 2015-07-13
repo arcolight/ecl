@@ -16,7 +16,7 @@ namespace web
 class request_parser
 {
 public:
-    request* parse(char* raw, size_t size)
+    request* parse(char* raw, std::size_t size)
     {
         (void)size;
         parser_state st = m_parser.process_event(rst());

@@ -41,13 +41,16 @@ public:
     }
 
     template<typename ST>
-    static void help(ST& st, size_t indent_increment = DEFAULT_INDENT_INCREMENT)
+    static void help(ST& st,
+                     std::size_t indent_increment = DEFAULT_INDENT_INCREMENT)
     {
         show_help<ST>(st, 0, indent_increment);
     }
 
     template<typename ST>
-    static void show_help(ST& st, size_t indent, size_t indent_increment = DEFAULT_INDENT_INCREMENT)
+    static void show_help(ST& st,
+                          std::size_t indent,
+                          std::size_t indent_increment = DEFAULT_INDENT_INCREMENT)
     {
         print_indent(st, indent);
         st << name() << "\n\r";
@@ -97,7 +100,9 @@ private:
     }
 
     template<typename ST, typename cmd, typename... tail>
-    static void show_help_internal(ST& st, size_t indent, size_t indent_increment)
+    static void show_help_internal(ST& st,
+                                   std::size_t indent,
+                                   std::size_t indent_increment)
     {
         cmd::show_help(st, indent, indent_increment);
 
@@ -105,7 +110,9 @@ private:
     }
 
     template<typename ST>
-    static void show_help_internal(ST& st, size_t indent, size_t indent_increment)
+    static void show_help_internal(ST& st,
+                                   std::size_t indent,
+                                   std::size_t indent_increment)
     {
         (void)st;
         (void)indent;

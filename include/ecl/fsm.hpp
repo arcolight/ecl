@@ -226,7 +226,7 @@ protected:
         callback_table(const callback_table&& other)                   = delete;
         callback_table& operator= (const callback_table&& other)       = delete;
 
-        template<size_t CNT, typename callback, typename... tail>
+        template<std::size_t CNT, typename callback, typename... tail>
         static void on_exit_chain(derived& fsm, const state_t s)
         {
             if(callback::cb_state() == s)
@@ -241,14 +241,14 @@ protected:
             on_exit_chain<CNT + 1, tail...>(fsm, s);
         }
 
-        template<size_t CNT>
+        template<std::size_t CNT>
         static void on_exit_chain(derived& fsm, const state_t s)
         {
             (void)(fsm);
             (void)(s);
         }
 
-        template<size_t CNT, typename callback, typename... tail>
+        template<std::size_t CNT, typename callback, typename... tail>
         static void on_enter_chain(derived& fsm, const state_t s)
         {
             if(callback::cb_state() == s)
@@ -263,7 +263,7 @@ protected:
             on_enter_chain<CNT + 1, tail...>(fsm, s);
         }
 
-        template<size_t CNT>
+        template<std::size_t CNT>
         static void on_enter_chain(derived& fsm, const state_t s)
         {
             (void)(fsm);

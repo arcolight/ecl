@@ -23,7 +23,7 @@ namespace ecl
  * @tparam ERASE_ELEMENTS = false Determines delete or not elements on
  * @ref clear
  */
-template<typename T, size_t CAPACITY, bool ERASE_ELEMENTS = false>
+template<typename T, std::size_t CAPACITY, bool ERASE_ELEMENTS = false>
 class circular_buffer
 {
 public:
@@ -59,7 +59,7 @@ public:
      * @brief Circular buffer capacity.
      * @return Circular buffer capacity.
      */
-    constexpr static size_t capacity()
+    constexpr static std::size_t capacity()
     {
         return CAPACITY;
     }
@@ -68,7 +68,7 @@ public:
      * @brief Circular buffer current size;
      * @return Current elements count in buffer.
      */
-    size_t size()                                                          const
+    std::size_t size()                                                     const
     {
         return m_size;
     }
@@ -115,12 +115,12 @@ public:
         return T();
     }
 
-    T& operator[](size_t index)
+    T& operator[](std::size_t index)
     {
         return m_array[wrap(index + m_offset)];
     }
 
-    const T& operator[](size_t index)                                      const
+    const T& operator[](std::size_t index)                                 const
     {
         return m_array[wrap(index + m_offset)];
     }
@@ -160,7 +160,7 @@ public:
         return operator [](m_size - 1);
     }
 
-    void drop_front(size_t count)
+    void drop_front(std::size_t count)
     {
         if (m_size <= count)
         {
@@ -170,7 +170,7 @@ public:
 
         if(ERASE_ELEMENTS)
         {
-            for(size_t i = 0; i < count; ++i)
+            for(std::size_t i = 0; i < count; ++i)
             {
                 m_array[wrap(m_offset + i)] = T();
             }
@@ -180,7 +180,7 @@ public:
         m_size -= count;
     }
 
-    void drop_back(size_t count)
+    void drop_back(std::size_t count)
     {
         if (m_size <= count)
         {
@@ -190,7 +190,7 @@ public:
 
         if(ERASE_ELEMENTS)
         {
-            for(size_t i = 0; i < count; ++i)
+            for(std::size_t i = 0; i < count; ++i)
             {
                 m_array[wrap(m_offset + m_size - i - 1)] = T();
             }
@@ -208,9 +208,9 @@ public:
             typedef T* pointer;
             typedef std::bidirectional_iterator_tag iterator_category;
             typedef ptrdiff_t difference_type;
-            iterator(size_t ind, circular_buffer<T,
-                                                 CAPACITY,
-                                                 ERASE_ELEMENTS>& data) :
+            iterator(std::size_t ind, circular_buffer<T,
+                                                      CAPACITY,
+                                                      ERASE_ELEMENTS>& data) :
                 index_(ind),
                 data_(data)
             {}
@@ -289,7 +289,7 @@ public:
             }
 
         private:
-            size_t                                        index_;
+            std::size_t                                   index_;
             circular_buffer<T, CAPACITY, ERASE_ELEMENTS>& data_;
     };
 
@@ -302,10 +302,10 @@ public:
             typedef const T* pointer;
             typedef std::bidirectional_iterator_tag iterator_category;
             typedef ptrdiff_t difference_type;
-            const_iterator(size_t ind,
-                           const circular_buffer<T,
-                                                 CAPACITY,
-                                                 ERASE_ELEMENTS>& data) :
+            const_iterator(std::size_t ind,
+                           const       circular_buffer<T,
+                                                       CAPACITY,
+                                                       ERASE_ELEMENTS>& data) :
                 index_(ind),
                 data_(data)
             {}
@@ -384,7 +384,7 @@ public:
             }
 
         private:
-            size_t                                              index_;
+            std::size_t                                         index_;
             const circular_buffer<T, CAPACITY, ERASE_ELEMENTS>& data_;
     };
 
@@ -432,14 +432,14 @@ public:
     }
 
 private:
-    static size_t wrap(size_t i)
+    static std::size_t wrap(std::size_t i)
     {
         return i % CAPACITY;
     }
 
-    size_t  m_offset;
-    size_t  m_size;
-    T       m_array[CAPACITY];
+    std::size_t m_offset;
+    std::size_t m_size;
+    T           m_array[CAPACITY];
 };
 
 } // namespace ecl

@@ -49,7 +49,7 @@ public:
         return check_resource_internal<0, NAME...>(req);
     }
 
-    template<size_t COUNT, typename N1, typename... TAIL>
+    template<std::size_t COUNT, typename N1, typename... TAIL>
     static bool check_resource_internal(const request* req)
     {
         if((0 == strncmp(req->uri, N1::name(), N1::size())) &&
@@ -61,7 +61,7 @@ public:
         return check_resource_internal<COUNT + 1, TAIL...>(req);
     }
 
-    template<size_t COUNT>
+    template<std::size_t COUNT>
     static bool check_resource_internal(const request* req)
     {
         (void)(req);

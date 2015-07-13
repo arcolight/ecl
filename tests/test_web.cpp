@@ -38,7 +38,7 @@ ECL_DECL_NAME_TYPE_STRING(page_500_name, "/500.html")
 
 int new_sd = 0;
 
-void write_sock(const char* const buf, size_t size)
+void write_sock(const char* const buf, std::size_t size)
 {
     std::cout << buf;
     send(new_sd, buf, size, 0);

@@ -63,9 +63,9 @@ typedef enum class alpha_case {
  */
 typedef struct width
 {
-    width(size_t w) : m_w(w) {}
+    width(std::size_t w) : m_w(w) {}
 
-    size_t m_w;
+    std::size_t m_w;
 } wd;
 
 /**
@@ -87,7 +87,7 @@ struct reset {};
  *
  * @return void
  */
-typedef void(*flush_function_t)(const char* const buf, size_t size);
+typedef void(*flush_function_t)(const char* const buf, std::size_t size);
 
 /**
  * @brief Stream class.
@@ -97,11 +97,11 @@ typedef void(*flush_function_t)(const char* const buf, size_t size);
  * @tparam FLUSH_F_PTR = nullptr Pointer to @ref flush_function_t
  * that will be called on internal buffer overflow.
  */
-template<size_t BUFFER_SIZE, flush_function_t FLUSH_F_PTR = nullptr>
+template<std::size_t BUFFER_SIZE, flush_function_t FLUSH_F_PTR = nullptr>
 class stream{
 public:
     explicit stream(const base   def_base = base::d,
-                    const size_t def_width = 8) :
+                    const std::size_t def_width = 8) :
         m_def_base(def_base),
         m_def_width(def_width)
     {
@@ -124,7 +124,7 @@ public:
      *
      * @param w @ref width object.
      */
-    stream& operator() (const size_t w)
+    stream& operator() (const std::size_t w)
     {
         m_width = w;
         return *this;
@@ -246,7 +246,7 @@ public:
      * @brief Characters count.
      * @return Count of characters in stream.
      */
-    size_t count()                                                         const
+    std::size_t count()                                                    const
     {
         return m_count;
     }
@@ -268,7 +268,7 @@ public:
         reset();
     }
 
-    constexpr static size_t m_s_size { BUFFER_SIZE };
+    constexpr static std::size_t m_s_size { BUFFER_SIZE };
 
 private:
     stream(const stream& other)                                        = delete;
@@ -439,7 +439,7 @@ private:
             return;
         }
 
-        for(size_t i = 0; (val[i] != 0) && (m_count < BUFFER_SIZE + 1); ++i)
+        for(std::size_t i = 0; (val[i] != 0) && (m_count < BUFFER_SIZE + 1); ++i)
         {
             if(m_count == BUFFER_SIZE)
             {
@@ -453,9 +453,9 @@ private:
         m_buf[BUFFER_SIZE] = 0;
     }
 
-    void print_binary(const uint8_t* const data, size_t size)
+    void print_binary(const uint8_t* const data, std::size_t size)
     {
-        for(size_t i = 0; i < size; ++i)
+        for(std::size_t i = 0; i < size; ++i)
         {
             if(m_count == BUFFER_SIZE)
             {
@@ -503,16 +503,16 @@ private:
     // can be used for all bases till 16.
     const char* m_alphabet = R"(0123456789abcdef)";
 
-    char         m_num_buf[66]; // (u)int64_t in binary mode takes 64 characters
-    uint8_t      m_buf[BUFFER_SIZE + 1];
-    size_t       m_count { 0 };
+    char              m_num_buf[66]; // (u)int64_t in binary mode takes 64 characters
+    uint8_t           m_buf[BUFFER_SIZE + 1];
+    std::size_t       m_count { 0 };
 
-    const base   m_def_base;
-    const size_t m_def_width;
+    const base        m_def_base;
+    const std::size_t m_def_width;
 
-    base         m_base  { m_def_base  };
-    size_t       m_width { m_def_width };
-    cs           m_case  { cs::lower   };
+    base              m_base  { m_def_base  };
+    std::size_t       m_width { m_def_width };
+    cs                m_case  { cs::lower   };
 };
 
 } // namespace ecl

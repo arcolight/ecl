@@ -17,7 +17,7 @@ public:
     typedef RESOURCES resources_t;
 
     template<typename STREAM>
-    void process_request(char* req_raw, size_t size, STREAM& st)
+    void process_request(char* req_raw, std::size_t size, STREAM& st)
     {
         m_resources.template call<STREAM>(st, m_parser.parse(req_raw, size));
     }

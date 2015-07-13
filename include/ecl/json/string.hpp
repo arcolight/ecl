@@ -39,7 +39,7 @@ namespace json
   *
   * @tparam SIZE max size of string.
   */
-template<size_t SIZE>
+template<std::size_t SIZE>
 class string
 {
 public:
@@ -50,9 +50,9 @@ public:
 
     string(const char* const ptr)
     {
-        size_t sz = std::min(strnlen(ptr, SIZE), SIZE);
+        std::size_t sz = std::min(strnlen(ptr, SIZE), SIZE);
 
-        for(size_t i = 0; i < sz; ++i)
+        for(std::size_t i = 0; i < sz; ++i)
         {
             m_val[i] = ptr[i];
         }
@@ -63,7 +63,7 @@ public:
      * @details Method used in compile-time JSON-object size calculation .
      * @return Max string size.
      */
-    constexpr static size_t size()
+    constexpr static std::size_t size()
     {
         return SIZE;
     }
@@ -89,8 +89,8 @@ public:
     template<typename STREAM>
     void serialize(STREAM& st,
                    bool beautify,
-                   size_t indent,
-                   size_t indent_increment)                                const
+                   std::size_t indent,
+                   std::size_t indent_increment)                           const
     {
         (void)beautify;
         (void)indent;
@@ -98,7 +98,7 @@ public:
 
         st << "\"";
 
-        for(size_t i = 0; i < strlen(m_val.data()) && i < SIZE; ++i)
+        for(std::size_t i = 0; i < strlen(m_val.data()) && i < SIZE; ++i)
         {
             if(m_val[i] == '"'  ||
                m_val[i] == '\\' ||
@@ -167,7 +167,7 @@ public:
         }
         s++;
 
-        for(size_t i = 0; i < SIZE; ++i)
+        for(std::size_t i = 0; i < SIZE; ++i)
         {
             details::spaces_rollup(s);
             if(*s == '"')
@@ -209,8 +209,8 @@ public:
      */
     string<SIZE>& operator= (const char* const ptr)
     {
-        size_t sz = std::min(strnlen(ptr, SIZE), SIZE);
-        for(size_t i = 0; i < sz; ++i)
+        std::size_t sz = std::min(strnlen(ptr, SIZE), SIZE);
+        for(std::size_t i = 0; i < sz; ++i)
         {
             m_val[i] = ptr[i];
         }

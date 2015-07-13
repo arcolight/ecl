@@ -26,7 +26,7 @@ namespace json
  * @tparam OBJ JSON object type. Type of array element.
  * @tparam COUNT Elements count.
  */
-template<typename OBJ, size_t COUNT>
+template<typename OBJ, std::size_t COUNT>
 class array
 {
 public:
@@ -36,7 +36,7 @@ public:
      * @brief Maximum serialized size in characters.
      * @return Maximum serialized size in characters.
      */
-    constexpr static size_t size()
+    constexpr static std::size_t size()
     {
         return 2 + OBJ::size() * COUNT + (COUNT - 1); // 2 for '[' and ']'
     }
@@ -71,12 +71,12 @@ public:
         }
         s++;
 
-        for(size_t i = 0; i < COUNT; ++i)
+        for(std::size_t i = 0; i < COUNT; ++i)
         {
             m_val[i].disable();
         }
 
-        for(size_t i = 0; i < COUNT; ++i)
+        for(std::size_t i = 0; i < COUNT; ++i)
         {
             m_val[i].disable();
             if(!m_val[i].deserialize_ref(s))
@@ -124,13 +124,14 @@ public:
     template<typename STREAM>
     void serialize(STREAM& st,
                    bool beautify = false,
-                   size_t indent = 0,
-                   size_t indent_increment = ECL_DEFAULT_INDENT_INCREMENT) const
+                   std::size_t indent = 0,
+                   std::size_t indent_increment =
+                               ECL_DEFAULT_INDENT_INCREMENT)               const
     {
         st << '[';
         details::print_beautify(st, beautify, indent + 1, indent_increment);
 
-        for(size_t i = 0; i < COUNT; ++i)
+        for(std::size_t i = 0; i < COUNT; ++i)
         {
             m_val[i].serialize(st, beautify, indent + 1, indent_increment);
 
@@ -188,12 +189,12 @@ public:
         return m_val.rend();
     }
 
-    OBJ& operator[](size_t index)
+    OBJ& operator[](std::size_t index)
     {
         return m_val[index];
     }
 
-    const OBJ& operator[](size_t index)                                    const
+    const OBJ& operator[](std::size_t index)                               const
     {
         return m_val[index];
     }

@@ -37,13 +37,13 @@ namespace details
 template<typename STREAM>
 void print_beautify(STREAM& st,
                     bool beautify,
-                    size_t indent,
-                    size_t indent_increment)
+                    std::size_t indent,
+                    std::size_t indent_increment)
 {
     if(beautify)
     {
         st << '\n';
-        for(size_t i = 0; i < indent * indent_increment; ++i)
+        for(std::size_t i = 0; i < indent * indent_increment; ++i)
         {
             st << ' ';
         }
@@ -64,7 +64,7 @@ void spaces_rollup(const char*& s)
 template<typename T>
 struct val_size
 {
-    constexpr static size_t size()
+    constexpr static std::size_t size()
     {
         return T::size();
     }
@@ -74,7 +74,7 @@ struct val_size
 template<>
 struct val_size<std::string>
 {
-    constexpr static size_t size()
+    constexpr static std::size_t size()
     {
         return 0; // We don't know real size of this type
     }
@@ -84,7 +84,7 @@ struct val_size<std::string>
 template<>
 struct val_size<bool>
 {
-    constexpr static size_t size()
+    constexpr static std::size_t size()
     {
         return 5;
     }
@@ -93,7 +93,7 @@ struct val_size<bool>
 template<>
 struct val_size<int8_t>
 {
-    constexpr static size_t size()
+    constexpr static std::size_t size()
     {
         return 4;
     }
@@ -102,7 +102,7 @@ struct val_size<int8_t>
 template<>
 struct val_size<uint8_t>
 {
-    constexpr static size_t size()
+    constexpr static std::size_t size()
     {
         return 3;
     }
@@ -111,7 +111,7 @@ struct val_size<uint8_t>
 template<>
 struct val_size<int16_t>
 {
-    constexpr static size_t size()
+    constexpr static std::size_t size()
     {
         return 6;
     }
@@ -120,7 +120,7 @@ struct val_size<int16_t>
 template<>
 struct val_size<uint16_t>
 {
-    constexpr static size_t size()
+    constexpr static std::size_t size()
     {
         return 5;
     }
@@ -129,7 +129,7 @@ struct val_size<uint16_t>
 template<>
 struct val_size<int32_t>
 {
-    constexpr static size_t size()
+    constexpr static std::size_t size()
     {
         return 11;
     }
@@ -138,7 +138,7 @@ struct val_size<int32_t>
 template<>
 struct val_size<uint32_t>
 {
-    constexpr static size_t size()
+    constexpr static std::size_t size()
     {
         return 10;
     }
@@ -147,7 +147,7 @@ struct val_size<uint32_t>
 template<>
 struct val_size<int64_t>
 {
-    constexpr static size_t size()
+    constexpr static std::size_t size()
     {
         return 21;
     }
@@ -156,7 +156,7 @@ struct val_size<int64_t>
 template<>
 struct val_size<uint64_t>
 {
-    constexpr static size_t size()
+    constexpr static std::size_t size()
     {
         return 20;
     }
@@ -275,7 +275,7 @@ struct val_deserializer<std::string>
         }
         s++;
 
-        for(size_t i = 0; i < strlen(s); ++i)
+        for(std::size_t i = 0; i < strlen(s); ++i)
         {
             if(*s == '"')
             {
@@ -401,8 +401,8 @@ struct val_serializer
     static void stringify(STREAM& st,
                           const T& val,
                           bool beautify,
-                          size_t indent,
-                          size_t indent_increment)
+                          std::size_t indent,
+                          std::size_t indent_increment)
     {
         val.serialize(st, beautify, indent, indent_increment);
     }
@@ -415,8 +415,8 @@ struct val_serializer<const char*>
     static void stringify(STREAM& st,
                           const char* val,
                           bool beautify,
-                          size_t indent,
-                          size_t indent_increment)
+                          std::size_t indent,
+                          std::size_t indent_increment)
     {
         (void)beautify;
         (void)indent;
@@ -424,7 +424,7 @@ struct val_serializer<const char*>
 
         st << "\"";
 
-        for(size_t i = 0; i < strlen(val); ++i)
+        for(std::size_t i = 0; i < strlen(val); ++i)
         {
             if(val[i] == '"'  ||
                val[i] == '\\' ||
@@ -470,8 +470,8 @@ struct val_serializer<bool>
     static void stringify(STREAM& st,
                           const bool& val,
                           bool beautify,
-                          size_t indent,
-                          size_t indent_increment)
+                          std::size_t indent,
+                          std::size_t indent_increment)
     {
         (void)beautify;
         (void)indent;
@@ -487,8 +487,8 @@ struct val_serializer<int8_t>
     static void stringify(STREAM& st,
                           const int8_t& val,
                           bool beautify,
-                          size_t indent,
-                          size_t indent_increment)
+                          std::size_t indent,
+                          std::size_t indent_increment)
     {
         (void)beautify;
         (void)indent;
@@ -504,8 +504,8 @@ struct val_serializer<uint8_t>
     static void stringify(STREAM& st,
                           const uint8_t& val,
                           bool beautify,
-                          size_t indent,
-                          size_t indent_increment)
+                          std::size_t indent,
+                          std::size_t indent_increment)
     {
         (void)beautify;
         (void)indent;
@@ -521,8 +521,8 @@ struct val_serializer<int16_t>
     static void stringify(STREAM& st,
                           const int16_t& val,
                           bool beautify,
-                          size_t indent,
-                          size_t indent_increment)
+                          std::size_t indent,
+                          std::size_t indent_increment)
     {
         (void)beautify;
         (void)indent;
@@ -538,8 +538,8 @@ struct val_serializer<uint16_t>
     static void stringify(STREAM& st,
                           const uint16_t& val,
                           bool beautify,
-                          size_t indent,
-                          size_t indent_increment)
+                          std::size_t indent,
+                          std::size_t indent_increment)
     {
         (void)beautify;
         (void)indent;
@@ -555,8 +555,8 @@ struct val_serializer<int32_t>
     static void stringify(STREAM& st,
                           const int32_t& val,
                           bool beautify,
-                          size_t indent,
-                          size_t indent_increment)
+                          std::size_t indent,
+                          std::size_t indent_increment)
     {
         (void)beautify;
         (void)indent;
@@ -572,8 +572,8 @@ struct val_serializer<uint32_t>
     static void stringify(STREAM& st,
                           const uint32_t& val,
                           bool beautify,
-                          size_t indent,
-                          size_t indent_increment)
+                          std::size_t indent,
+                          std::size_t indent_increment)
     {
         (void)beautify;
         (void)indent;
@@ -589,8 +589,8 @@ struct val_serializer<int64_t>
     static void stringify(STREAM& st,
                           const int64_t& val,
                           bool beautify,
-                          size_t indent,
-                          size_t indent_increment)
+                          std::size_t indent,
+                          std::size_t indent_increment)
     {
         (void)beautify;
         (void)indent;
@@ -606,8 +606,8 @@ struct val_serializer<uint64_t>
     static void stringify(STREAM& st,
                           const uint64_t& val,
                           bool beautify,
-                          size_t indent,
-                          size_t indent_increment)
+                          std::size_t indent,
+                          std::size_t indent_increment)
     {
         (void)beautify;
         (void)indent;
@@ -624,8 +624,8 @@ struct val_serializer<std::string>
     static void stringify(STREAM& st, const
                           std::string& val,
                           bool beautify,
-                          size_t indent,
-                          size_t indent_increment)
+                          std::size_t indent,
+                          std::size_t indent_increment)
     {
         val_serializer<const char*>::stringify(st,
                                                val.data(),

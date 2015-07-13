@@ -6,11 +6,14 @@
 namespace ecl
 {
 
-template<size_t BUFFER_SIZE, typename LEVELS, typename HEADER, typename... OUT>
+template<std::size_t BUFFER_SIZE,
+         typename LEVELS,
+         typename HEADER,
+         typename... OUT>
 class logger
 {
 private:
-    static void stream_out(const char* const buf, size_t size)
+    static void stream_out(const char* const buf, std::size_t size)
     {
         out_all(buf, size);
     }
@@ -57,20 +60,20 @@ public:
     }
 
 private:
-    static void out_all(const char* const buf, size_t size)
+    static void out_all(const char* const buf, std::size_t size)
     {
         out<0, OUT...>(buf, size);
     }
 
-    template<size_t COUNT, typename O, typename... TAIL>
-    static void out(const char* const buf, size_t size)
+    template<std::size_t COUNT, typename O, typename... TAIL>
+    static void out(const char* const buf, std::size_t size)
     {
         O::print(buf, size);
         out<COUNT + 1, TAIL...>(buf, size);
     }
 
-    template<size_t COUNT>
-    static void out(const char* const buf, size_t size)
+    template<std::size_t COUNT>
+    static void out(const char* const buf, std::size_t size)
     {
         (void)buf;
         (void)size;

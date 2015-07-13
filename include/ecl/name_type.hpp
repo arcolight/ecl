@@ -23,7 +23,7 @@ struct nm                                     \
         return ecl::str_const(#nm);           \
     }                                         \
                                               \
-    constexpr static size_t size()            \
+    constexpr static std::size_t size()       \
     {                                         \
         return ecl::str_const(#nm).size();    \
     }                                         \
@@ -37,7 +37,7 @@ struct nm                                     \
         return ecl::str_const(string);        \
     }                                         \
                                               \
-    constexpr static size_t size()            \
+    constexpr static std::size_t size()       \
     {                                         \
         return ecl::str_const(string).size(); \
     }                                         \

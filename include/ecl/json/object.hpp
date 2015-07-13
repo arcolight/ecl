@@ -157,7 +157,7 @@ public:
      * @details Calculates maximum size of serialized object in characters.
      * @return Serialized size in chars.
      */
-    constexpr static size_t size()
+    constexpr static std::size_t size()
     {
         return size_<2, NODES...>(); // 2 for '{' and '}'
     }
@@ -176,8 +176,9 @@ public:
     template<typename STREAM>
     void serialize(STREAM& st,
                    bool beautify = false,
-                   size_t indent = 0,
-                   size_t indent_increment = ECL_DEFAULT_INDENT_INCREMENT) const
+                   std::size_t indent = 0,
+                   std::size_t indent_increment =
+                               ECL_DEFAULT_INDENT_INCREMENT)               const
     {
         if(m_enabled)
         {
@@ -244,20 +245,20 @@ public:
     }
 
 private:
-    template<size_t SIZE, typename NODE, typename NEXT, typename... TAIL>
-    constexpr static size_t size_()
+    template<std::size_t SIZE, typename NODE, typename NEXT, typename... TAIL>
+    constexpr static std::size_t size_()
     {
         return size_<SIZE + NODE::size() + 1, NEXT, TAIL...>(); // 1 for ','
     }
 
-    template<size_t SIZE, typename NODE>
-    constexpr static size_t size_()
+    template<std::size_t SIZE, typename NODE>
+    constexpr static std::size_t size_()
     {
         return size_<SIZE + NODE::size()>();
     }
 
-    template<size_t SIZE>
-    constexpr static size_t size_()
+    template<std::size_t SIZE>
+    constexpr static std::size_t size_()
     {
         return SIZE; // '}' already counted.
     }
@@ -266,8 +267,8 @@ private:
     template<typename STREAM, typename NODE, typename NEXT, typename... TAIL>
     void serialize_internal(STREAM& st,
                             bool beautify,
-                            size_t indent,
-                            size_t indent_increment)                       const
+                            std::size_t indent,
+                            std::size_t indent_increment)                  const
     {
         this->NODE::serialize(st, beautify, indent, indent_increment);
 
@@ -283,8 +284,8 @@ private:
     template<typename STREAM, typename NODE>
     void serialize_internal(STREAM& st,
                             bool beautify,
-                            size_t indent,
-                            size_t indent_increment)                       const
+                            std::size_t indent,
+                            std::size_t indent_increment)                  const
     {
         this->NODE::serialize(st, beautify, indent, indent_increment);
 
@@ -294,8 +295,8 @@ private:
     template<typename STREAM>
     void serialize_internal(STREAM& st,
                             bool beautify,
-                            size_t indent,
-                            size_t indent_increment)                       const
+                            std::size_t indent,
+                            std::size_t indent_increment)                  const
     {
         (void)st;
         (void)beautify;

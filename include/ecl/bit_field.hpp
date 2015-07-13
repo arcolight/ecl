@@ -28,7 +28,7 @@ namespace ecl
  * @tparam S::*P Name of the field in the base struct S.
  * @tparam SIZE Size in bits(!).
  */
-template<typename S, typename T, T S::*P, size_t SIZE>
+template<typename S, typename T, T S::*P, std::size_t SIZE>
 class field : public virtual S
 {
 public:
@@ -37,7 +37,7 @@ public:
         static_assert((sizeof(T) * 8 >= SIZE), "field size > sizeof(var)");
     }
 
-    constexpr static size_t size()
+    constexpr static std::size_t size()
     {
         return SIZE;
     }
@@ -66,7 +66,7 @@ protected:
  * @tparam BASE Base struct type.
  * @tparam FIELDS List of the fields.
  */
-template <size_t SIZE, typename BASE, typename... FIELDS>
+template <std::size_t SIZE, typename BASE, typename... FIELDS>
 class bit_field final : public FIELDS...
 {
 public:
@@ -112,7 +112,7 @@ public:
      */
     void set_data(const uint8_t* const data)
     {
-        for(size_t i = 0; i < SIZE; ++i)
+        for(std::size_t i = 0; i < SIZE; ++i)
         {
             m_array[i] = data[i];
         }
@@ -151,17 +151,17 @@ public:
         }
     }
 
-    constexpr static size_t size { SIZE };
+    constexpr static std::size_t size { SIZE };
 
 private:
-    template<size_t SUM>
+    template<std::size_t SUM>
     constexpr bool check()                                                 const
     {
         static_assert((SIZE * 8 >= SUM), "array to small");
         return true;
     }
 
-    template<size_t SUM, typename F, typename... TAIL>
+    template<std::size_t SUM, typename F, typename... TAIL>
     constexpr bool check()                                                 const
     {
         return check<SUM + F::size(), TAIL...>();
@@ -180,9 +180,9 @@ private:
         typename F::field_t val = this->F::get();
         uint8_t bit = 0x00;
 
-        for(size_t i = 0; i < F::size(); ++i)
+        for(std::size_t i = 0; i < F::size(); ++i)
         {
-            size_t shift = (OFFSET + i) % 8;
+            std::size_t shift = (OFFSET + i) % 8;
             if(0 == shift)
             {
                 ++array;
@@ -208,9 +208,9 @@ private:
         typename F::field_t val = 0;
         decltype(val) bit = 0;
 
-        for(size_t i = 0; i < F::size(); ++i)
+        for(std::size_t i = 0; i < F::size(); ++i)
         {
-            size_t shift = (OFFSET + i) % 8;
+            std::size_t shift = (OFFSET + i) % 8;
             if(0 == shift)
             {
                 ++array;

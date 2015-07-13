@@ -23,9 +23,9 @@ namespace ecl
 {
 
 template<typename ST>
-static void print_indent(ST& st, size_t indent)
+static void print_indent(ST& st, std::size_t indent)
 {
-    for(size_t i = 0; i < indent; ++i)
+    for(std::size_t i = 0; i < indent; ++i)
     {
         st << " ";
     }
@@ -110,7 +110,9 @@ public:
     }
 
     template<typename ST>
-    static void show_help(ST& st, size_t indent, size_t indent_increment = DEFAULT_INDENT_INCREMENT)
+    static void show_help(ST& st,
+                          std::size_t indent,
+                          std::size_t indent_increment = DEFAULT_INDENT_INCREMENT)
     {
         (void)indent_increment;
         print_indent(st, indent);

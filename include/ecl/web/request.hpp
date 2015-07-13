@@ -22,7 +22,10 @@ struct request
         clear();
     }
 
-    constexpr static size_t max_headers_count() { return MAX_HEADERS_COUNT; }
+    constexpr static std::size_t max_headers_count()
+    {
+        return MAX_HEADERS_COUNT;
+    }
 
     method         met                         { method::GET  };
     version        ver                         { version::HTTP10 };
@@ -30,7 +33,7 @@ struct request
     const char*    uri_param                   { nullptr };
     const uint8_t* body                        { nullptr };
     header         headers[MAX_HEADERS_COUNT];
-    size_t         headers_count               { 0 };
+    std::size_t    headers_count               { 0 };
 
     void clear()
     {
