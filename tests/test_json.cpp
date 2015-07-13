@@ -126,7 +126,15 @@ int main(int argc, char* argv[])
     fill_document(doc_std);
     dump_document(doc_std, std_prefix);
 
-    doc_ecl.serialize(st_ecl, true);
+    std::cout << std::boolalpha;
+    std::cout << ecl_prefix << "Serialization to std::cout" << std::endl;
+    doc_ecl.serialize(std::cout, true);
+    std::cout << std::endl;
+    std::cout << std_prefix << "Serialization to std::cout" << std::endl;
+    doc_std.serialize(std::cout, true);
+    std::cout << std::endl;
+
+    doc_ecl.serialize(st_ecl);
     doc_std.serialize(st_std);
 
     std::cout << ecl_prefix << "Serialized count: " << st_ecl.count() << std::endl;
