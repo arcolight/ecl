@@ -162,6 +162,11 @@ public:
 
     void drop_front(std::size_t count)
     {
+        if (count == 0)
+        {
+            return;
+        }
+
         if (m_size <= count)
         {
             clear();
@@ -182,6 +187,11 @@ public:
 
     void drop_back(std::size_t count)
     {
+        if (count == 0)
+        {
+            return;
+        }
+
         if (m_size <= count)
         {
             clear();
