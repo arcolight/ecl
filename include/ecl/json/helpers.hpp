@@ -50,7 +50,7 @@ void print_beautify(STREAM& st,
     }
 }
 
-void spaces_rollup(const char*& s)
+inline void spaces_rollup(const char*& s)
 {
     while(*s == ' '  ||
           *s == '\n' ||
