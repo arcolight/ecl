@@ -3,7 +3,7 @@ OPTIMIZATION = -O2
 DEBUG = -g3
 
 GCC_WARNINGS = -Wall -Wextra -pedantic -Wswitch -Wnon-virtual-dtor
-CLANG_WARNINGS = -Weverything -Wno-padded -Wno-c++98-compat -Wno-documentation -Wno-covered-switch-default
+CLANG_WARNINGS = -Weverything -Wno-padded -Wno-c++98-compat -Wno-documentation -Wno-covered-switch-default -Wno-exit-time-destructors
 
 SECURE = -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 -ftrapv -Wformat-security -fPIE -Wl,-z,relro,-z,now
 
