@@ -190,6 +190,16 @@ public:
     }
 
     /**
+     * @brief Copy ctor
+     *
+     * @param other Another string<SIZE> object
+     */
+    string(const string<SIZE>& other)
+    {
+        m_val = other.m_val;
+    }
+
+    /**
      * @brief Assignment operator for ecl::json::string type.
      * @details One string can be assigned to another. Data will be copied.
      *
