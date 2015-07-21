@@ -19,6 +19,8 @@ enum class st
     s_5
 };
 
+void out_state(st s);
+
 class test_fsm : public ecl::state_machine<test_fsm, st, st::s_1>
 {
     void on_ev_1  (const ev_1& e) { (void)(e); std::cout << "event 1 -> ";   }
