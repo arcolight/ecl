@@ -7,24 +7,12 @@ lvl switch_level(lvl l)
 {
     switch(l)
     {
-        case lvl::debug:
-            return lvl::info;
-        break;
-        case lvl::info:
-            return lvl::warning;
-        break;
-        case lvl::warning:
-            return lvl::error;
-        break;
-        case lvl::error:
-            return lvl::critical;
-        break;
-        case lvl::critical:
-            return lvl::debug;
-        break;
-        default:
-            return lvl::debug;
-        break;
+        case lvl::debug:    return lvl::info;
+        case lvl::info:     return lvl::warning;
+        case lvl::warning:  return lvl::error;
+        case lvl::error:    return lvl::critical;
+        case lvl::critical: return lvl::debug;
+        default:            return lvl::debug;
     }
 }
 

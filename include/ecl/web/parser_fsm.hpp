@@ -136,7 +136,7 @@ class parser_fsm : public state_machine<parser_fsm,
             return false;
         }
 
-        m_request.body = (uint8_t*)e.line;
+        m_request.body = e.line;
 
         return true;
     }

@@ -341,7 +341,7 @@ private:
 
         do {
             m_num_buf[p] = (cs::upper == m_case) ?
-                           toupper(m_alphabet[tmp % bs]) :
+                           static_cast<char>(toupper(m_alphabet[tmp % bs])) :
                            m_alphabet[tmp % bs];
             tmp /= bs;
             ++p;

@@ -28,7 +28,7 @@ struct command_quit : public ecl::command<quit, command_quit>
     {
         if(argc > 0)
         {
-            m_exit_code = std::strtol((const char *)argv[0], nullptr, 10);
+            m_exit_code = std::strtol(argv[0], nullptr, 10);
         }
 
         return true;
@@ -50,9 +50,9 @@ struct command_1    : public ecl::command<cmd1, command_1>
     bool init(const std::size_t           argc,
               const char* const* const    argv)
     {
-        for(int i = 0; i < argc; ++i)
+        for(size_t i = 0; i < argc; ++i)
         {
-            m_args.push_back((const char*)argv[i]);
+            m_args.push_back(argv[i]);
         }
 
         return true;
@@ -66,9 +66,9 @@ struct command_2    : public ecl::command<cmd2, command_2>
     bool init(const std::size_t           argc,
               const char* const* const    argv)
     {
-        for(int i = 0; i < argc; ++i)
+        for(size_t i = 0; i < argc; ++i)
         {
-            m_args.push_back((const char*)argv[i]);
+            m_args.push_back(argv[i]);
         }
 
         return true;
@@ -82,9 +82,9 @@ struct command_3    : public ecl::command<cmd3, command_3>
     bool init(const std::size_t           argc,
               const char* const* const    argv)
     {
-        for(int i = 0; i < argc; ++i)
+        for(size_t i = 0; i < argc; ++i)
         {
-            m_args.push_back((const char*)argv[i]);
+            m_args.push_back(argv[i]);
         }
 
         return true;
@@ -98,9 +98,9 @@ struct command_4    : public ecl::command<cmd4, command_4>
     bool init(const std::size_t           argc,
               const char* const* const    argv)
     {
-        for(int i = 0; i < argc; ++i)
+        for(size_t i = 0; i < argc; ++i)
         {
-            m_args.push_back((const char*)argv[i]);
+            m_args.push_back(argv[i]);
         }
 
         return true;
@@ -114,9 +114,9 @@ struct command_5    : public ecl::command<cmd5, command_5>
     bool init(const std::size_t           argc,
               const char* const* const    argv)
     {
-        for(int i = 0; i < argc; ++i)
+        for(size_t i = 0; i < argc; ++i)
         {
-            m_args.push_back((const char*)argv[i]);
+            m_args.push_back(argv[i]);
         }
 
         return true;
@@ -266,12 +266,12 @@ int main(int argc, char* argv[])
         std::istream_iterator<std::string> end;
         std::vector<std::string> tokens(begin, end);
 
-        size_t token_count = std::min((size_t)MAX_TOKENS, tokens.size());
+        size_t token_count = std::min(static_cast<size_t>(MAX_TOKENS), tokens.size());
 
         tokens.resize(token_count);
         tokens.shrink_to_fit();
 
-        int ac = tokens.size();
+        size_t ac = tokens.size();
         const char* av[MAX_TOKENS];
 
         for(size_t i = 0; i < token_count; ++i)

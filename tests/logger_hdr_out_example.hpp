@@ -1,4 +1,4 @@
-enum lvl 
+enum lvl
 {
     debug,
     info,
@@ -31,9 +31,6 @@ struct lvl_to_string
             break;
             case lvl::always:
                 return "always  ";
-            break;
-            default:
-                return "unknown!";
             break;
         }
     }

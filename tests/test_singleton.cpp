@@ -39,7 +39,7 @@ public:
     }
 
 protected:
-    test_class_ns() {};
+    test_class_ns() {}
 };
 
 typedef ecl::singleton<test_class_ns> test_class_ns_singleton;

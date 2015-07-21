@@ -36,7 +36,9 @@ ECL_DECL_NAME_TYPE_STRING(page_403_name, "/403.html")
 ECL_DECL_NAME_TYPE_STRING(page_404_name, "/404.html")
 ECL_DECL_NAME_TYPE_STRING(page_500_name, "/500.html")
 
-int new_sd = 0;
+static int new_sd = 0;
+
+void write_sock(const char* const buf, std::size_t size);
 
 void write_sock(const char* const buf, std::size_t size)
 {
@@ -112,7 +114,7 @@ typedef ecl::web::server<
             >
 > server_t;
 
-char buffer[1024];
+static char buffer[1024];
 
 void start_server(void);
 
@@ -173,9 +175,9 @@ void start_server()
     {
         memset(buffer, 0x00, sizeof(buffer));
 
-        struct sockaddr_storage their_addr;
+        struct sockaddr their_addr;
         socklen_t addr_size = sizeof(their_addr);
-        new_sd = accept(socketfd, (struct sockaddr *)&their_addr, &addr_size);
+        new_sd = accept(socketfd, &their_addr, &addr_size);
         if (new_sd == -1)
         {
             std::cout << "listen error" << std::endl ;
@@ -208,7 +210,7 @@ void start_server()
 
         close(new_sd);
     }
-    std::cout << "Stopping server..." << std::endl;
-    freeaddrinfo(host_info_list);
-    close(socketfd);
+    // std::cout << "Stopping server..." << std::endl;
+    // freeaddrinfo(host_info_list);
+    // close(socketfd);
 }

@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
     (void)(argc);
     (void)(argv);
 
-    std::srand(std::time(0));
+    std::srand(static_cast<uint32_t>(std::time(0)));
     int random_variable = 18;
 
     size_t count = random_variable % (CB_SIZE*2) + 1;

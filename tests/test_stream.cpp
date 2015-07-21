@@ -14,13 +14,13 @@ void printf_nums(int8_t  i8,  uint8_t  u8,
                  int16_t i16, uint16_t u16,
                  int32_t i32, uint32_t u32,
                  int64_t i64, uint64_t u64);
-
 void out_nums(int8_t  i8,  uint8_t  u8,
               int16_t i16, uint16_t u16,
               int32_t i32, uint32_t u32,
               int64_t i64, uint64_t u64);
 
 void printf_floats(float_t f, double_t d);
+void out_floats(float_t f, double_t d);
 
 void out_bool_char(bool b, char c);
 
@@ -192,13 +192,13 @@ int main(int argc, char** argv)
     printf_floats(f,d);
     out_floats(f, d);
 
-    f = 2.7181;
+    f = 2.7181f;
     d = -2.7181;
 
     printf_floats(f,d);
     out_floats(f, d);
 
-    f = 0.1;
+    f = 0.1f;
     d = -0.2;
 
     printf_floats(f,d);
@@ -217,33 +217,33 @@ int main(int argc, char** argv)
     out_floats(f, d);
 
     std::srand(std::time(0));
-    int random_variable = std::rand();
+    int8_t random_variable = static_cast<int8_t>(std::rand());
     (void)(random_variable);
 
     printf("Using random variable: %d\r\n\r\n", random_variable);
     printf("TEST1\r\n");
 
-    int8_t   i8 =  std::numeric_limits<int8_t>::max() - random_variable;
-    uint8_t  u8 =  std::numeric_limits<uint8_t>::max() - random_variable;
-    int16_t  i16 = std::numeric_limits<int16_t>::max() - random_variable;
-    uint16_t u16 = std::numeric_limits<uint16_t>::max() - random_variable;
-    int32_t  i32 = std::numeric_limits<int32_t>::max() - random_variable;
-    uint32_t u32 = std::numeric_limits<uint32_t>::max() - random_variable;
-    int64_t  i64 = std::numeric_limits<int64_t>::max() - random_variable;
-    uint64_t u64 = std::numeric_limits<uint64_t>::max() - random_variable;
+    int8_t   i8 =  std::numeric_limits<int8_t>::max()   - static_cast<int8_t>(random_variable);
+    uint8_t  u8 =  std::numeric_limits<uint8_t>::max()  - static_cast<uint8_t>(random_variable);
+    int16_t  i16 = std::numeric_limits<int16_t>::max()  - static_cast<int16_t>(random_variable);
+    uint16_t u16 = std::numeric_limits<uint16_t>::max() - static_cast<uint16_t>(random_variable);
+    int32_t  i32 = std::numeric_limits<int32_t>::max()  - static_cast<int32_t>(random_variable);
+    uint32_t u32 = std::numeric_limits<uint32_t>::max() - static_cast<uint32_t>(random_variable);
+    int64_t  i64 = std::numeric_limits<int64_t>::max()  - static_cast<int64_t>(random_variable);
+    uint64_t u64 = std::numeric_limits<uint64_t>::max() - static_cast<uint64_t>(random_variable);
 
     printf_nums(i8, u8, i16, u16, i32, u32, i64, u64);
     out_nums(i8, u8, i16, u16, i32, u32, i64, u64);
 
     printf("TEST2\r\n");
-    i8 =  std::numeric_limits<int8_t>::min() + random_variable;
-    u8 =  std::numeric_limits<uint8_t>::min() + random_variable;
-    i16 = std::numeric_limits<int16_t>::min() + random_variable;
-    u16 = std::numeric_limits<uint16_t>::min() + random_variable;
-    i32 = std::numeric_limits<int32_t>::min() + random_variable;
-    u32 = std::numeric_limits<uint32_t>::min() + random_variable;
-    i64 = std::numeric_limits<int64_t>::min() + random_variable;
-    u64 = std::numeric_limits<uint64_t>::min() + random_variable;
+    i8 =  std::numeric_limits<int8_t>::min()   + static_cast<int8_t>(random_variable);
+    u8 =  std::numeric_limits<uint8_t>::min()  + static_cast<uint8_t>(random_variable);
+    i16 = std::numeric_limits<int16_t>::min()  + static_cast<int16_t>(random_variable);
+    u16 = std::numeric_limits<uint16_t>::min() + static_cast<uint16_t>(random_variable);
+    i32 = std::numeric_limits<int32_t>::min()  + static_cast<int32_t>(random_variable);
+    u32 = std::numeric_limits<uint32_t>::min() + static_cast<uint32_t>(random_variable);
+    i64 = std::numeric_limits<int64_t>::min()  + static_cast<int64_t>(random_variable);
+    u64 = std::numeric_limits<uint64_t>::min() + static_cast<uint64_t>(random_variable);
 
     printf_nums(i8, u8, i16, u16, i32, u32, i64, u64);
     out_nums(i8, u8, i16, u16, i32, u32, i64, u64);

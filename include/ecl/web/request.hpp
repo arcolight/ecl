@@ -31,7 +31,7 @@ struct request
     version        ver                         { version::HTTP10 };
     const char*    uri                         { nullptr };
     const char*    uri_param                   { nullptr };
-    const uint8_t* body                        { nullptr };
+    const char*    body                        { nullptr };
     header         headers[MAX_HEADERS_COUNT];
     std::size_t    headers_count               { 0 };
 
