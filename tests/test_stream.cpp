@@ -180,8 +180,8 @@ int main(int argc, char** argv)
 
 #endif
 
-    float  f = -1;
-    double d = -1;
+    float  f = -1.0f;
+    double d = -1.0;
 
     printf_floats(f,d);
     out_floats(f, d);
@@ -217,8 +217,7 @@ int main(int argc, char** argv)
     out_floats(f, d);
 
     std::srand(static_cast<unsigned>(std::time(0)));
-    int8_t random_variable = static_cast<int8_t>(std::rand());
-    (void)(random_variable);
+    uint8_t random_variable = static_cast<uint8_t>(std::rand());
 
     printf("Using random variable: %d\r\n\r\n", random_variable);
     printf("TEST1\r\n");
