@@ -87,12 +87,12 @@ public:
 struct play {};
 struct open_close {};
 struct cd_detected {
-    cd_detected(std::string name, std::vector<float> const& tracks_duration) :
+    cd_detected(std::string name, std::vector<double> const& tracks_duration) :
     m_name(name), m_tracks(tracks_duration)
     {}
 
-    std::string        m_name;
-    std::vector<float> m_tracks;
+    std::string         m_name;
+    std::vector<double> m_tracks;
 };
 struct pause {};
 struct stop {};
@@ -303,7 +303,7 @@ int main(int argc, char** argv)
 
     p.process_event(open_close()); // user opens CD player
     p.process_event(open_close()); // inserts CD and closes
-    std::vector<float> tracks(7);
+    std::vector<double> tracks(7);
     tracks[0] = 3.08;
     tracks[1] = 4.34;
     tracks[2] = 2.58;

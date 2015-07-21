@@ -165,63 +165,63 @@ struct val_size<uint64_t>
 template<typename T>
 struct val_initializer
 {
-    constexpr static T value() { return T(); };
+    constexpr static T value() { return T(); }
 };
 
 #ifdef ECL_WITH_STD_STRING
 template<>
 struct val_initializer<std::string>
 {
-    const static std::string value() { return ""; };
+    const static std::string value() { return ""; }
 };
 #endif
 
 template<>
 struct val_initializer<bool>
 {
-    constexpr static bool value() { return false; };
+    constexpr static bool value() { return false; }
 };
 
 template<>
 struct val_initializer<int8_t>
 {
-    constexpr static int8_t value() { return 0; };
+    constexpr static int8_t value() { return 0; }
 };
 
 template<>
 struct val_initializer<uint8_t>
 {
-    constexpr static uint8_t  value() { return 0; };
+    constexpr static uint8_t  value() { return 0; }
 };
 
 template<>
 struct val_initializer<int16_t>
 {
-    constexpr static int16_t  value() { return 0; };
+    constexpr static int16_t  value() { return 0; }
 };
 
 template<>
 struct val_initializer<uint16_t>
 {
-    constexpr static uint16_t value() { return 0; };
+    constexpr static uint16_t value() { return 0; }
 };
 
 template<>
 struct val_initializer<int32_t>
 {
-    constexpr static int32_t  value() { return 0; };
+    constexpr static int32_t  value() { return 0; }
 };
 
 template<>
 struct val_initializer<uint32_t>
 {
-    constexpr static uint32_t value() { return 0; };
+    constexpr static uint32_t value() { return 0; }
 };
 
 template<>
 struct val_initializer<int64_t>
 {
-    constexpr static int64_t  value() { return 0; };
+    constexpr static int64_t  value() { return 0; }
 };
 
 template<>
