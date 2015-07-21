@@ -83,7 +83,7 @@ struct constants
             case HTTP10: return "HTTP/1.0"; break;
             case HTTP11: return "HTTP/1.1"; break;
             case HTTP20: return "HTTP/2.0"; break;
-            // default:     return "UNKNOWN";  break;
+            default:     return "UNKNOWN";  break;
         }
     }
 
@@ -114,7 +114,7 @@ struct constants
             case SERVICE_UNAVAILABLE:        return "SERVICE UNAVAILABLE";        break;
             case GATEWAY_TIMEOUT:            return "GATEWAY TIMEOUT";            break;
             case HTTP_VERSION_NOT_SUPPORTED: return "HTTP VERSION NOT SUPPORTED"; break;
-            // default:                         return "UNKNOWN";                    break;
+            default:                         return "UNKNOWN";                    break;
         }
     }
 
@@ -125,7 +125,7 @@ struct constants
             case GET:  return "GET";     break;
             case POST: return "POST";    break;
             case PUT:  return "PUT";     break;
-            // default:   return "UNKNOWN"; break;
+            default:   return "UNKNOWN"; break;
         }
     }
 
@@ -135,7 +135,7 @@ struct constants
         {
             case CONTENT_TYPE:   return "Content-Type";   break;
             case CONTENT_LENGTH: return "Content-Length"; break;
-            // default:             return "UNKNOWN";        break;
+            default:             return "UNKNOWN";        break;
         }
     }
 
@@ -152,7 +152,7 @@ struct constants
             case IMAGE_X_ICON:     return "image/x-icon";     break;
             case IMAGE_GIF:        return "image/gif";        break;
             case TEXT_PLAIN:       return "text/plain";       break;
-            // default:               return "UNKNOWN";          break;
+            default:               return "UNKNOWN";          break;
         }
     }
 

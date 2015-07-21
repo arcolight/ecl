@@ -216,7 +216,7 @@ int main(int argc, char** argv)
     printf_floats(f,d);
     out_floats(f, d);
 
-    std::srand(std::time(0));
+    std::srand(static_cast<unsigned>(std::time(0)));
     int8_t random_variable = static_cast<int8_t>(std::rand());
     (void)(random_variable);
 

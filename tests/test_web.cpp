@@ -116,6 +116,7 @@ typedef ecl::web::server<
 
 static char buffer[1024];
 
+[[ noreturn ]]
 void start_server(void);
 
 int main(int argc, char* argv[])
@@ -124,8 +125,6 @@ int main(int argc, char* argv[])
     (void)(argv);
 
     start_server();
-
-    return 0;
 }
 
 void start_server()
@@ -205,7 +204,7 @@ void start_server()
         std::cout << buffer << std::endl;
 
         ecl::stream<1024, write_sock> out_stream;
-        server.process_request(buffer, bytes_recieved, out_stream);
+        server.process_request(buffer, static_cast<std::size_t>(bytes_recieved), out_stream);
         out_stream.flush();
 
         close(new_sd);

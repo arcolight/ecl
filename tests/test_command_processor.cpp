@@ -21,6 +21,9 @@ ECL_DECL_NAME_TYPE(cmd4)
 ECL_DECL_NAME_TYPE(cmd5)
 ECL_DECL_NAME_TYPE(quit)
 
+namespace
+{
+
 struct command_quit : public ecl::command<quit, command_quit>
 {
     bool init(const std::size_t           argc,
@@ -28,7 +31,7 @@ struct command_quit : public ecl::command<quit, command_quit>
     {
         if(argc > 0)
         {
-            m_exit_code = std::strtol(argv[0], nullptr, 10);
+            m_exit_code = static_cast<int>(std::strtol(argv[0], nullptr, 10));
         }
 
         return true;
@@ -125,6 +128,8 @@ struct command_5    : public ecl::command<cmd5, command_5>
     std::vector<std::string> m_args {};
 };
 
+}
+
 typedef ecl::command_processor< proc,
     command_quit,
     command_1,
@@ -135,6 +140,9 @@ typedef ecl::command_processor< proc,
         command_5
     >
 > processor_t;
+
+namespace
+{
 
 class receiver_quit : public ecl::receiver<command_quit>
 {
@@ -237,6 +245,8 @@ public:
         }
     }
 };
+
+}
 
 typedef ecl::stream<1024> help_stream_t;
 

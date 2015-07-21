@@ -301,7 +301,8 @@ private:
             }
             else
             {
-                typename std::make_unsigned<T>::type uval = val;
+                typename std::make_unsigned<T>::type uval =
+                    static_cast<typename std::make_unsigned<T>::type>(val);
                 print_num_unsigned(uval);
             }
         }
@@ -462,7 +463,7 @@ private:
                 flush();
             }
 
-            m_buf[m_count] = data[i];
+            m_buf[m_count] = static_cast<char>(data[i]);
             ++m_count;
         }
     }

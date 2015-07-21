@@ -11,8 +11,6 @@
 
 typedef ecl::circular_buffer<uint8_t, CB_SIZE, true> circular_buffer_t;
 
-static circular_buffer_t cb;
-
 static void dump(circular_buffer_t& c);
 
 static void dump(circular_buffer_t& c)
@@ -66,6 +64,8 @@ int main(int argc, char* argv[])
 {
     (void)(argc);
     (void)(argv);
+
+    circular_buffer_t cb;
 
     std::srand(static_cast<uint32_t>(std::time(0)));
     int random_variable = 18;
