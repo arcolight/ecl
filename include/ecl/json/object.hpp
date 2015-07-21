@@ -204,7 +204,7 @@ public:
      * @param s reference to serialized JSON string.
      * @return true - deserialization successful, false - unsuccessful.
      */
-    bool deserialize_ref(const char*& s)
+    bool deserialize(const char*& s)
     {
         details::spaces_rollup(s);
         if(*s != '{')
@@ -228,20 +228,6 @@ public:
         details::spaces_rollup(s);
 
         return true;
-    }
-
-    /**
-     * @brief Deserialization from char pointer.
-     * @attention If deserialization fails, all valid fields will be changed,
-     * document will be partialy changed.
-     *
-     * @param s serialized JSON string.
-     * @return true - deserialization successful, false - unsuccessful.
-     */
-    bool deserialize(const char* s)
-    {
-        const char* ptr = s;
-        return deserialize_ref(ptr);
     }
 
 private:

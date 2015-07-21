@@ -124,6 +124,7 @@ protected:
         }
         s++;
 
+        details::spaces_rollup(s);
         if(!details::val_deserializer<value_t>::parse(s, m_val))
         {
             return false;

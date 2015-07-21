@@ -259,7 +259,7 @@ struct val_deserializer
 {
     static bool parse(const char*& s, T& val)
     {
-        return val.deserialize_ref(s);
+        return val.deserialize(s);
     }
 };
 

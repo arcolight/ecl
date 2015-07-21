@@ -137,19 +137,6 @@ public:
     }
 
     /**
-     * @brief Deserialization from char pointer.
-     * @details Deserialization from char pointer.
-     *
-     * @param s Serialized JSON string.
-     * @return true - deserialization successful, false - unsuccessful.
-     */
-    bool deserialize(const char* s)
-    {
-        const char* ptr = s;
-        return deserialize_ref(ptr);
-    }
-
-    /**
      * @brief Deserialization from reference to char pointer.
      * @details Deserialization from reference to char pointer. Used inside JSON
      * objects, but can be used from client code. Pointer will be moved to last
@@ -158,9 +145,8 @@ public:
      * @param s Reference to serialized JSON string.
      * @return true - deserialization successful, false - unsuccessful.
      */
-    bool deserialize_ref(const char*& s)
+    bool deserialize(const char*& s)
     {
-        details::spaces_rollup(s);
         if(*s != '"')
         {
             return false;
@@ -169,14 +155,12 @@ public:
 
         for(std::size_t i = 0; i < SIZE; ++i)
         {
-            details::spaces_rollup(s);
             if(*s == '"')
             {
                 s++;
                 break;
             }
 
-            details::spaces_rollup(s);
             if(*s == '\\' && *(s + 1) == '"')
             {
                 s++;

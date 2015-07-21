@@ -234,7 +234,17 @@ public:
         return m_buf;
     }
 
-    operator const char* ()
+    operator char* ()
+    {
+        return m_buf;
+    }
+
+    const char* data()                                                     const
+    {
+        return m_buf;
+    }
+
+    char* data()
     {
         return m_buf;
     }
