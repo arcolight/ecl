@@ -95,8 +95,8 @@ public:
         return true;
     }
 
-    bool init(const uint8_t   argc,
-              const uint8_t** argv)
+    bool init(const std::size_t argc,
+              const char**      argv)
     {
         m_argc = argc;
         m_argv = argv;
@@ -120,8 +120,8 @@ public:
     }
 
 protected:
-    uint8_t         m_argc { 0 };
-    const uint8_t** m_argv { nullptr };
+    std::size_t  m_argc { 0 };
+    const char** m_argv { nullptr };
 };
 
 template<typename cmd>

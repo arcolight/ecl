@@ -21,10 +21,10 @@ ECL_DECL_NAME_TYPE(cmd4)
 ECL_DECL_NAME_TYPE(cmd5)
 ECL_DECL_NAME_TYPE(quit)
 
-struct command_quit : public ecl::command<quit, command_quit> 
+struct command_quit : public ecl::command<quit, command_quit>
 {
-    bool init(const uint8_t               argc,
-              const uint8_t* const* const argv)
+    bool init(const std::size_t           argc,
+              const char* const* const    argv)
     {
         if(argc > 0)
         {
@@ -47,8 +47,8 @@ struct command_quit : public ecl::command<quit, command_quit>
 
 struct command_1    : public ecl::command<cmd1, command_1>
 {
-    bool init(const uint8_t               argc,
-              const uint8_t* const* const argv)
+    bool init(const std::size_t           argc,
+              const char* const* const    argv)
     {
         for(int i = 0; i < argc; ++i)
         {
@@ -61,10 +61,10 @@ struct command_1    : public ecl::command<cmd1, command_1>
     std::vector<std::string> m_args {};
 };
 
-struct command_2    : public ecl::command<cmd2, command_2> 
+struct command_2    : public ecl::command<cmd2, command_2>
 {
-    bool init(const uint8_t               argc,
-              const uint8_t* const* const argv)
+    bool init(const std::size_t           argc,
+              const char* const* const    argv)
     {
         for(int i = 0; i < argc; ++i)
         {
@@ -77,10 +77,10 @@ struct command_2    : public ecl::command<cmd2, command_2>
     std::vector<std::string> m_args {};
 };
 
-struct command_3    : public ecl::command<cmd3, command_3> 
+struct command_3    : public ecl::command<cmd3, command_3>
 {
-    bool init(const uint8_t               argc,
-              const uint8_t* const* const argv)
+    bool init(const std::size_t           argc,
+              const char* const* const    argv)
     {
         for(int i = 0; i < argc; ++i)
         {
@@ -93,10 +93,10 @@ struct command_3    : public ecl::command<cmd3, command_3>
     std::vector<std::string> m_args {};
 };
 
-struct command_4    : public ecl::command<cmd4, command_4> 
+struct command_4    : public ecl::command<cmd4, command_4>
 {
-    bool init(const uint8_t               argc,
-              const uint8_t* const* const argv)
+    bool init(const std::size_t           argc,
+              const char* const* const    argv)
     {
         for(int i = 0; i < argc; ++i)
         {
@@ -109,10 +109,10 @@ struct command_4    : public ecl::command<cmd4, command_4>
     std::vector<std::string> m_args {};
 };
 
-struct command_5    : public ecl::command<cmd5, command_5> 
+struct command_5    : public ecl::command<cmd5, command_5>
 {
-    bool init(const uint8_t               argc,
-              const uint8_t* const* const argv)
+    bool init(const std::size_t           argc,
+              const char* const* const    argv)
     {
         for(int i = 0; i < argc; ++i)
         {
@@ -281,7 +281,7 @@ int main(int argc, char* argv[])
 
         help_stream_t st;
 
-        if(proc.init(ac, (const uint8_t** const)av))
+        if(proc.init(ac, av))
         {
             if(!proc.dispatch(st))
             {

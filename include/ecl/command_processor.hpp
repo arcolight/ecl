@@ -12,8 +12,8 @@ template<typename NAME, typename... commands>
 class command_processor
 {
 public:
-    bool init(const uint8_t   argc,
-              const uint8_t** argv)
+    bool init(const std::size_t argc,
+              const char**      argv)
     {
         if(0 == argc)
         {
@@ -30,7 +30,7 @@ public:
     bool dispatch(ST& st)
     {
         return call<ST, commands...>(st,
-                                     (const char* const)m_argv[0],
+                                     m_argv[0],
                                      m_argc - 1,
                                      m_argv + 1);
     }
@@ -61,9 +61,9 @@ public:
 private:
     template<typename ST, typename cmd, typename... tail>
     bool call(ST& st,
-              const char* const  nm,
-              const uint8_t      argc,
-              const uint8_t**    argv)                                     const
+              const char* const nm,
+              const std::size_t argc,
+              const char**      argv)                                      const
     {
         static_assert((cmd::name() != nullptr), "cmd::name is empty!");
 
@@ -86,8 +86,8 @@ private:
     template<typename ST>
     bool call(ST& st,
               const char* const nm,
-              const uint8_t     argc,
-              const uint8_t**   argv)                                      const
+              const std::size_t argc,
+              const char**      argv)                                      const
     {
         (void)(st);
         (void)(nm);
@@ -119,8 +119,8 @@ private:
         (void)indent_increment;
     }
 
-    uint8_t         m_argc;
-    const uint8_t** m_argv;
+    std::size_t  m_argc;
+    const char** m_argv;
 };
 
 } // namespace ecl
