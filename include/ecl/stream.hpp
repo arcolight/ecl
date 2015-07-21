@@ -234,12 +234,12 @@ public:
 
     operator const char* ()                                                const
     {
-        return (const char*)m_buf;
+        return m_buf;
     }
 
     operator const char* ()
     {
-        return (const char*)m_buf;
+        return m_buf;
     }
 
     /**
@@ -262,7 +262,7 @@ public:
 #pragma GCC diagnostic ignored "-Waddress"
         if(nullptr != FLUSH_F_PTR)
         {
-            FLUSH_F_PTR((const char*)m_buf, m_count);
+            FLUSH_F_PTR(m_buf, m_count);
         }
 #pragma GCC diagnostic pop
         reset();
@@ -354,7 +354,7 @@ private:
             m_num_buf[i] = t;
         }
 
-        print_val((const char* const)m_num_buf);
+        print_val(static_cast<const char*>(m_num_buf));
     }
 
 #ifdef ECL_WITH_STD_STRING
@@ -429,7 +429,7 @@ private:
     void print_val(const char& val)
     {
         char tmp[2] = { val, 0 };
-        print_val((const char* const)&tmp[0]);
+        print_val(static_cast<const char*>(tmp));
     }
 
     void print_val(const char* const val)
@@ -489,9 +489,9 @@ private:
             f = -f;
         }
 
-        print_num_unsigned((uint64_t)i);
+        print_num_unsigned(static_cast<uint64_t>(i));
         print_val('.');
-        print_num_unsigned((uint64_t)(f * std::pow(10, m_width)));
+        print_num_unsigned(static_cast<uint64_t>(f * std::pow(10, m_width)));
     }
 
     template<typename T>
@@ -504,7 +504,7 @@ private:
     const char* m_alphabet = R"(0123456789abcdef)";
 
     char              m_num_buf[66]; // (u)int64_t in binary mode takes 64 characters
-    uint8_t           m_buf[BUFFER_SIZE + 1];
+    char              m_buf[BUFFER_SIZE + 1];
     std::size_t       m_count { 0 };
 
     const base        m_def_base;

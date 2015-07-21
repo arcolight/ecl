@@ -4,19 +4,21 @@
 
 namespace
 {
-int testVar = 0;
-const char *ok = "OK   ";
-const char *fail = "FAIL ";
+    int testVar = 0;
+    const char *ok = "OK   ";
+    const char *fail = "FAIL ";
 
-const char* test(int step)
-{
-    if ((testVar++) == step)
+    const char* test(int step)
     {
-        return ok;
+        if ((testVar++) == step)
+        {
+            return ok;
+        }
+        return fail;
     }
-    return fail;
 }
-}
+
+void f(bool);
 
 class A
 {

@@ -13,6 +13,20 @@ using namespace ecl;
 void printf_nums(int8_t  i8,  uint8_t  u8,
                  int16_t i16, uint16_t u16,
                  int32_t i32, uint32_t u32,
+                 int64_t i64, uint64_t u64);
+
+void out_nums(int8_t  i8,  uint8_t  u8,
+              int16_t i16, uint16_t u16,
+              int32_t i32, uint32_t u32,
+              int64_t i64, uint64_t u64);
+
+void printf_floats(float_t f, double_t d);
+
+void out_bool_char(bool b, char c);
+
+void printf_nums(int8_t  i8,  uint8_t  u8,
+                 int16_t i16, uint16_t u16,
+                 int32_t i32, uint32_t u32,
                  int64_t i64, uint64_t u64)
 {
 #ifdef __arm__
@@ -62,7 +76,7 @@ void printf_nums(int8_t  i8,  uint8_t  u8,
            "int32_t: %x | uint32_t: %x \r\n"
            "int64_t: %lx | uint64_t: %lx \r\n\r\n",
            i8, u8, i16, u16, i32, u32, i64, u64);
-    
+
 #endif
 }
 
@@ -124,10 +138,10 @@ void out_floats(float_t f, double_t d)
     l(8) << "[ LOG ]" << "\r\n" <<
     "float:  " << f << " | " << "double: " << d << "\r\n";
 
-    l(6) << 
+    l(6) <<
     "float:  " << f << " | " << "double: " << d << "\r\n";
 
-    l(4) << 
+    l(4) <<
     "float:  " << f << " | " << "double: " << d << "\r\n";
 
     std::cout << l << std::endl;

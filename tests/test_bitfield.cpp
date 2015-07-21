@@ -71,28 +71,46 @@ typedef ecl::bit_field<10, test_struct_3,
    ECL_FIELD(test_struct_3, array, 80)
 > test_bit_field_3_t;
 
-namespace numerical_chars {
-std::ostream &operator<<(std::ostream &os, char c) {
-    return os << (std::is_signed<char>::value ? static_cast<int>(c)
-                                              : static_cast<unsigned int>(c));
-}
+namespace numerical_chars
+{
+    std::ostream &operator<<(std::ostream &os, char c);
+    std::ostream &operator<<(std::ostream &os, signed char c);
+    std::ostream &operator<<(std::ostream &os, unsigned char c);
 
-std::ostream &operator<<(std::ostream &os, signed char c) {
-    return os << static_cast<int>(c);
-}
+    std::ostream &operator<<(std::ostream &os, char c) {
+        if(std::is_signed<char>::value)
+        {
+            os << static_cast<int>(c);
+        }
+        else
+        {
+            os << static_cast<unsigned int>(c);
+        }
 
-std::ostream &operator<<(std::ostream &os, unsigned char c) {
-    return os << static_cast<unsigned int>(c);
-}
+        return os;
+    }
+
+    std::ostream &operator<<(std::ostream &os, signed char c)
+    {
+        return os << static_cast<int>(c);
+    }
+
+    std::ostream &operator<<(std::ostream &os, unsigned char c)
+    {
+        return os << static_cast<unsigned int>(c);
+    }
 }
 
 using namespace numerical_chars;
 
-void dump_bit_field(test_bit_field_t const& bf) {
+void dump_bit_field(test_bit_field_t const& bf);
+
+void dump_bit_field(test_bit_field_t const& bf)
+{
     std::cout <<
-      bf.f0 << " " << bf.f1 << " " << bf.f2  << " " << bf.f3  << " " << 
-      bf.f4 << " " << bf.f5 << " " << bf.f6  << " " << bf.f7  << " " << 
-      bf.f8 << " " << bf.f9 << " " << bf.f10 << " " << bf.f11 << " " << 
+      bf.f0 << " " << bf.f1 << " " << bf.f2  << " " << bf.f3  << " " <<
+      bf.f4 << " " << bf.f5 << " " << bf.f6  << " " << bf.f7  << " " <<
+      bf.f8 << " " << bf.f9 << " " << bf.f10 << " " << bf.f11 << " " <<
       bf.f12 << std::endl;
 
     // printf("Fields:\n\r"
@@ -109,7 +127,7 @@ void dump_bit_field(test_bit_field_t const& bf) {
     //        "f10: %u\n\r"
     //        "f11: %u\n\r"
     //        "f12: %lu\n\r",
-    //        bf.f0, bf.f1, bf.f2, bf.f3, bf.f4, bf.f5, bf.f6, bf.f7, bf.f8, bf.f9, 
+    //        bf.f0, bf.f1, bf.f2, bf.f3, bf.f4, bf.f5, bf.f6, bf.f7, bf.f8, bf.f9,
     //        bf.f10, bf.f11, bf.f12);
 }
 
