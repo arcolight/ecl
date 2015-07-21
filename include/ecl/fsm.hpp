@@ -277,10 +277,10 @@ public:
      * @details Main input for FSM. Method should be called, when event occured.
      *
      * @tparam event_t Event.
-     * @tparam transition_table_t @ref transition_table.
-     * Table with transition rules.
-     * @tparam callback_table_t @ref callback_table.
-     * Table with callback rules.
+     * @tparam transition_table_t Type, that describes transition table.
+     * @ref transition_table
+     * @tparam callback_table_t Type, that describes callback table.
+     * @ref callback_table
      *
      * @param e Reference to event object.
      * @return FSM state after event processing.
@@ -301,7 +301,6 @@ public:
 
     /**
      * @brief Reset FSM to @ref init state.
-     * @return Reset FSM to @ref init state.
      */
     void reset()
     {

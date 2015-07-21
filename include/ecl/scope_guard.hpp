@@ -30,7 +30,7 @@ public:
     /**
      * @brief Constructor
      *
-     * @param  Callable object.
+     * @param action Object, that would be called on scope_guard destruction.
      */
     explicit scope_guard(std::function<void()> &&action) :
         m_action(std::forward<decltype(m_action)>(action))

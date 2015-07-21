@@ -25,7 +25,7 @@ namespace ecl
  *
  * @tparam S Base struct type.
  * @tparam T Type of the field.
- * @tparam S::*P Name of the field in the base struct S.
+ * @tparam P Name of the field in the base struct S.
  * @tparam SIZE Size in bits(!).
  */
 template<typename S, typename T, T S::*P, std::size_t SIZE>

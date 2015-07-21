@@ -85,7 +85,6 @@ struct reset {};
  * @param buf pointer to buffer.
  * @param size size of data.
  *
- * @return void
  */
 typedef void(*flush_function_t)(const char* const buf, std::size_t size);
 
@@ -111,7 +110,7 @@ public:
     /**
      * @brief Numeric system base change.
      *
-     * @param b @ref base object
+     * @param b Numeric base enumeration. @ref base
      */
     stream& operator() (const base& b)
     {
@@ -122,7 +121,7 @@ public:
     /**
      * @brief Field width change.
      *
-     * @param w @ref width object.
+     * @param w Field width. @ref width
      */
     stream& operator() (const std::size_t w)
     {
@@ -133,7 +132,7 @@ public:
     /**
      * @brief Alpha case change.
      *
-     * @param c @ref cs object
+     * @param c Alpha case. @ref cs
      */
     stream& operator() (const cs& c)
     {
@@ -144,7 +143,7 @@ public:
     /**
      * @brief Field width change.
      *
-     * @param w @ref width object.
+     * @param w Field width. @ref width
      */
     stream& operator() (const width& w)
     {
@@ -155,7 +154,7 @@ public:
     /**
      * @brief Field width change.
      *
-     * @param w @ref width object.
+     * @param w Field width. @ref width
      */
     stream& operator<< (const width& w)
     {
@@ -166,7 +165,7 @@ public:
     /**
      * @brief Numeric system base change.
      *
-     * @param b @ref base object
+     * @param b Numeric base enumeration. @ref base
      */
     stream& operator<< (const base& b)
     {
@@ -178,7 +177,7 @@ public:
      * @brief Stream reset.
      * @details Reset will cause erasing all characters from stream.
      *
-     * @param end reset object.
+     * @param r reset object. @ref reset
      */
     stream& operator<< (const reset& r)
     {
@@ -191,7 +190,7 @@ public:
      * @brief End of stream.
      * @details End will cause @ref flush and @ref reset.
      *
-     * @param end end object.
+     * @param end end of stream object. @ref end
      */
     stream& operator<< (const end& end)
     {
@@ -202,8 +201,7 @@ public:
     }
 
     /**
-     * @brief @ref sized_data serialization.
-     * @details @ref sized_data serialized as binary.
+     * @brief binary data serialization. @ref sized_data
      *
      * @param d reference to @ref sized_data object
      */
@@ -214,8 +212,7 @@ public:
     }
 
     /**
-     * @brief @ref const_sized_data serialization.
-     * @details @ref const_sized_data serialized as binary.
+     * @brief constant binary data serialization. @ref const_sized_data
      *
      * @param d reference to @ref const_sized_data object
      */
