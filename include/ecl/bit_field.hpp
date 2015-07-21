@@ -127,7 +127,7 @@ public:
     const uint8_t* pack()
     {
         clear_array();
-        pack_<0, FIELDS...>(m_array - 1);
+        pack_<0, FIELDS...>(&m_array[0] - 1);
         return m_array;
     }
 
@@ -138,7 +138,7 @@ public:
      */
     BASE* unpack()
     {
-        unpack_<0, FIELDS...>(m_array - 1);
+        unpack_<0, FIELDS...>(&m_array[0] - 1);
         return this;
     }
 #pragma GCC diagnostic pop
