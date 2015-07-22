@@ -461,7 +461,7 @@ private:
         m_buf[BUFFER_SIZE] = 0;
     }
 
-    void print_binary(const uint8_t* const data, std::size_t size)
+    void print_binary(const uint8_t* const bin_data, std::size_t size)
     {
         for(std::size_t i = 0; i < size; ++i)
         {
@@ -470,7 +470,7 @@ private:
                 flush();
             }
 
-            m_buf[m_count] = static_cast<char>(data[i]);
+            m_buf[m_count] = static_cast<char>(bin_data[i]);
             ++m_count;
         }
     }
