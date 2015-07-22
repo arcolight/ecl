@@ -5,7 +5,6 @@
 #include <cstring>
 
 #include <algorithm>
-#include <tuple>
 
 #include <ecl/web/request.hpp>
 #include <ecl/web/constants.hpp>
