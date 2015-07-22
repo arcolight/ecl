@@ -27,7 +27,7 @@ class str_const
 {
 public:
     template<std::size_t N>
-    constexpr str_const(const char(&a)[N]) :
+    constexpr explicit str_const(const char(&a)[N]) :
         m_p(a), m_sz(N-1)
     {}
 

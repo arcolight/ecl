@@ -63,7 +63,7 @@ typedef enum class alpha_case {
  */
 typedef struct width
 {
-    width(std::size_t w) : m_w(w) {}
+    explicit width(std::size_t w) : m_w(w) {}
 
     std::size_t m_w;
 } wd;
@@ -479,8 +479,7 @@ private:
     void print_float(const T& val)
     {
         T i = 0.0;
-        T f = 0.0;
-        f = std::modf(val, &i);
+        T f = std::modf(val, &i);
 
         if((i < 0.0) || (f < 0.0))
         {
@@ -511,8 +510,8 @@ private:
     // can be used for all bases till 16.
     const char* m_alphabet = R"(0123456789abcdef)";
 
-    char              m_num_buf[66]; // (u)int64_t in binary mode takes 64 characters
-    char              m_buf[BUFFER_SIZE + 1];
+    char              m_num_buf[66] {}; // (u)int64_t in binary mode takes 64 characters
+    char              m_buf[BUFFER_SIZE + 1] {};
     std::size_t       m_count { 0 };
 
     const base        m_def_base;

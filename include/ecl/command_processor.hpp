@@ -119,8 +119,8 @@ private:
         (void)indent_increment;
     }
 
-    std::size_t  m_argc;
-    const char** m_argv;
+    std::size_t  m_argc { 0 };
+    const char** m_argv { nullptr };
 };
 
 } // namespace ecl

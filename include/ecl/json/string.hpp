@@ -48,7 +48,7 @@ public:
         m_val.fill('\0');
     }
 
-    string(const char* const ptr)
+    explicit string(const char* const ptr)
     {
         std::size_t sz = std::min(strnlen(ptr, SIZE), SIZE);
 

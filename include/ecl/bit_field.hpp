@@ -225,7 +225,7 @@ private:
         unpack_<(OFFSET + F::size()) % 8, TAIL...>(array);
     }
 
-    uint8_t m_array[SIZE];
+    uint8_t m_array[SIZE] {};
 };
 
 } // namespace ecl
