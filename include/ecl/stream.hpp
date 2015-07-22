@@ -22,8 +22,6 @@
 #include <string>
 #endif
 
-#include <ecl/sized_data.h>
-
 namespace ecl
 {
 
@@ -200,25 +198,10 @@ public:
         return *this;
     }
 
-    /**
-     * @brief binary data serialization. @ref sized_data
-     *
-     * @param d reference to @ref sized_data object
-     */
-    stream& operator<< (const sized_data& d)
+    template<std::size_t N>
+    stream& operator<< (const uint8_t(&d)[N])
     {
-        print_binary(d.ptr, d.size);
-        return *this;
-    }
-
-    /**
-     * @brief constant binary data serialization. @ref const_sized_data
-     *
-     * @param d reference to @ref const_sized_data object
-     */
-    stream& operator<< (const const_sized_data& d)
-    {
-        print_binary(d.ptr, d.size);
+        print_binary(d, N);
         return *this;
     }
 

@@ -17,7 +17,6 @@
 #include <ecl/name_type.hpp>
 #include <ecl/scope_guard.hpp>
 #include <ecl/singleton.hpp>
-#include <ecl/sized_data.h>
 #include <ecl/str_const.hpp>
 #include <ecl/stream.hpp>
 

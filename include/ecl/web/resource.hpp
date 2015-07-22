@@ -7,7 +7,6 @@
 #include <algorithm>
 #include <tuple>
 
-#include <ecl/sized_data.h>
 #include <ecl/web/request.hpp>
 #include <ecl/web/constants.hpp>
 
@@ -41,7 +40,7 @@ public:
            << ":"
            << constants::get_content_type(TYPE) << "\r\n";
         st << "\r\n";
-        st << const_sized_data { RES_DATA::data, RES_DATA::size } << "\r\n";
+        st << RES_DATA::data << "\r\n";
     }
 
     static bool check_resource(const request* req)
