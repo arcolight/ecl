@@ -143,13 +143,11 @@ int main(int argc, char* argv[])
     std::cout << std_prefix << "Serialized count: " << st_std.count() << std::endl;
     std::cout << st_std << std::endl;
 
-    const char* ptr = st_ecl.data();
-    bool deser_result = doc_ecl_2.deserialize(ptr);
+    bool deser_result = doc_ecl_2.deserialize(st_ecl.data());
     std::cout << ecl_prefix << "deserialization result: " << (deser_result ? "true" : "false") << std::endl;
     dump_document(doc_ecl_2, ecl_prefix);
 
-    ptr = st_std.data();
-    deser_result = doc_std_2.deserialize(ptr);
+    deser_result = doc_std_2.deserialize(st_std.data());
     std::cout << std_prefix << "deserialization result: " << (deser_result ? "true" : "false") << std::endl;
     dump_document(doc_std_2, std_prefix);
 

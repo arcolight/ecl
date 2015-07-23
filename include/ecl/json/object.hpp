@@ -196,15 +196,30 @@ public:
     }
 
     /**
-     * @brief Deserialization from reference to char pointer.
+     * @brief Deserialization from universal reference to char pointer.
      * @details Used inside JSON objects, but can be used from client code.
      * Pointer will be moved to last
      * successfully parsed position in string.
+     * @tparam T rvalue or lvalue reference.
      *
-     * @param s reference to serialized JSON string.
+     * @param s universal reference to serialized JSON
+     * C-style string(const char*). std::forward used.
      * @return true - deserialization successful, false - unsuccessful.
      */
-    bool deserialize(const char*& s)
+    template<typename T>
+    bool deserialize(T&& s)
+    {
+        return deserialize_(std::forward<T>(s));
+    }
+
+private:
+    bool deserialize_(const char*&& s)
+    {
+        const char* s_ref = s;
+        return deserialize_(s_ref);
+    }
+
+    bool deserialize_(const char*& s)
     {
         details::spaces_rollup(s);
         if(*s != '{')
@@ -230,7 +245,6 @@ public:
         return true;
     }
 
-private:
     template<std::size_t SIZE, typename NODE, typename NEXT, typename... TAIL>
     constexpr static std::size_t size_()
     {

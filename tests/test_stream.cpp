@@ -31,7 +31,9 @@ void printf_nums(int8_t  i8,  uint8_t  u8,
 {
 #ifdef __arm__
 
-    printf("[ PRINTF ]\r\n");
+    printf("[ PRINTF ]------------------------------");
+    printf("----------------------------------------\r\n");
+
     printf("Octal:\r\n"
            "int8_t:  %o | uint8_t:  %o \r\n"
            "int16_t: %o | uint16_t: %o \r\n"
@@ -55,7 +57,9 @@ void printf_nums(int8_t  i8,  uint8_t  u8,
 
 #else
 
-    printf("[ PRINTF ]\r\n");
+    printf("[ PRINTF ]------------------------------");
+    printf("----------------------------------------\r\n");
+
     printf("Octal:\r\n"
            "int8_t:  %o | uint8_t:  %o \r\n"
            "int16_t: %o | uint16_t: %o \r\n"
@@ -87,7 +91,8 @@ void out_nums(int8_t  i8,  uint8_t  u8,
 {
     stream<2048> l;
 
-    l << "[ LOG ]" << "\r\n" << end();
+    l << "[ STREAM ]------------------------------"
+      << "----------------------------------------" << "\r\n";
 
     l(base::b)(8)    << "Binary:"           << "\r\n" <<
     "int8_t:  " << i8  << " | " << "uint8_t:  " << u8  << "\r\n" <<
@@ -124,7 +129,8 @@ void out_nums(int8_t  i8,  uint8_t  u8,
 
 void printf_floats(float_t f, double_t d)
 {
-    printf("[ PRINTF ]\r\n");
+    printf("[ PRINTF ]------------------------------");
+    printf("----------------------------------------\r\n");
 
     printf("float:  %8.8f | double: %8.8f\r\n", f, d);
     printf("float:  %6.6f | double: %6.6f\r\n", f, d);
@@ -135,7 +141,9 @@ void out_floats(float_t f, double_t d)
 {
     stream<2048> l;
 
-    l(8) << "[ LOG ]" << "\r\n" <<
+    l(8) << "[ STREAM ]------------------------------"
+         << "----------------------------------------" << "\r\n" <<
+
     "float:  " << f << " | " << "double: " << d << "\r\n";
 
     l(6) <<
@@ -183,37 +191,37 @@ int main(int argc, char** argv)
     float  f = -1.0f;
     double d = -1.0;
 
-    printf_floats(f,d);
+    printf_floats(f, d);
     out_floats(f, d);
 
     f = 1;
     d = 1;
 
-    printf_floats(f,d);
+    printf_floats(f, d);
     out_floats(f, d);
 
     f = 2.7181f;
     d = -2.7181;
 
-    printf_floats(f,d);
+    printf_floats(f, d);
     out_floats(f, d);
 
     f = 0.1f;
     d = -0.2;
 
-    printf_floats(f,d);
+    printf_floats(f, d);
     out_floats(f, d);
 
     f = std::numeric_limits<float>::min();
     d = std::numeric_limits<double>::min();
 
-    printf_floats(f,d);
+    printf_floats(f, d);
     out_floats(f, d);
 
     f = std::numeric_limits<float>::max();
     d = std::numeric_limits<double>::max();
 
-    printf_floats(f,d);
+    printf_floats(f, d);
     out_floats(f, d);
 
     std::srand(static_cast<unsigned>(std::time(0)));
