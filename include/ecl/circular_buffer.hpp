@@ -423,22 +423,22 @@ public:
 
     reverse_iterator rbegin()
     {
-        return ++reverse_iterator(end());
+        return reverse_iterator(end());
     }
 
     reverse_iterator rend()
     {
-        return ++reverse_iterator(begin());
+        return reverse_iterator(begin());
     }
 
     const_reverse_iterator rbegin()                                        const
     {
-        return ++const_reverse_iterator(end());
+        return const_reverse_iterator(end());
     }
 
     const_reverse_iterator rend()                                          const
     {
-        return ++const_reverse_iterator(begin());
+        return const_reverse_iterator(begin());
     }
 
 private:
