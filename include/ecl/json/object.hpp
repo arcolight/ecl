@@ -202,17 +202,22 @@ public:
      * C-style string(const char*).
      * @return true - deserialization successful, false - unsuccessful.
      */
-    bool deserialize(const char* s)
+    bool deserialize(const char* s, const char** end = nullptr)
     {
-        return deserialize(s, strlen(s));
-    }
+        if(nullptr == s)
+        {
+            return false;
+        }
 
-    bool deserialize(const char* s, std::size_t length)
-    {
-        ECL_JSON_CHECK_PTR_AND_LENGTH_RETURN(s, length)
-        const char* s_ptr = s;
+        std::size_t length = strlen(s);
+        const char* s_ref = s;
+        bool result = deserialize_ref(s_ref, length, true);
+        if(nullptr != end)
+        {
+            *end = s_ref;
+        }
 
-        return deserialize_ref(s_ptr, length, true);
+        return result;
     }
 
     bool deserialize_ref(const char*& s, std::size_t& length, bool top)
