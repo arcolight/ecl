@@ -196,55 +196,40 @@ public:
     }
 
     /**
-     * @brief Deserialization from universal reference to char pointer.
-     * @details Used inside JSON objects, but can be used from client code.
-     * Pointer will be moved to last
-     * successfully parsed position in string.
-     * @tparam T rvalue or lvalue reference.
+     * @brief Deserialization from char pointer.
      *
-     * @param s universal reference to serialized JSON
-     * C-style string(const char*). std::forward used.
+     * @param s pointer to serialized JSON
+     * C-style string(const char*).
      * @return true - deserialization successful, false - unsuccessful.
      */
-    template<typename T>
-    bool deserialize(T&& s)
+    bool deserialize(const char* s)
     {
-        return deserialize_(std::forward<T>(s));
+        return deserialize(s, strlen(s));
     }
 
-private:
-    bool deserialize_(const char*&& s)
+    bool deserialize(const char* s, std::size_t length)
     {
-        const char* s_ref = s;
-        return deserialize_(s_ref);
+        ECL_JSON_CHECK_PTR_AND_LENGTH_RETURN(s, length)
+        const char* s_ptr = s;
+
+        return deserialize_ref(s_ptr, length, true);
     }
 
-    bool deserialize_(const char*& s)
+    bool deserialize_ref(const char*& s, std::size_t& length, bool top)
     {
-        details::spaces_rollup(s);
-        if(*s != '{')
-        {
-            return false;
-        }
-        s++;
-        details::spaces_rollup(s);
+        ECL_JSON_TEST_SYMBOL_SPACES_ROUND(s, '{', length, false)
 
-        if(!deserialize_internal<NODES...>(s))
+        if(!deserialize_internal<NODES...>(s, length))
         {
             return false;
         }
 
-        details::spaces_rollup(s);
-        if(*s != '}')
-        {
-            return false;
-        }
-        s++;
-        details::spaces_rollup(s);
+        ECL_JSON_TEST_SYMBOL_SPACES_ROUND(s, '}', length, top)
 
         return true;
     }
 
+private:
     template<std::size_t SIZE, typename NODE, typename NEXT, typename... TAIL>
     constexpr static std::size_t size_()
     {
@@ -306,37 +291,33 @@ private:
 
     // Deserialization
     template<typename NODE, typename NEXT, typename... TAIL>
-    bool deserialize_internal(const char*& s)
+    bool deserialize_internal(const char*& s, std::size_t& length)
     {
-        if(!this->NODE::deserialize(s))
+        if(!this->NODE::deserialize_ref(s, length, false))
         {
             return false;
         }
 
-        details::spaces_rollup(s);
-        if(*s != ',')
-        {
-            return false;
-        }
-        s++;
+        ECL_JSON_TEST_SYMBOL_SPACES_ROUND(s, ',', length, false)
 
-        return deserialize_internal<NEXT, TAIL...>(s);
+        return deserialize_internal<NEXT, TAIL...>(s, length);
     }
 
     template<typename NODE>
-    bool deserialize_internal(const char*& s)
+    bool deserialize_internal(const char*& s, std::size_t& length)
     {
-        if(!this->NODE::deserialize(s))
+        if(!this->NODE::deserialize_ref(s, length, false))
         {
             return false;
         }
 
-        return deserialize_internal(s);
+        return deserialize_internal(s, length);
     }
 
-    bool deserialize_internal(const char*& s)
+    bool deserialize_internal(const char*& s, std::size_t& length)
     {
         (void)s;
+        (void)length;
         return true;
     }
 

@@ -145,29 +145,31 @@ public:
      * @param s Reference to serialized JSON string.
      * @return true - deserialization successful, false - unsuccessful.
      */
-    bool deserialize(const char*& s)
+    bool deserialize_ref(const char*& s, std::size_t& length, bool)
     {
-        if(*s != '"')
-        {
-            return false;
-        }
-        s++;
+        ECL_JSON_TEST_SYMBOL_RETURN(s, '"', length)
 
         for(std::size_t i = 0; i < SIZE; ++i)
         {
             if(*s == '"')
             {
-                s++;
+                ECL_JSON_SHIFT_S_L(s, length)
+                ECL_JSON_TEST_LENGTH_RETURN(length, false)
+
                 break;
             }
 
+            ECL_JSON_TEST_LENGTH_RETURN(length, false)
+            ECL_JSON_TEST_LENGTH_RETURN(length - 1, false)
+
             if(*s == '\\' && *(s + 1) == '"')
             {
-                s++;
+                ECL_JSON_SHIFT_S_L(s, length)
             }
 
             m_val[i] = *s;
-            s++;
+            ECL_JSON_SHIFT_S_L(s, length)
+            ECL_JSON_TEST_LENGTH_RETURN(length, false)
         }
 
         return true;

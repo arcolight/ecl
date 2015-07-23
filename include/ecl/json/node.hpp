@@ -95,37 +95,22 @@ protected:
      * @param s serialized JSON string.
      * @return true - deserialization successful, false - unsuccessful.
      */
-    bool deserialize(const char*& s)
+    bool deserialize_ref(const char*& s, std::size_t& length, bool)
     {
-        details::spaces_rollup(s);
-        if(*s != '"')
-        {
-            return false;
-        }
-        s++;
+        ECL_JSON_TEST_SYMBOL_SPACES_ROUND(s, '"', length, false)
 
         if(0 != strncmp(s, NAME::name(), NAME::size()))
         {
             return false;
         }
         s += NAME::size();
+        length -= NAME::size();
 
-        details::spaces_rollup(s);
-        if(*s != '"')
-        {
-            return false;
-        }
-        s++;
+        ECL_JSON_TEST_SYMBOL_SPACES_ROUND(s, '"', length, false)
 
-        details::spaces_rollup(s);
-        if(*s != ':')
-        {
-            return false;
-        }
-        s++;
+        ECL_JSON_TEST_SYMBOL_SPACES_ROUND(s, ':', length, false)
 
-        details::spaces_rollup(s);
-        if(!details::val_deserializer<value_t>::parse(s, m_val))
+        if(!details::val_deserializer<value_t>::parse(s, length, m_val))
         {
             return false;
         }

@@ -25,6 +25,60 @@
 #define ECL_DEFAULT_INDENT_INCREMENT 4
 #endif
 
+#define ECL_JSON_SHIFT_S_L(s, length) \
+    ++(s);                            \
+    --(length);
+
+#define ECL_JSON_CHECK_PTR_AND_LENGTH_RETURN(s, length) \
+    if((nullptr == (s)) || (0 == (length)))             \
+    {                                                   \
+        return false;                                   \
+    }
+
+#define ECL_JSON_SPACE_ROLLUP_RETURN(s, length) \
+    if(!details::spaces_rollup(s, length))      \
+    {                                           \
+        return false;                           \
+    }
+
+#define ECL_JSON_TEST_SYMBOL_RETURN(s, sym, length) \
+    if(*(s) != (sym))                               \
+    {                                               \
+        return false;                               \
+    }                                               \
+    ECL_JSON_SHIFT_S_L(s, length)
+
+#define ECL_JSON_TEST_SYMBOL_BREAK(s, sym, length) \
+    if(*(s) != (sym))                              \
+    {                                              \
+        break;                                     \
+    }                                              \
+    ECL_JSON_SHIFT_S_L(s, length)
+
+#define ECL_JSON_TEST_LENGTH_RETURN(length, finalizer) \
+    if((0 == (length)) && !(finalizer))                \
+    {                                                  \
+        return false;                                  \
+    }
+
+#define ECL_JSON_TEST_SYMBOL_SPACES_ROUND(s, sym, length, finalizer) \
+    ECL_JSON_TEST_LENGTH_RETURN(length, false)                       \
+    ECL_JSON_SPACE_ROLLUP_RETURN(s, length)                          \
+    ECL_JSON_TEST_LENGTH_RETURN(length, false)                       \
+    ECL_JSON_TEST_SYMBOL_RETURN(s, sym, length)                      \
+    ECL_JSON_TEST_LENGTH_RETURN(length, finalizer)                   \
+    ECL_JSON_SPACE_ROLLUP_RETURN(s, length)                          \
+    ECL_JSON_TEST_LENGTH_RETURN(length, finalizer)
+
+#define ECL_JSON_TEST_SYMBOL_SPACES_ROUND_BREAK(s, sym, length) \
+    ECL_JSON_TEST_LENGTH_RETURN(length, false)                  \
+    ECL_JSON_SPACE_ROLLUP_RETURN(s, length)                     \
+    ECL_JSON_TEST_LENGTH_RETURN(length, false)                  \
+    ECL_JSON_TEST_SYMBOL_BREAK(s, sym, length)                  \
+    ECL_JSON_TEST_LENGTH_RETURN(length, false)                  \
+    ECL_JSON_SPACE_ROLLUP_RETURN(s, length)                     \
+    ECL_JSON_TEST_LENGTH_RETURN(length, false)                  \
+
 namespace ecl
 {
 
@@ -50,15 +104,18 @@ void print_beautify(STREAM& st,
     }
 }
 
-inline void spaces_rollup(const char*& s)
+inline bool spaces_rollup(const char*& s, std::size_t& length)
 {
     while(*s == ' '  ||
           *s == '\n' ||
           *s == '\r' ||
           *s == '\t')
     {
-        ++s;
+        ECL_JSON_SHIFT_S_L(s, length)
+        ECL_JSON_TEST_LENGTH_RETURN(length, false)
     }
+
+    return true;
 }
 
 template<typename T>
@@ -233,10 +290,11 @@ struct val_initializer<uint64_t>
 template<typename T>
 struct val_deserializer_numeric_signed
 {
-    static bool parse(const char*& s, T& val)
+    static bool parse(const char*& s, std::size_t& length, T& val)
     {
         char* end = nullptr;
         val = static_cast<T>(strtoll(s, &end, 10));
+        length -= static_cast<std::size_t>(end - s);
         s = end;
         return true;
     }
@@ -245,10 +303,11 @@ struct val_deserializer_numeric_signed
 template<typename T>
 struct val_deserializer_numeric_unsigned
 {
-    static bool parse(const char*& s, T& val)
+    static bool parse(const char*& s, std::size_t& length, T& val)
     {
         char* end = nullptr;
         val = static_cast<T>(strtoull(s, &end, 10));
+        length -= static_cast<std::size_t>(end - s);
         s = end;
         return true;
     }
@@ -257,9 +316,9 @@ struct val_deserializer_numeric_unsigned
 template<typename T>
 struct val_deserializer
 {
-    static bool parse(const char*& s, T& val)
+    static bool parse(const char*& s, std::size_t& length, T& val)
     {
-        return val.deserialize(s);
+        return val.deserialize_ref(s, length, false);
     }
 };
 
@@ -267,29 +326,31 @@ struct val_deserializer
 template<>
 struct val_deserializer<std::string>
 {
-    static bool parse(const char*& s, std::string& val)
+    static bool parse(const char*& s, std::size_t& length, std::string& val)
     {
-        if(*s != '"')
-        {
-            return false;
-        }
-        s++;
+        ECL_JSON_TEST_SYMBOL_RETURN(s, '"', length)
 
-        for(std::size_t i = 0; i < strlen(s); ++i)
+        for(std::size_t i = 0; i < length; ++i)
         {
             if(*s == '"')
             {
-                s++;
+                ECL_JSON_SHIFT_S_L(s, length)
+                ECL_JSON_TEST_LENGTH_RETURN(length, false)
                 break;
             }
 
+            ECL_JSON_TEST_LENGTH_RETURN(length, false)
+            ECL_JSON_TEST_LENGTH_RETURN(length - 1, false)
+
             if(*s == '\\' && *(s + 1) == '"')
             {
-                s++;
+                ECL_JSON_SHIFT_S_L(s, length)
+                ECL_JSON_TEST_LENGTH_RETURN(length, false)
             }
 
             val.push_back(*s);
-            s++;
+            ECL_JSON_SHIFT_S_L(s, length)
+            ECL_JSON_TEST_LENGTH_RETURN(length, false)
         }
 
         return true;
@@ -300,12 +361,13 @@ struct val_deserializer<std::string>
 template<>
 struct val_deserializer<bool>
 {
-    static bool parse(const char*& s, bool& val)
+    static bool parse(const char*& s, std::size_t& length, bool& val)
     {
         if(0 == strncmp(s, "true", 4))
         {
             val = true;
             s += 4;
+            length -= 4;
             return true;
         }
 
@@ -313,6 +375,7 @@ struct val_deserializer<bool>
         {
             val = false;
             s += 5;
+            length -= 5;
             return true;
         }
 
@@ -325,72 +388,72 @@ struct val_deserializer<bool>
 template<>
 struct val_deserializer<int8_t>
 {
-    static bool parse(const char*& s, int8_t& val)
+    static bool parse(const char*& s, std::size_t& length, int8_t& val)
     {
-        return val_deserializer_numeric_signed<int8_t>::parse(s, val);
+        return val_deserializer_numeric_signed<int8_t>::parse(s, length, val);
     }
 };
 
 template<>
 struct val_deserializer<uint8_t>
 {
-    static bool parse(const char*& s, uint8_t& val)
+    static bool parse(const char*& s, std::size_t& length, uint8_t& val)
     {
-        return val_deserializer_numeric_unsigned<uint8_t>::parse(s, val);
+        return val_deserializer_numeric_unsigned<uint8_t>::parse(s, length, val);
     }
 };
 
 template<>
 struct val_deserializer<int16_t>
 {
-    static bool parse(const char*& s, int16_t& val)
+    static bool parse(const char*& s, std::size_t& length, int16_t& val)
     {
-        return val_deserializer_numeric_signed<int16_t>::parse(s, val);
+        return val_deserializer_numeric_signed<int16_t>::parse(s, length, val);
     }
 };
 
 template<>
 struct val_deserializer<uint16_t>
 {
-    static bool parse(const char*& s, uint16_t& val)
+    static bool parse(const char*& s, std::size_t& length, uint16_t& val)
     {
-        return val_deserializer_numeric_unsigned<uint16_t>::parse(s, val);
+        return val_deserializer_numeric_unsigned<uint16_t>::parse(s, length, val);
     }
 };
 
 template<>
 struct val_deserializer<int32_t>
 {
-    static bool parse(const char*& s, int32_t& val)
+    static bool parse(const char*& s, std::size_t& length, int32_t& val)
     {
-        return val_deserializer_numeric_signed<int32_t>::parse(s, val);
+        return val_deserializer_numeric_signed<int32_t>::parse(s, length, val);
     }
 };
 
 template<>
 struct val_deserializer<uint32_t>
 {
-    static bool parse(const char*& s, uint32_t& val)
+    static bool parse(const char*& s, std::size_t& length, uint32_t& val)
     {
-        return val_deserializer_numeric_unsigned<uint32_t>::parse(s, val);
+        return val_deserializer_numeric_unsigned<uint32_t>::parse(s, length, val);
     }
 };
 
 template<>
 struct val_deserializer<int64_t>
 {
-    static bool parse(const char*& s, int64_t& val)
+    static bool parse(const char*& s, std::size_t& length, int64_t& val)
     {
-        return val_deserializer_numeric_signed<int64_t>::parse(s, val);
+        return val_deserializer_numeric_signed<int64_t>::parse(s, length, val);
     }
 };
 
 template<>
 struct val_deserializer<uint64_t>
 {
-    static bool parse(const char*& s, uint64_t& val)
+    static bool parse(const char*& s, std::size_t& length, uint64_t& val)
     {
-        return val_deserializer_numeric_unsigned<uint64_t>::parse(s, val);
+        return val_deserializer_numeric_unsigned<uint64_t>::parse(s, length, val);
     }
 };
 

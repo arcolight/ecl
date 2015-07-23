@@ -50,14 +50,9 @@ public:
      * @param s reference to serialized JSON string.
      * @return true - deserialization successful, false - unsuccessful.
      */
-    bool deserialize(const char*& s)
+    bool deserialize_ref(const char*& s, std::size_t& length, bool)
     {
-        details::spaces_rollup(s);
-        if(*s != '[')
-        {
-            return false;
-        }
-        s++;
+        ECL_JSON_TEST_SYMBOL_SPACES_ROUND(s, '[', length, false)
 
         for(std::size_t i = 0; i < COUNT; ++i)
         {
@@ -67,7 +62,7 @@ public:
         for(std::size_t i = 0; i < COUNT; ++i)
         {
             m_val[i].disable();
-            if(!m_val[i].deserialize(s))
+            if(!m_val[i].deserialize_ref(s, length, false))
             {
                 break;
             }
@@ -75,21 +70,11 @@ public:
 
             if(i != COUNT - 1)
             {
-                details::spaces_rollup(s);
-                if(*s != ',')
-                {
-                    break;
-                }
-                s++;
+                ECL_JSON_TEST_SYMBOL_SPACES_ROUND_BREAK(s, ',', length)
             }
         }
 
-        details::spaces_rollup(s);
-        if(*s != ']')
-        {
-            return false;
-        }
-        s++;
+        ECL_JSON_TEST_SYMBOL_SPACES_ROUND(s, ']', length, false)
 
         return true;
     }
