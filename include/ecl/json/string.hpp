@@ -50,7 +50,7 @@ public:
 
     explicit string(const char* const ptr)
     {
-        std::size_t sz = std::min(strnlen(ptr, SIZE), SIZE);
+        std::size_t sz = std::min(strlen(ptr), SIZE);
 
         for(std::size_t i = 0; i < sz; ++i)
         {
@@ -205,7 +205,7 @@ public:
      */
     string<SIZE>& operator= (const char* const ptr)
     {
-        std::size_t sz = std::min(strnlen(ptr, SIZE), SIZE);
+        std::size_t sz = std::min(strlen(ptr), SIZE);
         for(std::size_t i = 0; i < sz; ++i)
         {
             m_val[i] = ptr[i];
