@@ -284,7 +284,7 @@ struct val_initializer<int64_t>
 template<>
 struct val_initializer<uint64_t>
 {
-    constexpr static uint64_t value { 0 };
+    constexpr static uint64_t value() { return 0; }
 };
 
 template<typename T>

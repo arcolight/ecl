@@ -55,8 +55,8 @@ class node
 public:
     constexpr node() {}
 
-    typedef T    value_t;
-    typedef NAME name_t;
+    using value_t = T;
+    using name_t  = NAME;
 
 protected:
     /**

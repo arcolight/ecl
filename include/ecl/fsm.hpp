@@ -9,6 +9,7 @@
 #define ECL_FSM_HPP
 
 #include <cstddef>
+#include <functional>
 
 #include <ecl/singleton.hpp>
 
@@ -40,8 +41,8 @@ protected:
     template<typename event_t>
     class transition_layer
     {
-        typedef void (derived::*action_t)(const event_t&);
-        typedef bool (derived::*guard_t)(const event_t&);
+        using action_t = void (derived::*)(const event_t&);
+        using guard_t  = bool (derived::*)(const event_t&);
 
     protected:
         typedef struct transition_info
@@ -65,7 +66,7 @@ protected:
     protected:
         transition_layer() : m_list(nullptr) {}
 
-        void add(transition_info_t* const ti)
+        void add(transition_info_t* const ti)                           noexcept
         {
             if(nullptr == m_list)
             {
@@ -160,10 +161,10 @@ protected:
     class transition_table : public rows...
     {
     public:
-    	transition_table();
+        transition_table()                                             noexcept;
 
         template<typename event_t>
-        state_t transition(derived& fsm, const event_t& e)                 const
+        state_t transition(derived& fsm, const event_t& e)        const noexcept
         {
             return this->transition_layer<event_t>::call(fsm, e);
         }
@@ -175,8 +176,8 @@ protected:
         transition_table& operator= (const transition_table&& other)   = delete;
     };
 
-    typedef void (derived::*on_enter_t)(void);
-    typedef void (derived::*on_exit_t)(void);
+    using on_enter_t = void (derived::*)(void);
+    using on_exit_t  = void (derived::*)(void);
 
     /**
      * @brief Event enter/exit callback description class.
@@ -193,9 +194,9 @@ protected:
     class scb
     {
     protected:
-        constexpr static state_t    cb_state()    { return state;    }
-        constexpr static on_enter_t cb_on_enter() { return on_enter; }
-        constexpr static on_exit_t  cb_on_exit()  { return on_exit;  }
+        constexpr static state_t    cb_state()    noexcept { return state;    }
+        constexpr static on_enter_t cb_on_enter() noexcept { return on_enter; }
+        constexpr static on_exit_t  cb_on_exit()  noexcept { return on_exit;  }
 
     private:
         scb(const scb& other)                                          = delete;

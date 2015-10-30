@@ -12,7 +12,7 @@ struct header
     char* name  { nullptr };
     char* value { nullptr };
 
-    void clear()
+    void clear()                                                        noexcept
     {
         name =  nullptr;
         value = nullptr;

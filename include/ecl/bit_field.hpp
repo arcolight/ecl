@@ -32,25 +32,25 @@ template<typename S, typename T, T S::*P, std::size_t SIZE>
 class field : public virtual S
 {
 public:
-    constexpr field()
+    constexpr field()                                                   noexcept
     {
         static_assert((sizeof(T) * 8 >= SIZE), "field size > sizeof(var)");
     }
 
-    constexpr static std::size_t size()
+    constexpr static std::size_t size()                                 noexcept
     {
         return SIZE;
     }
 
 protected:
-    typedef T field_t;
+    using field_t = T;
 
-    constexpr field_t get()                                                const
+    constexpr field_t get()                                       const noexcept
     {
         return this->*P;
     }
 
-    void set(const field_t& val)
+    void set(const field_t& val)                                        noexcept
     {
         this->*P = val;
     }
@@ -70,10 +70,12 @@ template <std::size_t SIZE, typename BASE, typename... FIELDS>
 class bit_field final : public FIELDS...
 {
 public:
-    typedef struct packed_data
+    struct packed_data
     {
         uint8_t data[SIZE];
-    } packed_data_t;
+    };
+
+    using packed_data_t = struct packed_data;
 
     bit_field () : FIELDS()...
     {
@@ -85,18 +87,18 @@ public:
         set_data(other);
     }
 
-    operator uint8_t*()                                                    const
+    operator uint8_t*()                                           const noexcept
     {
         return m_array;
     }
 
-    operator const uint8_t*()                                              const
+    operator const uint8_t*()                                     const noexcept
     {
         return m_array;
     }
 
     bit_field<SIZE, BASE, FIELDS...>&
-    operator= (const bit_field<SIZE, BASE, FIELDS...>& other)
+    operator= (const bit_field<SIZE, BASE, FIELDS...>& other)           noexcept
     {
         set_data(other);
         return *this;
@@ -110,7 +112,7 @@ public:
      * @param data Pointer to byte array.
      * @attention No size check fir @ref data !
      */
-    void set_data(const uint8_t* const data)
+    void set_data(const uint8_t* const data)                            noexcept
     {
         for(std::size_t i = 0; i < SIZE; ++i)
         {
@@ -124,7 +126,7 @@ public:
     // Disable GCC warning, we know what we do.
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Warray-bounds"
-    const uint8_t* pack()
+    const uint8_t* pack()                                               noexcept
     {
         clear_array();
         pack_<0, FIELDS...>(&m_array[0] - 1);
@@ -136,7 +138,7 @@ public:
      * @details Unpacks internal byte array to fields.
      * @return Pointer to base struct.
      */
-    BASE* unpack()
+    BASE* unpack()                                                      noexcept
     {
         unpack_<0, FIELDS...>(&m_array[0] - 1);
         return this;
@@ -155,27 +157,27 @@ public:
 
 private:
     template<std::size_t SUM>
-    constexpr bool check()                                                 const
+    constexpr bool check()                                        const noexcept
     {
         static_assert((SIZE * 8 >= SUM), "array to small");
         return true;
     }
 
     template<std::size_t SUM, typename F, typename... TAIL>
-    constexpr bool check()                                                 const
+    constexpr bool check()                                        const noexcept
     {
         return check<SUM + F::size(), TAIL...>();
     }
 
     template<uint8_t OFFSET>
-    void pack_(uint8_t* array)                                             const
+    void pack_(uint8_t* array)                                    const noexcept
     {
         static_assert((OFFSET <= SIZE * 8), "offset out of bound");
         (void)array;
     }
 
     template<uint8_t OFFSET, typename F, typename... TAIL>
-    void pack_(uint8_t* array)                                             const
+    void pack_(uint8_t* array)                                          noexcept
     {
         typename F::field_t val = this->F::get();
         uint8_t bit = 0x00;
@@ -196,14 +198,14 @@ private:
     }
 
     template<uint8_t OFFSET>
-    void unpack_(uint8_t* array)                                           const
+    void unpack_(uint8_t* array)                                  const noexcept
     {
         static_assert((OFFSET <= SIZE * 8), "offset out of bound");
         (void)array;
     }
 
     template<uint8_t OFFSET, typename F, typename... TAIL>
-    void unpack_(uint8_t* array)
+    void unpack_(uint8_t* array)                                        noexcept
     {
         typename F::field_t val = 0;
         decltype(val) bit = 0;

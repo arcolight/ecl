@@ -10,23 +10,24 @@ template<typename T>
 class singleton : public T
 {
 public:
-    static T& instance();
+    static T& instance()                                               noexcept;
 
     // For really lazy people :)
-    static T& inst()
+    static T& inst()                                                    noexcept
     {
         return instance();
     }
 
-    static T* pointer()
+    static T* pointer()                                                 noexcept
     {
         return &(instance());
     }
 
 private:
-    singleton() : T() 
+    singleton()                                                         noexcept
+        : T()
     {}
-    
+
     singleton(const singleton<T>& other)                               = delete;
     singleton<T>& operator= (const singleton<T>& other)                = delete;
     singleton(const singleton<T>&& other)                              = delete;

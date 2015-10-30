@@ -80,7 +80,7 @@ public:
     }
 
 private:
-    typedef std::array<OBJ, COUNT> array_t;
+    using array_t = std::array<OBJ, COUNT>;
 
 public:
     /**

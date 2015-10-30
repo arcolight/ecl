@@ -77,7 +77,7 @@ static void fill_document(T& doc)
         i.template f<ar_item1>() = true;
         i.template f<ar_item2>() = ctr;
         i.template f<ar_item3>() = "item3";
-        ctr++;
+        ++ctr;
     }
 
     doc.template f<name5>() = true;

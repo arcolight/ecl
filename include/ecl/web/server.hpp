@@ -14,12 +14,17 @@ template<typename RESOURCES>
 class server
 {
 public:
-    typedef RESOURCES resources_t;
+    using resources_t = RESOURCES;
 
     template<typename STREAM>
     void process_request(char* req_raw, std::size_t size, STREAM& st)
     {
-        m_resources.template call<STREAM>(st, m_parser.parse(req_raw, size));
+        request* req = m_parser.parse(req_raw, size);
+        do
+        {
+            req = m_resources.template call<STREAM>(st, req);
+        }
+        while(req != nullptr);
     }
 
     resources_t    m_resources {};

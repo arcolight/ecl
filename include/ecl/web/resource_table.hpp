@@ -23,17 +23,15 @@ class resource_table : public PAGE_400,
 {
 public:
     template<typename T>
-    bool call(T& st, const request* req)
+    request* call(T& st, request* req)
     {
         if(nullptr == req)
         {
-            this->PAGE_400::template exec<T>(st, nullptr);
-            return false;
+            return this->PAGE_400::template exec<T>(st, nullptr);
         }
         if(nullptr == req->uri)
         {
-            this->PAGE_400::template exec<T>(st, nullptr);
-            return false;
+            return this->PAGE_400::template exec<T>(st, nullptr);
         }
 
         return call_internal<T, RESOURCES...>(st, req);
@@ -41,23 +39,20 @@ public:
 
 private:
     template<typename T, typename RES, typename... TAIL>
-    bool call_internal(T& st, const request* req)
+    request* call_internal(T& st, request* req)
     {
         if(RES::check_resource(req))
         {
-            this->RES::template exec<T>(st, req);
-            return true;
+            return this->RES::template exec<T>(st, req);
         }
 
         return call_internal<T, TAIL...>(st, req);
     }
 
     template<typename T>
-    bool call_internal(T& st, const request* req)
+    request* call_internal(T& st, request* req)
     {
-        this->PAGE_404::template exec<T>(st, req);
-
-        return false;
+        return this->PAGE_404::template exec<T>(st, req);
     }
 };
 

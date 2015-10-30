@@ -6,11 +6,11 @@
 #include <netdb.h>
 #include <unistd.h>
 
-#include <ecl/str_const.hpp>
 #include <ecl/name_type.hpp>
 #include <ecl/json.hpp>
 #include <ecl/web.hpp>
 
+// include generated sources
 #include "web_resources/index_html.h"
 #include "web_resources/style_css.h"
 #include "web_resources/jquery_js.h"
@@ -22,19 +22,37 @@
 #include "web_resources/404_html.h"
 #include "web_resources/500_html.h"
 
-ECL_DECL_NAME_TYPE_STRING(index_name_1,  "/")
-ECL_DECL_NAME_TYPE_STRING(index_name_2,  "/index.html")
-ECL_DECL_NAME_TYPE_STRING(icon_name,     "/etc/img/icon.png")
-ECL_DECL_NAME_TYPE_STRING(favicon_name,  "/favicon.png")
-ECL_DECL_NAME_TYPE_STRING(style_name,    "/etc/style.css")
-ECL_DECL_NAME_TYPE_STRING(jquery_name,   "/etc/js/jquery.js")
-ECL_DECL_NAME_TYPE_STRING(info_name,     "/info")
-ECL_DECL_NAME_TYPE_STRING(auth_name,     "/auth")
+namespace name
+{
+    ECL_DECL_NAME_TYPE_STRING(index_1,   "/")
+    ECL_DECL_NAME_TYPE_STRING(index_2,   "/index.html")
+    ECL_DECL_NAME_TYPE_STRING(icon,      "/etc/img/icon.png")
+    ECL_DECL_NAME_TYPE_STRING(favicon,   "/favicon.png")
+    ECL_DECL_NAME_TYPE_STRING(style,     "/etc/style.css")
+    ECL_DECL_NAME_TYPE_STRING(jquery,    "/etc/js/jquery.js")
+    ECL_DECL_NAME_TYPE_STRING(info,      "/info")
+    ECL_DECL_NAME_TYPE_STRING(auth,      "/auth")
+    ECL_DECL_NAME_TYPE_STRING(json_data, "/json_data")
 
-ECL_DECL_NAME_TYPE_STRING(page_400_name, "/400.html")
-ECL_DECL_NAME_TYPE_STRING(page_403_name, "/403.html")
-ECL_DECL_NAME_TYPE_STRING(page_404_name, "/404.html")
-ECL_DECL_NAME_TYPE_STRING(page_500_name, "/500.html")
+    ECL_DECL_NAME_TYPE_STRING(page_400,  "/400.html")
+    ECL_DECL_NAME_TYPE_STRING(page_403,  "/403.html")
+    ECL_DECL_NAME_TYPE_STRING(page_404,  "/404.html")
+    ECL_DECL_NAME_TYPE_STRING(page_500,  "/500.html")
+
+    ECL_DECL_NAME_TYPE(json_1)
+    ECL_DECL_NAME_TYPE(json_2)
+    ECL_DECL_NAME_TYPE(json_3)
+
+    ECL_DECL_NAME_TYPE(val_1)
+    ECL_DECL_NAME_TYPE(val_2)
+    ECL_DECL_NAME_TYPE(val_3)
+    ECL_DECL_NAME_TYPE(val_4)
+    ECL_DECL_NAME_TYPE(val_5)
+    ECL_DECL_NAME_TYPE(val_6)
+    ECL_DECL_NAME_TYPE(val_7)
+    ECL_DECL_NAME_TYPE(val_8)
+    ECL_DECL_NAME_TYPE(val_9)
+} // namespace name
 
 static int new_sd = 0;
 
@@ -46,37 +64,84 @@ void write_sock(const char* const buf, std::size_t size)
     send(new_sd, buf, size, 0);
 }
 
-ECL_DECL_NAME_TYPE(json_1)
-ECL_DECL_NAME_TYPE(json_2)
-ECL_DECL_NAME_TYPE(json_3)
+template<typename... NAME>
+class settings : public ecl::web::cgi<NAME...>
+{
+private:
+    using document_t = ecl::json::object<
+        ecl::json::node<name::val_1, int8_t                >,
+        ecl::json::node<name::val_2, uint8_t               >,
+        ecl::json::node<name::val_3, ecl::json::string<8>  >,
+        ecl::json::node<name::val_4, int64_t               >,
+        ecl::json::node<name::val_5, uint64_t              >
+    >;
+
+    document_t m_doc;
+
+public:
+    template<typename T>
+    ecl::web::request* exec(T& st, ecl::web::request* req)
+    {
+        (void)st;
+
+        for(auto& h : req->headers)
+        {
+            if(h.name == nullptr || h.value == nullptr)
+            {
+                continue;
+            }
+
+            if((0 == strcmp(ecl::web::constants::get_header_name(ecl::web::CONTENT_TYPE),
+                            h.name)) &&
+               (0 == strcmp(ecl::web::constants::get_content_type(ecl::web::APPLICATION_JSON),
+                            h.value)))
+            {
+                if(m_doc.deserialize(req->body))
+                {
+                    m_doc.serialize(std::cout, true);
+//                    return this->redirect(req, "/index.html", nullptr, ecl::web::method::GET);
+                    return nullptr;
+                }
+
+                break;
+            }
+        }
+
+        return this->redirect(req, "/400.html", nullptr, ecl::web::method::GET);
+    }
+};
 
 template<typename... NAME>
 class info : public ecl::web::cgi<NAME...>
 {
 private:
-    typedef ecl::json::object<
-        ecl::json::node<json_1, bool>,
-        ecl::json::node<json_2, uint32_t>,
-        ecl::json::node<json_3, ecl::json::string<64>>
-    > document_t;
+    using document_t = ecl::json::object<
+        ecl::json::node<name::json_1, bool                  >,
+        ecl::json::node<name::json_2, uint32_t              >,
+        ecl::json::node<name::json_3, ecl::json::string<64> >
+    >;
+
 public:
     template<typename T>
-    void exec(T& st, const ecl::web::request* req)
+    ecl::web::request* exec(T& st, ecl::web::request* req)
     {
         ecl::web::constants::write_status_line(st, req->ver, ecl::web::OK);
 
         st << ecl::web::constants::get_header_name(ecl::web::CONTENT_TYPE)
            << ":"
-           << ecl::web::constants::get_content_type(ecl::web::APPLICATION_JSON) << "\r\n";
+           << ecl::web::constants::get_content_type(ecl::web::APPLICATION_JSON)
+           << "\r\n";
         st << "\r\n";
 
         (void)(req);
-        m_doc.f<json_1>() = !m_doc.f<json_1>();
-        m_doc.f<json_2>() = m_counter++;
-        m_doc.f<json_3>() = "Test json string with \"escaped\" \\characters/.\n\r\tCR LF TAB.";
+        m_doc.f<name::json_1>() = !m_doc.f<name::json_1>();
+        m_doc.f<name::json_2>() = m_counter++;
+        m_doc.f<name::json_3>() = "Test json string with \"escaped\" \\characters/.\n\r\tCR LF TAB.";
 
         m_doc.serialize(st);
         st << "\r\n";
+
+        return nullptr;
     }
 
 private:
@@ -89,45 +154,113 @@ class auth : public ecl::web::cgi<NAME...>
 {
 public:
     template<typename T>
-    void exec(T& st, const ecl::web::request* req)
+    ecl::web::request* exec(T& st, ecl::web::request* req)
     {
         std::cout << req->uri << std::endl;
         std::cout << req->uri_param << std::endl;
 
         ecl::web::constants::write_status_line(st, req->ver, ecl::web::OK);
+
+        return this->redirect(req, "/index.html", nullptr, ecl::web::method::GET);
     }
 };
 
-typedef ecl::web::server<
-            ecl::web::resource_table<
-                ecl::web::resource<res_400_html_t,    ecl::web::TEXT_HTML,       ecl::web::BAD_REQUEST,           page_400_name>,
-//                ecl::web::resource<res_403_html_t,    ecl::web::TEXT_HTML,       ecl::web::FORBIDDEN,             page_403_name>,
-                ecl::web::resource<res_404_html_t,    ecl::web::TEXT_HTML,       ecl::web::NOT_FOUND,             page_404_name>,
-                ecl::web::resource<res_500_html_t,    ecl::web::TEXT_HTML,       ecl::web::INTERNAL_SERVER_ERROR, page_500_name>,
-                ecl::web::resource<res_index_html_t,  ecl::web::TEXT_HTML,       ecl::web::OK,                    index_name_1, index_name_2>,
-                ecl::web::resource<res_icon_png_t,    ecl::web::IMAGE_PNG,       ecl::web::OK,                    icon_name>,
-                ecl::web::resource<res_favicon_png_t, ecl::web::IMAGE_PNG,       ecl::web::OK,                    favicon_name>,
-                ecl::web::resource<res_style_css_t,   ecl::web::TEXT_CSS,        ecl::web::OK,                    style_name>,
-                ecl::web::resource<res_jquery_js_t,   ecl::web::TEXT_JAVASCRIPT, ecl::web::OK,                    jquery_name>,
-                info<info_name>,
-                auth<auth_name>
-            >
-> server_t;
+using server_t = ecl::web::server<
+    ecl::web::resource_table<
+// static resources
+        ecl::web::resource<
+            res_400_html_t,
+            ecl::web::TEXT_HTML,
+            ecl::web::BAD_REQUEST,
+            name::page_400
+        >,
+/*
+        ecl::web::resource<
+            res_403_html_t,
+            ecl::web::TEXT_HTML,
+            ecl::web::FORBIDDEN,
+            name::page_403
+        >,
+*/
+        ecl::web::resource<
+            res_404_html_t,
+            ecl::web::TEXT_HTML,
+            ecl::web::NOT_FOUND,
+            name::page_404
+        >,
+        ecl::web::resource<
+            res_500_html_t,
+            ecl::web::TEXT_HTML,
+            ecl::web::INTERNAL_SERVER_ERROR,
+            name::page_500
+        >,
+// index
+        ecl::web::resource<
+            res_index_html_t,
+            ecl::web::TEXT_HTML,
+            ecl::web::OK,
+            name::index_1, name::index_2
+        >,
+// logo
+        ecl::web::resource<
+            res_icon_png_t,
+            ecl::web::IMAGE_PNG,
+            ecl::web::OK,
+            name::icon
+        >,
+// favicon
+        ecl::web::resource<
+            res_favicon_png_t,
+            ecl::web::IMAGE_PNG,
+            ecl::web::OK,
+            name::favicon
+        >,
+// CSS
+        ecl::web::resource<
+            res_style_css_t,
+            ecl::web::TEXT_CSS,
+            ecl::web::OK,
+            name::style
+        >,
+// jquery
+        ecl::web::resource<
+            res_jquery_js_t,
+            ecl::web::TEXT_JAVASCRIPT,
+            ecl::web::OK,
+            name::jquery
+        >,
+// CGIs
+        info<
+            name::info
+        >,
+        auth<
+            name::auth
+        >,
+        settings<
+            name::json_data
+        >
+    >
+>;
 
 static char buffer[1024];
 
 [[ noreturn ]]
-void start_server(void);
+void start_server(const char*);
 
 int main(int argc, char* argv[])
 {
-    (void)(argc);
-    (void)(argv);
+    const char* port = "80";
+    if(argc > 1)
+    {
+        port = argv[1];
+    }
 
-    start_server();
+    std::cout << "port: " << port << std::endl;
+
+    start_server(port);
 }
 
-void start_server()
+void start_server(const char* port)
 {
     int status;
     struct addrinfo  host_info;
@@ -144,7 +277,7 @@ void start_server()
     host_info.ai_flags = AI_PASSIVE;     // IP Wildcard
 
     // Now fill up the linked list of host_info structs with google's address information.
-    status = getaddrinfo(NULL, "5556", &host_info, &host_info_list);
+    status = getaddrinfo(NULL, port, &host_info, &host_info_list);
     // getaddrinfo returns 0 on succes, or some other value when an error occured.
     // (translated into human readable text by the gai_gai_strerror function).
     if (status != 0)  std::cout << "getaddrinfo error" << gai_strerror(status) ;
@@ -156,6 +289,7 @@ void start_server()
     if (socketfd == -1)
     {
         std::cout << "socket error ";
+        exit(1);
     }
 
     std::cout << "Binding socket..."  << std::endl;
@@ -164,11 +298,19 @@ void start_server()
     int yes = 1;
     status = setsockopt(socketfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int));
     status = bind(socketfd, host_info_list->ai_addr, host_info_list->ai_addrlen);
-    if (status == -1)  std::cout << "bind error" << std::endl ;
+    if (status == -1)
+    {
+        std::cout << "bind error" << std::endl;
+        exit(1);
+    }
 
-    std::cout << "Listen()ing for connections..."  << std::endl;
+    std::cout << "Listen()ing for connections at port " << port << "..." << std::endl;
     status =  listen(socketfd, 5);
-    if (status == -1)  std::cout << "listen error" << std::endl ;
+    if (status == -1)
+    {
+        std::cout << "listen error" << std::endl;
+        exit(1);
+    }
 
     while(true)
     {

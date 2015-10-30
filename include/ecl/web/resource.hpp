@@ -24,7 +24,7 @@ class resource
 {
 public:
     template<typename T>
-    void exec(T& st, const request* req)                                   const
+    request* exec(T& st, request* req)                                     const
     {
         if(nullptr != req)
         {
@@ -40,30 +40,40 @@ public:
            << constants::get_content_type(TYPE) << "\r\n";
         st << "\r\n";
         st << RES_DATA::data << "\r\n";
+
+        return nullptr;
     }
 
-    static bool check_resource(const request* req)
-    {
-        return check_resource_internal<0, NAME...>(req);
-    }
-
-    template<std::size_t COUNT, typename N1, typename... TAIL>
+    template<typename N>
     static bool check_resource_internal(const request* req)
     {
-        if((0 == strncmp(req->uri, N1::name(), N1::size())) &&
-           (strlen(req->uri) == N1::size()))
+        if((0 == strncmp(req->uri, N::name(), N::size())) &&
+           (strlen(req->uri) == N::size())                &&
+           (method::GET == req->met)
+        )
         {
             return true;
         }
 
-        return check_resource_internal<COUNT + 1, TAIL...>(req);
+        return false;
     }
 
-    template<std::size_t COUNT>
+    template<typename N1, typename N2, typename... TAIL>
     static bool check_resource_internal(const request* req)
     {
-        (void)(req);
-        return false;
+        if((0 == strncmp(req->uri, N1::name(), N1::size())) &&
+           (strlen(req->uri) == N1::size())                 &&
+           (method::GET == req->met))
+        {
+            return true;
+        }
+
+        return check_resource_internal<N2, TAIL...>(req);
+    }
+
+    static bool check_resource(const request* req)
+    {
+        return check_resource_internal<NAME...>(req);
     }
 };
 

@@ -27,12 +27,12 @@ class str_const
 {
 public:
     template<std::size_t N>
-    constexpr explicit str_const(const char(&a)[N]) :
-        m_p(a), m_sz(N-1)
+    constexpr explicit str_const(const char(&a)[N])                     noexcept
+        : m_p(a), m_sz(N-1)
     {}
 
-    constexpr str_const(const char* str, std::size_t N)
-        :m_p(str), m_sz(N)
+    constexpr str_const(const char* str, std::size_t N)                 noexcept
+        : m_p(str), m_sz(N)
     {}
 
     /**
@@ -41,7 +41,7 @@ public:
      * @param n index
      * @return n-th char in string. If n out of bound, returns 0.
      */
-    constexpr char operator[](std::size_t n)                               const
+    constexpr char operator[](std::size_t n)                      const noexcept
     {
         // Don't use throw. In embedded systems we have no exceptions.
         return (n < m_sz) ? m_p[n] : 0;
@@ -51,7 +51,7 @@ public:
      * @brief String size.
      * @return String length in characters.
      */
-    constexpr std::size_t size()                                           const
+    constexpr std::size_t size()                                  const noexcept
     {
         return m_sz;
     }
@@ -61,7 +61,7 @@ public:
      *
      * @return Pointer to constant string.
      */
-    constexpr operator const char*()                                       const
+    constexpr operator const char*()                              const noexcept
     {
         return m_p;
     }

@@ -13,7 +13,7 @@ class command_processor
 {
 public:
     bool init(const std::size_t argc,
-              const char**      argv)
+              const char**      argv)                                   noexcept
     {
         if(0 == argc)
         {
@@ -35,27 +35,9 @@ public:
                                      m_argv + 1);
     }
 
-    constexpr static const char* name()
+    constexpr static const char* name()         noexcept(noexcept(NAME::name()))
     {
         return NAME::name();
-    }
-
-    template<typename ST>
-    static void help(ST& st,
-                     std::size_t indent_increment = DEFAULT_INDENT_INCREMENT)
-    {
-        show_help<ST>(st, 0, indent_increment);
-    }
-
-    template<typename ST>
-    static void show_help(ST& st,
-                          std::size_t indent,
-                          std::size_t indent_increment = DEFAULT_INDENT_INCREMENT)
-    {
-        print_indent(st, indent);
-        st << name() << "\n\r";
-
-        show_help_internal<ST, commands...>(st, indent + indent_increment, indent_increment);
     }
 
 private:
@@ -67,7 +49,8 @@ private:
     {
         static_assert((cmd::name() != nullptr), "cmd::name is empty!");
 
-        if((strlen(cmd::name()) == strlen(nm)) && (0 == strcmp(cmd::name(), nm)))
+        if( (strlen(cmd::name()) == strlen(nm)) &&
+            (0 == strcmp(cmd::name(), nm)) )
         {
             cmd c;
 
@@ -87,7 +70,7 @@ private:
     bool call(ST& st,
               const char* const nm,
               const std::size_t argc,
-              const char**      argv)                                      const
+              const char**      argv)                             const noexcept
     {
         (void)(st);
         (void)(nm);
@@ -102,7 +85,9 @@ private:
     template<typename ST, typename cmd, typename... tail>
     static void show_help_internal(ST& st,
                                    std::size_t indent,
-                                   std::size_t indent_increment)
+                                   std::size_t indent_increment)       noexcept(
+                          noexcept(cmd::show_help(st, indent, indent_increment))
+                                                                               )
     {
         cmd::show_help(st, indent, indent_increment);
 
@@ -112,7 +97,7 @@ private:
     template<typename ST>
     static void show_help_internal(ST& st,
                                    std::size_t indent,
-                                   std::size_t indent_increment)
+                                   std::size_t indent_increment)        noexcept
     {
         (void)st;
         (void)indent;
@@ -121,6 +106,38 @@ private:
 
     std::size_t  m_argc { 0 };
     const char** m_argv { nullptr };
+
+public:
+    template<typename ST>
+    static void show_help(ST& st,
+                          std::size_t indent,
+                          std::size_t indent_inc = DEFAULT_INDENT_INCREMENT)
+                        noexcept(
+                            noexcept(print_indent(st, indent)) &&
+                            noexcept(st.operator<<("")) &&
+                            noexcept(show_help_internal<
+                                        ST,
+                                        commands...
+                                     >(st,
+                                       indent + indent_inc,
+                                       indent_inc)
+                            )
+                        )
+    {
+        print_indent(st, indent);
+        st << name() << "\n\r";
+
+        show_help_internal<ST, commands...>(st,
+                                            indent + indent_inc,
+                                            indent_inc);
+    }
+
+    template<typename ST>
+    static void help(ST& st, std::size_t indent_inc = DEFAULT_INDENT_INCREMENT)
+                            noexcept(noexcept(show_help<ST>(st, 0, indent_inc)))
+    {
+        show_help<ST>(st, 0, indent_inc);
+    }
 };
 
 } // namespace ecl

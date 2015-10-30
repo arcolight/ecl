@@ -23,7 +23,7 @@ namespace ecl
 {
 
 template<typename ST>
-static void print_indent(ST& st, std::size_t indent)
+static void print_indent(ST& st, std::size_t indent)                    noexcept
 {
     for(std::size_t i = 0; i < indent; ++i)
     {
@@ -38,7 +38,8 @@ template<typename cmd>
 class i_receiver
 {
 protected:
-    virtual ~i_receiver() {}
+    virtual ~i_receiver()
+    {}
 
 public:
     virtual void receive(cmd&)                                              = 0;
@@ -47,12 +48,21 @@ public:
 template<typename cmd>
 class cmd_core
 {
+private:
+    using receiver_t = detail::i_receiver<cmd>;
+    using receiver_ptr_t = receiver_t*;
+    using array_singleton_t = ecl::singleton<
+        std::array<receiver_ptr_t, RECEIVER_CAPACITY>
+    >;
+
 protected:
     virtual ~cmd_core() {}
 
-    void reg(detail::i_receiver<cmd>* const i)
+    void reg(receiver_ptr_t const i)                                   noexcept(
+                                         noexcept(array_singleton_t::instance())
+                                                                               )
     {
-        for(auto &itf: array_singleton::instance())
+        for(auto &itf: array_singleton_t::instance())
         {
             if(nullptr == itf)
             {
@@ -64,20 +74,15 @@ protected:
 
     void execute(cmd& c)                                                   const
     {
-        std::size_t sz = array_singleton::instance().size();
+        std::size_t sz = array_singleton_t::instance().size();
         for(std::size_t i = 0; i < sz; ++i)
         {
-            if(nullptr != array_singleton::instance()[i])
+            if(nullptr != array_singleton_t::instance()[i])
             {
-                array_singleton::instance()[i]->receive(c);
+                array_singleton_t::instance()[i]->receive(c);
             }
         }
     }
-
-private:
-    typedef ecl::singleton<
-                std::array<detail::i_receiver<cmd>*, RECEIVER_CAPACITY>
-            > array_singleton;
 };
 
 } // namespace detail
@@ -104,7 +109,7 @@ public:
         return true;
     }
 
-    constexpr static const char* name()
+    constexpr static const char* name()         noexcept(noexcept(NAME::name()))
     {
         return NAME::name();
     }
@@ -112,9 +117,14 @@ public:
     template<typename ST>
     static void show_help(ST& st,
                           std::size_t indent,
-                          std::size_t indent_increment = DEFAULT_INDENT_INCREMENT)
+                          std::size_t indent_inc = DEFAULT_INDENT_INCREMENT)
+                                              noexcept(
+                                                  noexcept(print_indent) &&
+                                                  noexcept(st.operator<<("")) &&
+                                                  noexcept(name())
+                                              )
     {
-        (void)indent_increment;
+        (void)indent_inc;
         print_indent(st, indent);
         st << name() << "\n\r";
     }
@@ -134,7 +144,8 @@ protected:
         this->detail::cmd_core<cmd>::reg(this);
     }
 
-    virtual ~receiver() {}
+    virtual ~receiver()
+    {}
 };
 
 } // namespace ecl

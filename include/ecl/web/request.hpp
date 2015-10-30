@@ -17,24 +17,6 @@ namespace web
 
 struct request
 {
-    request()
-    {
-        clear();
-    }
-
-    constexpr static std::size_t max_headers_count()
-    {
-        return MAX_HEADERS_COUNT;
-    }
-
-    method         met                         { method::GET  };
-    version        ver                         { version::HTTP10 };
-    const char*    uri                         { nullptr };
-    const char*    uri_param                   { nullptr };
-    const char*    body                        { nullptr };
-    header         headers[MAX_HEADERS_COUNT];
-    std::size_t    headers_count               { 0 };
-
     void clear()
     {
         met = method::GET;
@@ -50,6 +32,24 @@ struct request
 
         headers_count = 0;
     }
+
+    request()
+    {
+        clear();
+    }
+
+    constexpr static std::size_t max_headers_count()                    noexcept
+    {
+        return MAX_HEADERS_COUNT;
+    }
+
+    method         met                         { method::GET  };
+    version        ver                         { version::HTTP10 };
+    const char*    uri                         { nullptr };
+    const char*    uri_param                   { nullptr };
+    const char*    body                        { nullptr };
+    header         headers[MAX_HEADERS_COUNT];
+    std::size_t    headers_count               { 0 };
 };
 
 } // namespace web

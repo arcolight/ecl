@@ -129,6 +129,17 @@ public:
         return m_enabled;
     }
 
+    template<typename NAME>
+    using value_type_t = typename std::tuple_element<
+        0,
+        typename filter<
+            name_predicate,
+            NAME,
+            std::tuple,
+            NODES...
+        >::type
+    >::type;
+
     /**
      * @brief Field accessor.
      * @details Returns reference to field, that associated with
@@ -139,17 +150,9 @@ public:
      * @return Reference to value with name NAME.
      */
     template<typename NAME>
-    typename std::tuple_element<0,
-        typename filter<name_predicate,
-                        NAME,
-                        std::tuple,
-                        NODES...>::type>::type::value_t& f()
+    typename value_type_t<NAME>::value_t& f()
     {
-        return this->std::tuple_element<0,
-            typename filter<name_predicate,
-                            NAME,
-                            std::tuple,
-                            NODES...>::type>::type::m_val;
+        return this->value_type_t<NAME>::m_val;
     }
 
     /**

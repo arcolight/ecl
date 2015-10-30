@@ -5,12 +5,16 @@ DEBUG = -g3
 GCC_WARNINGS = -Wall -Wextra -pedantic -Wswitch -Wnon-virtual-dtor
 CLANG_WARNINGS = -Weverything -Wno-padded -Wno-c++98-compat -Wno-covered-switch-default -Wno-exit-time-destructors
 
+WARNINGS = -Wall -Wextra -pedantic -Wswitch -Wnon-virtual-dtor
+
 SECURE = -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 -ftrapv -Wformat-security -fPIE -Wl,-z,relro,-z,now
 
 CXXFLAGS = -std=c++11 -fPIC -fno-rtti -fno-exceptions -fvisibility=hidden $(SECURE) $(OPTIMIZATION) $(DEBUG)
 
 GCC_FLAGS = $(CXXFLAGS) $(GCC_WARNINGS) -fstack-check -fbounds-check -ggdb
 CLANG_FLAGS = $(CXXFLAGS) $(CLANG_WARNINGS)
+
+FLAGS = $(CXXFLAGS) $(WARNINGS) $(ADD_FLAGS) $(ADD_WARN)
 
 DOXYGEN_CONFIG = doxygen.config
 
@@ -35,16 +39,12 @@ WEB_RES_SRC_DIR = ./tests/web_resources_src
 WEB_RES_GEN_DIR = ./tests/web_resources
 WEB_GEN_SOURCES = $(WEB_RES_GEN_DIR)/400_html.cpp $(WEB_RES_GEN_DIR)/403_html.cpp $(WEB_RES_GEN_DIR)/404_html.cpp $(WEB_RES_GEN_DIR)/500_html.cpp $(WEB_RES_GEN_DIR)/favicon_png.cpp $(WEB_RES_GEN_DIR)/icon_png.cpp $(WEB_RES_GEN_DIR)/index_html.cpp $(WEB_RES_GEN_DIR)/jquery_js.cpp $(WEB_RES_GEN_DIR)/style_css.cpp
 
-GCC_TGT = _gcc_x86
-CLANG_TGT = _clang_x86
-GCC_ARM_TGT = _gcc_arm
-GCC_ARM_NONE_TGT = _gcc_arm_none_eabi
+all: tests
 
-GCC = g++
-CLANG = clang++
-ARM_NONE_EABI_GCC = arm-none-eabi-g++
+out_dir:
+	@mkdir -p $(BIN_DIR)
 
-all: gcc clang
+tests: tests_without_$(WEB) test_$(WEB)
 
 gen_web_res:
 	@mkdir -p $(WEB_RES_GEN_DIR)
@@ -58,44 +58,37 @@ gen_web_res:
 	./res_gen.sh $(WEB_RES_SRC_DIR)/favicon.png $(WEB_RES_GEN_DIR)/
 	./res_gen.sh $(WEB_RES_SRC_DIR)/jquery.js   $(WEB_RES_GEN_DIR)/
 
-gcc: gen_web_res
-	@mkdir -p $(BIN_DIR)
-	$(GCC) $(GCC_FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(FSM)$(GCC_TGT).map $(TESTS_DIR)/test_$(FSM).cpp -o $(BIN_DIR)/test_$(FSM)$(GCC_TGT)
-	$(GCC) $(GCC_FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(SG)$(GCC_TGT).map $(TESTS_DIR)/test_$(SG).cpp -o $(BIN_DIR)/test_$(SG)$(GCC_TGT)
-	$(GCC) $(GCC_FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(CB)$(GCC_TGT).map $(TESTS_DIR)/test_$(CB).cpp -o $(BIN_DIR)/test_$(CB)$(GCC_TGT)
-	$(GCC) $(GCC_FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(BF)$(GCC_TGT).map $(TESTS_DIR)/test_$(BF).cpp -o $(BIN_DIR)/test_$(BF)$(GCC_TGT)
-	$(GCC) $(GCC_FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(SINGLETON)$(GCC_TGT).map $(TESTS_DIR)/test_$(SINGLETON).cpp -o $(BIN_DIR)/test_$(SINGLETON)$(GCC_TGT)
-	$(GCC) $(GCC_FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(STREAM)$(GCC_TGT).map $(TESTS_DIR)/test_$(STREAM).cpp -o $(BIN_DIR)/test_$(STREAM)$(GCC_TGT)
-	$(GCC) $(GCC_FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(JSON)$(GCC_TGT).map $(TESTS_DIR)/test_$(JSON).cpp -o $(BIN_DIR)/test_$(JSON)$(GCC_TGT)
-	$(GCC) $(GCC_FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(STR_CONST)$(GCC_TGT).map $(TESTS_DIR)/test_$(STR_CONST).cpp -o $(BIN_DIR)/test_$(STR_CONST)$(GCC_TGT)
-	$(GCC) $(GCC_FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(CMD)$(GCC_TGT).map $(TESTS_DIR)/test_$(CMD).cpp -o $(BIN_DIR)/test_$(CMD)$(GCC_TGT)
-	$(GCC) $(GCC_FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(WEB)$(GCC_TGT).map $(TESTS_DIR)/test_$(WEB).cpp $(WEB_GEN_SOURCES) -o $(BIN_DIR)/test_$(WEB)$(GCC_TGT)
+tests_without_$(WEB): test_$(FSM) test_$(SG) test_$(CB) test_$(BF) test_$(SINGLETON) test_$(STREAM) test_$(JSON) test_$(STR_CONST) test_$(CMD)
 
-clang: gen_web_res
-	@mkdir -p $(BIN_DIR)
-	$(CLANG) $(CLANG_FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(FSM)$(CLANG_TGT).map $(TESTS_DIR)/test_$(FSM).cpp -o $(BIN_DIR)/test_$(FSM)$(CLANG_TGT)
-	$(CLANG) $(CLANG_FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(SG)$(CLANG_TGT).map $(TESTS_DIR)/test_$(SG).cpp -o $(BIN_DIR)/test_$(SG)$(CLANG_TGT)
-	$(CLANG) $(CLANG_FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(CB)$(CLANG_TGT).map $(TESTS_DIR)/test_$(CB).cpp -o $(BIN_DIR)/test_$(CB)$(CLANG_TGT)
-	$(CLANG) $(CLANG_FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(BF)$(CLANG_TGT).map $(TESTS_DIR)/test_$(BF).cpp -o $(BIN_DIR)/test_$(BF)$(CLANG_TGT)
-	$(CLANG) $(CLANG_FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(SINGLETON)$(CLANG_TGT).map $(TESTS_DIR)/test_$(SINGLETON).cpp -o $(BIN_DIR)/test_$(SINGLETON)$(CLANG_TGT)
-	$(CLANG) $(CLANG_FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(STREAM)$(CLANG_TGT).map $(TESTS_DIR)/test_$(STREAM).cpp -o $(BIN_DIR)/test_$(STREAM)$(CLANG_TGT)
-	$(CLANG) $(CLANG_FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(JSON)$(CLANG_TGT).map $(TESTS_DIR)/test_$(JSON).cpp -o $(BIN_DIR)/test_$(JSON)$(CLANG_TGT)
-	$(CLANG) $(CLANG_FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(STR_CONST)$(CLANG_TGT).map $(TESTS_DIR)/test_$(STR_CONST).cpp -o $(BIN_DIR)/test_$(STR_CONST)$(CLANG_TGT)
-	$(CLANG) $(CLANG_FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(CMD)$(CLANG_TGT).map $(TESTS_DIR)/test_$(CMD).cpp -o $(BIN_DIR)/test_$(CMD)$(CLANG_TGT)
-	$(CLANG) $(CLANG_FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(WEB)$(CLANG_TGT).map $(TESTS_DIR)/test_$(WEB).cpp $(WEB_GEN_SOURCES) -o $(BIN_DIR)/test_$(WEB)$(CLANG_TGT)
+test_$(FSM): out_dir
+	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(FSM)_$(CXX).map $(TESTS_DIR)/test_$(FSM).cpp -o $(BIN_DIR)/$(FSM)_$(CXX)
 
-gcc_arm_none_eabi:
-	@mkdir -p $(BIN_DIR)
-	$(ARM_NONE_EABI_GCC) $(GCC_FLAGS) $(ARM_LD_FLAGS) -Wl,-Map=$(BIN_DIR)/$(FSM)$(GCC_ARM_NONE_TGT).map -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(FSM).cpp -o $(BIN_DIR)/test_$(FSM)$(GCC_ARM_NONE_TGT)
-	$(ARM_NONE_EABI_GCC) $(GCC_FLAGS) $(ARM_LD_FLAGS) -Wl,-Map=$(BIN_DIR)/$(SG)$(GCC_ARM_NONE_TGT).map -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(SG).cpp -o $(BIN_DIR)/test_$(SG)$(GCC_ARM_NONE_TGT)
-	$(ARM_NONE_EABI_GCC) $(GCC_FLAGS) $(ARM_LD_FLAGS) -Wl,-Map=$(BIN_DIR)/$(CB)$(GCC_ARM_NONE_TGT).map -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(CB).cpp -o $(BIN_DIR)/test_$(CB)$(GCC_ARM_NONE_TGT)
-	$(ARM_NONE_EABI_GCC) $(GCC_FLAGS) $(ARM_LD_FLAGS) -Wl,-Map=$(BIN_DIR)/$(BF)$(GCC_ARM_NONE_TGT).map -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(BF).cpp -o $(BIN_DIR)/test_$(BF)$(GCC_ARM_NONE_TGT)
-	$(ARM_NONE_EABI_GCC) $(GCC_FLAGS) $(ARM_LD_FLAGS) -Wl,-Map=$(BIN_DIR)/$(SINGLETON)$(GCC_ARM_NONE_TGT).map -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(SINGLETON).cpp -o $(BIN_DIR)/test_$(SINGLETON)$(GCC_ARM_NONE_TGT)
-	$(ARM_NONE_EABI_GCC) $(GCC_FLAGS) $(ARM_LD_FLAGS) -Wl,-Map=$(BIN_DIR)/$(STREAM)$(GCC_ARM_NONE_TGT).map -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(STREAM).cpp -o $(BIN_DIR)/test_$(STREAM)$(GCC_ARM_NONE_TGT)
-	$(ARM_NONE_EABI_GCC) $(GCC_FLAGS) $(ARM_LD_FLAGS) -Wl,-Map=$(BIN_DIR)/$(JSON)$(GCC_ARM_NONE_TGT).map -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(JSON).cpp -o $(BIN_DIR)/test_$(JSON)$(GCC_ARM_NONE_TGT)
-	$(ARM_NONE_EABI_GCC) $(GCC_FLAGS) $(ARM_LD_FLAGS) -Wl,-Map=$(BIN_DIR)/$(STR_CONST)$(GCC_ARM_NONE_TGT).map -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(STR_CONST).cpp -o $(BIN_DIR)/test_$(STR_CONST)$(GCC_ARM_NONE_TGT)
-	$(ARM_NONE_EABI_GCC) $(GCC_FLAGS) $(ARM_LD_FLAGS) -Wl,-Map=$(BIN_DIR)/$(CMD)$(GCC_ARM_NONE_TGT).map -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(CMD).cpp -o $(BIN_DIR)/test_$(CMD)$(GCC_ARM_NONE_TGT)
-#	$(ARM_NONE_EABI_GCC) $(GCC_FLAGS) $(ARM_LD_FLAGS) -Wl,-Map=$(BIN_DIR)/$(WEB)$(GCC_ARM_NONE_TGT).map -I$(INCLUDE_DIR) $(TESTS_DIR)/test_$(WEB).cpp -o $(BIN_DIR)/test_$(WEB)$(GCC_ARM_NONE_TGT)
+test_$(SG): out_dir
+	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(SG)_$(CXX).map $(TESTS_DIR)/test_$(SG).cpp -o $(BIN_DIR)/$(SG)_$(CXX)
+
+test_$(CB): out_dir
+	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(CB)_$(CXX).map $(TESTS_DIR)/test_$(CB).cpp -o $(BIN_DIR)/$(CB)_$(CXX)
+
+test_$(BF): out_dir
+	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(BF)_$(CXX).map $(TESTS_DIR)/test_$(BF).cpp -o $(BIN_DIR)/$(BF)_$(CXX)
+
+test_$(SINGLETON): out_dir
+	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(SINGLETON)_$(CXX).map $(TESTS_DIR)/test_$(SINGLETON).cpp -o $(BIN_DIR)/$(SINGLETON)_$(CXX)
+
+test_$(STREAM): out_dir
+	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(STREAM)_$(CXX).map $(TESTS_DIR)/test_$(STREAM).cpp -o $(BIN_DIR)/$(STREAM)_$(CXX)
+
+test_$(JSON): out_dir
+	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(JSON)_$(CXX).map $(TESTS_DIR)/test_$(JSON).cpp -o $(BIN_DIR)/$(JSON)_$(CXX)
+
+test_$(STR_CONST): out_dir
+	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(STR_CONST)_$(CXX).map $(TESTS_DIR)/test_$(STR_CONST).cpp -o $(BIN_DIR)/$(STR_CONST)_$(CXX)
+
+test_$(CMD): out_dir
+	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(CMD)_$(CXX).map $(TESTS_DIR)/test_$(CMD).cpp -o $(BIN_DIR)/$(CMD)_$(CXX)
+
+test_$(WEB): out_dir gen_web_res
+	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(WEB)_$(CXX).map $(TESTS_DIR)/test_$(WEB).cpp $(WEB_GEN_SOURCES) -o $(BIN_DIR)/$(WEB)_$(CXX)
 
 doxygen:
 	doxygen $(DOXYGEN_CONFIG)

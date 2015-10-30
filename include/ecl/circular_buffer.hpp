@@ -27,9 +27,9 @@ template<typename T, std::size_t CAPACITY, bool ERASE_ELEMENTS = false>
 class circular_buffer
 {
 public:
-    circular_buffer() :
-    m_offset(0),
-    m_size(0)
+    circular_buffer()                                                   noexcept
+        : m_offset(0),
+          m_size(0)
     {
         static_assert(std::is_nothrow_copy_constructible<T>::value,
                       "T must be nothrow copy-constructible!");
@@ -41,7 +41,7 @@ public:
      * @brief Clear buffer.
      *
      */
-    void clear()
+    void clear()                                                        noexcept
     {
         if(ERASE_ELEMENTS)
         {
@@ -59,7 +59,7 @@ public:
      * @brief Circular buffer capacity.
      * @return Circular buffer capacity.
      */
-    constexpr static std::size_t capacity()
+    constexpr static std::size_t capacity()                             noexcept
     {
         return CAPACITY;
     }
@@ -68,7 +68,7 @@ public:
      * @brief Circular buffer current size;
      * @return Current elements count in buffer.
      */
-    std::size_t size()                                                     const
+    std::size_t size()                                            const noexcept
     {
         return m_size;
     }
@@ -78,7 +78,7 @@ public:
      *
      * @param v Element to push.
      */
-    void push(const T& v)
+    void push(const T& v)                                               noexcept
     {
         m_array[wrap(m_offset + m_size)] = v;
 
@@ -97,7 +97,7 @@ public:
      *
      * @return Top element.
      */
-    T pop()
+    T pop()                                                             noexcept
     {
         T t = m_array[m_offset];
         if(ERASE_ELEMENTS)
@@ -115,32 +115,32 @@ public:
         return T();
     }
 
-    T& operator[](std::size_t index)
+    T& operator[](std::size_t index)                                    noexcept
     {
         return m_array[wrap(index + m_offset)];
     }
 
-    const T& operator[](std::size_t index)                                 const
+    const T& operator[](std::size_t index)                        const noexcept
     {
         return m_array[wrap(index + m_offset)];
     }
 
-    bool is_empty()                                                        const
+    bool is_empty()                                               const noexcept
     {
         return (m_size == 0);
     }
 
-    T& front()
+    T& front()                                                          noexcept
     {
         return operator [](0);
     }
 
-    const T& front()                                                       const
+    const T& front()                                              const noexcept
     {
         return operator [](0);
     }
 
-    T& back()
+    T& back()                                                           noexcept
     {
         if(is_empty())
         {
@@ -150,7 +150,7 @@ public:
         return operator [](m_size - 1);
     }
 
-    const T& back()                                                        const
+    const T& back()                                               const noexcept
     {
         if(is_empty())
         {
@@ -160,7 +160,7 @@ public:
         return operator [](m_size - 1);
     }
 
-    void drop_front(std::size_t count)
+    void drop_front(std::size_t count)                                  noexcept
     {
         if (count == 0)
         {
@@ -185,7 +185,7 @@ public:
         m_size -= count;
     }
 
-    void drop_back(std::size_t count)
+    void drop_back(std::size_t count)                                   noexcept
     {
         if (count == 0)
         {
@@ -225,7 +225,7 @@ public:
                 data_(data)
             {}
 
-            self_type& operator++()
+            self_type& operator++()                                     noexcept
             {
                 if(CAPACITY == index_)
                 {
@@ -239,7 +239,7 @@ public:
                 return *this;
             }
 
-            self_type operator++(int junk)
+            self_type operator++(int junk)                              noexcept
             {
                 (void)(junk);
 
@@ -255,7 +255,7 @@ public:
                 return *this;
             }
 
-            self_type& operator--()
+            self_type& operator--()                                     noexcept
             {
                 if(0 == index_)
                 {
@@ -269,7 +269,7 @@ public:
                 return *this;
             }
 
-            self_type operator--(int junk)
+            self_type operator--(int junk)                              noexcept
             {
                 (void)(junk);
                 if(0 == index_)
@@ -283,17 +283,17 @@ public:
                 return *this;
             }
 
-            reference operator*()
+            reference operator*()                                       noexcept
             {
                 return data_[index_];
             }
 
-            bool operator==(const self_type& rhs)                          const
+            bool operator==(const self_type& rhs)                 const noexcept
             {
                 return index_ == rhs.index_;
             }
 
-            bool operator!=(const self_type& rhs)                          const
+            bool operator!=(const self_type& rhs)                 const noexcept
             {
                 return !operator==(rhs);
             }
@@ -320,7 +320,7 @@ public:
                 data_(data)
             {}
 
-            self_type& operator++()
+            self_type& operator++()                                     noexcept
             {
                 if(CAPACITY == index_)
                 {
@@ -334,7 +334,7 @@ public:
                 return *this;
             }
 
-            self_type operator++(int junk)
+            self_type operator++(int junk)                              noexcept
             {
                 (void)(junk);
 
@@ -350,7 +350,7 @@ public:
                 return *this;
             }
 
-            self_type& operator--()
+            self_type& operator--()                                     noexcept
             {
                 if(0 == index_)
                 {
@@ -364,7 +364,7 @@ public:
                 return *this;
             }
 
-            self_type operator--(int junk)
+            self_type operator--(int junk)                              noexcept
             {
                 (void)(junk);
                 if(0 == index_)
@@ -378,17 +378,17 @@ public:
                 return *this;
             }
 
-            reference operator*()                                          const
+            reference operator*()                                 const noexcept
             {
                 return data_[index_];
             }
 
-            bool operator==(const self_type& rhs)                          const
+            bool operator==(const self_type& rhs)                 const noexcept
             {
                 return index_ == rhs.index_;
             }
 
-            bool operator!=(const self_type& rhs)                          const
+            bool operator!=(const self_type& rhs)                 const noexcept
             {
                 return !operator==(rhs);
             }
@@ -401,48 +401,48 @@ public:
     typedef std::reverse_iterator<iterator> reverse_iterator;
     typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 
-    iterator begin()
+    iterator begin()                                                    noexcept
     {
         return iterator(0, *this);
     }
 
-    iterator end()
+    iterator end()                                                      noexcept
     {
         return iterator(m_size, *this);
     }
 
-    const_iterator begin()                                                 const
+    const_iterator begin()                                        const noexcept
     {
         return const_iterator(0, *this);
     }
 
-    const_iterator end()                                                   const
+    const_iterator end()                                          const noexcept
     {
         return const_iterator(m_size, *this);
     }
 
-    reverse_iterator rbegin()
+    reverse_iterator rbegin()                                           noexcept
     {
         return reverse_iterator(end());
     }
 
-    reverse_iterator rend()
+    reverse_iterator rend()                                             noexcept
     {
         return reverse_iterator(begin());
     }
 
-    const_reverse_iterator rbegin()                                        const
+    const_reverse_iterator rbegin()                               const noexcept
     {
         return const_reverse_iterator(end());
     }
 
-    const_reverse_iterator rend()                                          const
+    const_reverse_iterator rend()                                 const noexcept
     {
         return const_reverse_iterator(begin());
     }
 
 private:
-    static std::size_t wrap(std::size_t i)
+    static std::size_t wrap(std::size_t i)                              noexcept
     {
         return i % CAPACITY;
     }
