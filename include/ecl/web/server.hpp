@@ -10,25 +10,25 @@ namespace ecl
 namespace web
 {
 
-template<typename RESOURCES>
+template<typename RESOURCES, std::size_t MAX_REQUEST_SIZE>
 class server
 {
 public:
     using resources_t = RESOURCES;
 
     template<typename STREAM>
-    void process_request(char* req_raw, std::size_t size, STREAM& st)
+    void process_request(const char* req_raw, std::size_t, STREAM& st)
     {
-        request* req = m_parser.parse(req_raw, size);
         do
         {
-            req = m_resources.template call<STREAM>(st, req);
+            req_raw = m_resources.template call<STREAM>(st,
+                                                        m_parser.parse(req_raw));
         }
-        while(req != nullptr);
+        while(req_raw != nullptr);
     }
 
-    resources_t    m_resources {};
-    request_parser m_parser    {};
+    resources_t                      m_resources {};
+    request_parser<MAX_REQUEST_SIZE> m_parser    {};
 };
 
 } // namespace web

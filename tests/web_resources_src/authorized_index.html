@@ -49,11 +49,16 @@
                 </div>
                 <div class="content">
                     <table>
-                    <tr><td><b>JSON val_1 number (int8_t)  : </b></td><td><input id="val_1" type="number" min="-127" max="128" value="" /><br></td></tr>
-                    <tr><td><b>JSON val_2 number (uint8_t) : </b></td><td><input id="val_2" type="number" min="0"    max="255" value="" /><br></td></tr>
-                    <tr><td><b>JSON val_3 string (8-char)  : </b></td><td><input id="val_3"                                    value="" /><br></td></tr>
-                    <tr><td><b>JSON val_4 number (int64_t) : </b></td><td><input id="val_4" type="number"                      value="" /><br></td></tr>
-                    <tr><td><b>JSON val_5 number (uint64_t): </b></td><td><input id="val_5" type="number"                      value="" /><br></td></tr>
+                    <tr><td><b>JSON val_1  number (int8_t)  : </b></td><td><input id="val_1"  type="number" min="-127" max="128" value="" /><br></td></tr>
+                    <tr><td><b>JSON val_2  number (uint8_t) : </b></td><td><input id="val_2"  type="number" min="0"    max="255" value="" /><br></td></tr>
+                    <tr><td><b>JSON val_3  string (8-char)  : </b></td><td><input id="val_3"                                     value="" /><br></td></tr>
+                    <tr><td><b>JSON val_4  number (int64_t) : </b></td><td><input id="val_4"  type="number"                      value="" /><br></td></tr>
+                    <tr><td><b>JSON val_5  number (uint64_t): </b></td><td><input id="val_5"  type="number"                      value="" /><br></td></tr>
+                    <tr><td><b>JSON val_6  number (int8_t)  : </b></td><td><input id="val_6"  type="number" min="-127" max="128" value="" /><br></td></tr>
+                    <tr><td><b>JSON val_7  number (uint8_t) : </b></td><td><input id="val_7"  type="number" min="0"    max="255" value="" /><br></td></tr>
+                    <tr><td><b>JSON val_8  string (8-char)  : </b></td><td><input id="val_8"                                     value="" /><br></td></tr>
+                    <tr><td><b>JSON val_9  number (int64_t) : </b></td><td><input id="val_9"  type="number"                      value="" /><br></td></tr>
+                    <tr><td><b>JSON val_10 number (uint64_t): </b></td><td><input id="val_10" type="number"                      value="" /><br></td></tr>
                     <input id="data_send" type="submit" name="data_send" value="send" /><br>
                     <script type="text/javascript">
                         $("#data_send").on("click", function() {
@@ -62,7 +67,12 @@
                                 val_2 : $("#val_2").val(),
                                 val_3 : $("#val_3").val(),
                                 val_4 : $("#val_4").val(),
-                                val_5 : $("#val_5").val()
+                                val_5 : $("#val_5").val(),
+                                val_6 : $("#val_6").val(),
+                                val_7 : $("#val_7").val(),
+                                val_8 : $("#val_8").val(),
+                                val_9 : $("#val_9").val(),
+                                val_10 : $("#val_10").val()
                             }
                             var dataToSend = JSON.stringify(jsonToSend);
                             $.ajax({

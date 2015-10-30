@@ -7,22 +7,35 @@
 
 #include <ecl/web/parser_fsm.hpp>
 
+#include <ecl/str_const.hpp>
+
 namespace ecl
 {
 
 namespace web
 {
 
+template<std::size_t MAX_REQUEST_SIZE = 1024>
 class request_parser
 {
 public:
-    request* parse(char* raw, std::size_t size)
+    request* parse(request_raw_t raw)
     {
-        (void)size;
+        memset(m_request_raw, 0, MAX_REQUEST_SIZE);
+
         parser_state st = m_parser.process_event(rst());
 
-        char* current = raw;
-        char* next = nullptr;
+        std::size_t r_size = strlen(raw);
+
+        if(r_size > MAX_REQUEST_SIZE)
+        {
+            return nullptr;
+        }
+
+        strncpy(m_request_raw, raw, MAX_REQUEST_SIZE - 1);
+
+        char* current = m_request_raw;
+        char* next    = nullptr;
         char* next_cr = nullptr;
         char* next_lf = nullptr;
 
@@ -69,11 +82,13 @@ public:
     }
 
 private:
-    parser_fsm        m_parser {};
+    char                       m_request_raw [MAX_REQUEST_SIZE];
 
-    const char* const m_crlf = "\r\n";
-    const char* const m_cr   = "\r";
-    const char* const m_lf   = "\n";
+    parser_fsm                 m_parser {};
+
+    str_const m_crlf { "\r\n" };
+    str_const m_cr   { "\r"   };
+    str_const m_lf   { "\n"   };
 };
 
 } // namespace web

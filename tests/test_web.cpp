@@ -12,6 +12,7 @@
 
 // include generated sources
 #include "web_resources/index_html.h"
+#include "web_resources/authorized_index_html.h"
 #include "web_resources/style_css.h"
 #include "web_resources/jquery_js.h"
 #include "web_resources/icon_png.h"
@@ -24,20 +25,21 @@
 
 namespace name
 {
-    ECL_DECL_NAME_TYPE_STRING(index_1,   "/")
-    ECL_DECL_NAME_TYPE_STRING(index_2,   "/index.html")
-    ECL_DECL_NAME_TYPE_STRING(icon,      "/etc/img/icon.png")
-    ECL_DECL_NAME_TYPE_STRING(favicon,   "/favicon.png")
-    ECL_DECL_NAME_TYPE_STRING(style,     "/etc/style.css")
-    ECL_DECL_NAME_TYPE_STRING(jquery,    "/etc/js/jquery.js")
-    ECL_DECL_NAME_TYPE_STRING(info,      "/info")
-    ECL_DECL_NAME_TYPE_STRING(auth,      "/auth")
-    ECL_DECL_NAME_TYPE_STRING(json_data, "/json_data")
+    ECL_DECL_NAME_TYPE_STRING(index_1,          "/")
+    ECL_DECL_NAME_TYPE_STRING(index_2,          "/index.html")
+    ECL_DECL_NAME_TYPE_STRING(authorized_index, "/authorized_index.html")
+    ECL_DECL_NAME_TYPE_STRING(icon,             "/etc/img/icon.png")
+    ECL_DECL_NAME_TYPE_STRING(favicon,          "/favicon.png")
+    ECL_DECL_NAME_TYPE_STRING(style,            "/etc/style.css")
+    ECL_DECL_NAME_TYPE_STRING(jquery,           "/etc/js/jquery.js")
+    ECL_DECL_NAME_TYPE_STRING(info,             "/info")
+    ECL_DECL_NAME_TYPE_STRING(auth,             "/auth")
+    ECL_DECL_NAME_TYPE_STRING(json_data,        "/json_data")
 
-    ECL_DECL_NAME_TYPE_STRING(page_400,  "/400.html")
-    ECL_DECL_NAME_TYPE_STRING(page_403,  "/403.html")
-    ECL_DECL_NAME_TYPE_STRING(page_404,  "/404.html")
-    ECL_DECL_NAME_TYPE_STRING(page_500,  "/500.html")
+    ECL_DECL_NAME_TYPE_STRING(page_400,         "/400.html")
+    ECL_DECL_NAME_TYPE_STRING(page_403,         "/403.html")
+    ECL_DECL_NAME_TYPE_STRING(page_404,         "/404.html")
+    ECL_DECL_NAME_TYPE_STRING(page_500,         "/500.html")
 
     ECL_DECL_NAME_TYPE(json_1)
     ECL_DECL_NAME_TYPE(json_2)
@@ -69,18 +71,18 @@ class settings : public ecl::web::cgi<NAME...>
 {
 private:
     using document_t = ecl::json::object<
-        ecl::json::node<name::val_1, int8_t                >,
-        ecl::json::node<name::val_2, uint8_t               >,
-        ecl::json::node<name::val_3, ecl::json::string<8>  >,
-        ecl::json::node<name::val_4, int64_t               >,
-        ecl::json::node<name::val_5, uint64_t              >
+        ecl::json::node<name::val_1, int8_t               >,
+        ecl::json::node<name::val_2, uint8_t              >,
+        ecl::json::node<name::val_3, ecl::json::string<8> >,
+        ecl::json::node<name::val_4, int64_t              >,
+        ecl::json::node<name::val_5, uint64_t             >
     >;
 
     document_t m_doc;
 
 public:
     template<typename T>
-    ecl::web::request* exec(T& st, ecl::web::request* req)
+    const char* exec(T& st, ecl::web::request* req)
     {
         (void)st;
 
@@ -107,7 +109,7 @@ public:
             }
         }
 
-        return this->redirect(req, "/400.html", nullptr, ecl::web::method::GET);
+        return "GET /400.html HTTP/1.1\n\r";
     }
 };
 
@@ -123,7 +125,7 @@ private:
 
 public:
     template<typename T>
-    ecl::web::request* exec(T& st, ecl::web::request* req)
+    const char* exec(T& st, ecl::web::request* req)
     {
         ecl::web::constants::write_status_line(st, req->ver, ecl::web::OK);
 
@@ -149,19 +151,35 @@ private:
     uint32_t   m_counter { 0 };
 };
 
+static bool authorized = false;
+
 template<typename... NAME>
 class auth : public ecl::web::cgi<NAME...>
 {
 public:
     template<typename T>
-    ecl::web::request* exec(T& st, ecl::web::request* req)
+    const char* exec(T& st, ecl::web::request* req)
     {
-        std::cout << req->uri << std::endl;
-        std::cout << req->uri_param << std::endl;
+        std::cout << req->uri              << std::endl;
+        std::cout << req->uri_param_string << std::endl;
+        for(auto& p : req->uri_parameters)
+        {
+            if(p.name != nullptr)
+            {
+                std::cout << p.name << " : " << p.value << std::endl;
+            }
+        }
+
+        authorized = true;
 
         ecl::web::constants::write_status_line(st, req->ver, ecl::web::OK);
 
-        return this->redirect(req, "/index.html", nullptr, ecl::web::method::GET);
+        if(authorized)
+        {
+            return "GET /authorized_index.html HTTP/1.1\n\r";
+        }
+
+        return "GET /index.html HTTP/1.1\n\r";
     }
 };
 
@@ -201,6 +219,13 @@ using server_t = ecl::web::server<
             ecl::web::OK,
             name::index_1, name::index_2
         >,
+// authorized_index
+        ecl::web::resource<
+            res_authorized_index_html_t,
+            ecl::web::TEXT_HTML,
+            ecl::web::OK,
+            name::authorized_index
+        >,
 // logo
         ecl::web::resource<
             res_icon_png_t,
@@ -239,7 +264,8 @@ using server_t = ecl::web::server<
         settings<
             name::json_data
         >
-    >
+    >,
+    1024
 >;
 
 static char buffer[1024];

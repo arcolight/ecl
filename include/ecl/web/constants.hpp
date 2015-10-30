@@ -70,12 +70,8 @@ enum content_type_header
     TEXT_PLAIN
 };
 
-struct constants
+namespace constants
 {
-    // typedef std::map<version, const char*>     version_map_t;
-    // typedef std::map<status_code, const char*> status_code_map_t;
-    // typedef std::map<method, const char*>      method_map_t;
-
     static const char* get_version(version v)
     {
         switch(v)
@@ -175,7 +171,7 @@ struct constants
         write_status<T>(st, code);
         st << "\r\n";
     }
-};
+} // namespace constants
 
 } // namespace web
 

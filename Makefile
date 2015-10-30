@@ -11,7 +11,7 @@ SECURE = -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 -ftrapv -Wformat-security -fPIE -
 
 CXXFLAGS = -std=c++11 -fPIC -fno-rtti -fno-exceptions -fvisibility=hidden $(SECURE) $(OPTIMIZATION) $(DEBUG)
 
-GCC_FLAGS = $(CXXFLAGS) $(GCC_WARNINGS) -fstack-check -fbounds-check -ggdb
+GCC_FLAGS = $(CXXFLAGS) $(GCC_WARNINGS) -fstack-protector -fstack-check -fbounds-check -ggdb
 CLANG_FLAGS = $(CXXFLAGS) $(CLANG_WARNINGS)
 
 FLAGS = $(CXXFLAGS) $(WARNINGS) $(ADD_FLAGS) $(ADD_WARN)
@@ -37,7 +37,7 @@ DOC_DIR = ./doc
 WEB_DEF_PAGES_DIR=./web_def_pages
 WEB_RES_SRC_DIR = ./tests/web_resources_src
 WEB_RES_GEN_DIR = ./tests/web_resources
-WEB_GEN_SOURCES = $(WEB_RES_GEN_DIR)/400_html.cpp $(WEB_RES_GEN_DIR)/403_html.cpp $(WEB_RES_GEN_DIR)/404_html.cpp $(WEB_RES_GEN_DIR)/500_html.cpp $(WEB_RES_GEN_DIR)/favicon_png.cpp $(WEB_RES_GEN_DIR)/icon_png.cpp $(WEB_RES_GEN_DIR)/index_html.cpp $(WEB_RES_GEN_DIR)/jquery_js.cpp $(WEB_RES_GEN_DIR)/style_css.cpp
+WEB_GEN_SOURCES = $(WEB_RES_GEN_DIR)/400_html.cpp $(WEB_RES_GEN_DIR)/403_html.cpp $(WEB_RES_GEN_DIR)/404_html.cpp $(WEB_RES_GEN_DIR)/500_html.cpp $(WEB_RES_GEN_DIR)/favicon_png.cpp $(WEB_RES_GEN_DIR)/icon_png.cpp $(WEB_RES_GEN_DIR)/index_html.cpp $(WEB_RES_GEN_DIR)/authorized_index_html.cpp $(WEB_RES_GEN_DIR)/jquery_js.cpp $(WEB_RES_GEN_DIR)/style_css.cpp
 
 all: tests
 
@@ -48,15 +48,16 @@ tests: tests_without_$(WEB) test_$(WEB)
 
 gen_web_res:
 	@mkdir -p $(WEB_RES_GEN_DIR)
-	./res_gen.sh $(WEB_DEF_PAGES_DIR)/400.html  $(WEB_RES_GEN_DIR)/
-	./res_gen.sh $(WEB_DEF_PAGES_DIR)/403.html  $(WEB_RES_GEN_DIR)/
-	./res_gen.sh $(WEB_DEF_PAGES_DIR)/404.html  $(WEB_RES_GEN_DIR)/
-	./res_gen.sh $(WEB_DEF_PAGES_DIR)/500.html  $(WEB_RES_GEN_DIR)/
-	./res_gen.sh $(WEB_RES_SRC_DIR)/index.html  $(WEB_RES_GEN_DIR)/
-	./res_gen.sh $(WEB_RES_SRC_DIR)/style.css   $(WEB_RES_GEN_DIR)/
-	./res_gen.sh $(WEB_RES_SRC_DIR)/icon.png    $(WEB_RES_GEN_DIR)/
-	./res_gen.sh $(WEB_RES_SRC_DIR)/favicon.png $(WEB_RES_GEN_DIR)/
-	./res_gen.sh $(WEB_RES_SRC_DIR)/jquery.js   $(WEB_RES_GEN_DIR)/
+	./res_gen.sh $(WEB_DEF_PAGES_DIR)/400.html            $(WEB_RES_GEN_DIR)/
+	./res_gen.sh $(WEB_DEF_PAGES_DIR)/403.html            $(WEB_RES_GEN_DIR)/
+	./res_gen.sh $(WEB_DEF_PAGES_DIR)/404.html            $(WEB_RES_GEN_DIR)/
+	./res_gen.sh $(WEB_DEF_PAGES_DIR)/500.html            $(WEB_RES_GEN_DIR)/
+	./res_gen.sh $(WEB_RES_SRC_DIR)/index.html            $(WEB_RES_GEN_DIR)/
+	./res_gen.sh $(WEB_RES_SRC_DIR)/authorized_index.html $(WEB_RES_GEN_DIR)/
+	./res_gen.sh $(WEB_RES_SRC_DIR)/style.css             $(WEB_RES_GEN_DIR)/
+	./res_gen.sh $(WEB_RES_SRC_DIR)/icon.png              $(WEB_RES_GEN_DIR)/
+	./res_gen.sh $(WEB_RES_SRC_DIR)/favicon.png           $(WEB_RES_GEN_DIR)/
+	./res_gen.sh $(WEB_RES_SRC_DIR)/jquery.js             $(WEB_RES_GEN_DIR)/
 
 tests_without_$(WEB): test_$(FSM) test_$(SG) test_$(CB) test_$(BF) test_$(SINGLETON) test_$(STREAM) test_$(JSON) test_$(STR_CONST) test_$(CMD)
 

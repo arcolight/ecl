@@ -68,8 +68,14 @@ class parser_fsm : public state_machine<parser_fsm,
         if(nullptr != uri_param_str)
         {
             *uri_param_str = 0x00; ++uri_param_str;
-            m_request.uri_param = uri_param_str;
+            m_request.uri_param_string = uri_param_str;
         }
+
+        // char* ptr = uri_param_str;
+        // while(*ptr != 0)
+        // {
+        //     ++ptr;
+        // }
 
         size_t method_str_len = strlen(method_str);
         if(0 == strncmp(method_str,

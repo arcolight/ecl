@@ -49,21 +49,6 @@ public:
     {
         return check_resource_internal<NAME...>(req);
     }
-
-protected:
-    request* redirect(request*     req_prev,
-                      const char*  uri,
-                      const char*  uri_param = nullptr,
-                      const method met       = method::GET,
-                      const char*  body      = nullptr)
-    {
-        req_prev->uri       = uri;
-        req_prev->uri_param = uri_param;
-        req_prev->met       = met;
-        req_prev->body      = body;
-
-        return req_prev;
-    }
 };
 
 } // namespace web

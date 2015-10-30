@@ -23,7 +23,7 @@ class resource_table : public PAGE_400,
 {
 public:
     template<typename T>
-    request* call(T& st, request* req)
+    request_raw_t call(T& st, request* req)
     {
         if(nullptr == req)
         {
@@ -39,7 +39,7 @@ public:
 
 private:
     template<typename T, typename RES, typename... TAIL>
-    request* call_internal(T& st, request* req)
+    request_raw_t call_internal(T& st, request* req)
     {
         if(RES::check_resource(req))
         {
@@ -50,7 +50,7 @@ private:
     }
 
     template<typename T>
-    request* call_internal(T& st, request* req)
+    request_raw_t call_internal(T& st, request* req)
     {
         return this->PAGE_404::template exec<T>(st, req);
     }
