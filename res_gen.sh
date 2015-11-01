@@ -1,5 +1,9 @@
 #!/bin/sh
 
+XXD=xxd
+
+type -P $XXD &>/dev/null || { echo "$XXD command not found."; exit 1; }
+
 if [ $# -lt 2 ] ; then
     echo "Usage: ./res_gen.sh RES_FILE OUT_DIR";
     exit 1
@@ -35,18 +39,18 @@ SOURCE_FILE=$OUT_DIR/$SOURCE_NAME
 
 HEADER_GUARD_PREF="WEB_RES_GENERATED"
 HEADER_GUARD_DEF=$HEADER_GUARD_PREF\_$(echo $HEADER_NAME | tr '.' '_' | tr [:lower:] [:upper:])
-echo "#ifndef $HEADER_GUARD_DEF"                                                   >  $HEADER_FILE
-echo "#define $HEADER_GUARD_DEF"                                                   >> $HEADER_FILE
-echo ""                                                                            >> $HEADER_FILE
-echo "#include <cstddef>"                                                          >> $HEADER_FILE
-echo ""                                                                            >> $HEADER_FILE
-echo "typedef struct $STRUCT_NAME"                                                 >> $HEADER_FILE
-echo "{"                                                                           >> $HEADER_FILE
-echo -n "    static constexpr "                                                    >> $HEADER_FILE
-xxd -i $RES_FILE | sed 's/[a-z_0-9]*_len/size/' | sed 's/[a-z_0-9]*\[\]/data\[\]/' >> $HEADER_FILE
-echo "} ${STRUCT_NAME_TPD};"                                                       >> $HEADER_FILE
-echo ""                                                                            >> $HEADER_FILE
-echo "#endif // $HEADER_GUARD_DEF"                                                 >> $HEADER_FILE
+echo "#ifndef $HEADER_GUARD_DEF"                                                    >  $HEADER_FILE
+echo "#define $HEADER_GUARD_DEF"                                                    >> $HEADER_FILE
+echo ""                                                                             >> $HEADER_FILE
+echo "#include <cstddef>"                                                           >> $HEADER_FILE
+echo ""                                                                             >> $HEADER_FILE
+echo "typedef struct $STRUCT_NAME"                                                  >> $HEADER_FILE
+echo "{"                                                                            >> $HEADER_FILE
+echo -n "    static constexpr "                                                     >> $HEADER_FILE
+$XXD -i $RES_FILE | sed 's/[a-z_0-9]*_len/size/' | sed 's/[a-z_0-9]*\[\]/data\[\]/' >> $HEADER_FILE
+echo "} ${STRUCT_NAME_TPD};"                                                        >> $HEADER_FILE
+echo ""                                                                             >> $HEADER_FILE
+echo "#endif // $HEADER_GUARD_DEF"                                                  >> $HEADER_FILE
 
 echo " * $HEADER_FILE generated"
 

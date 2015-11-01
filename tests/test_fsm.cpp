@@ -23,25 +23,27 @@ void out_state(st s);
 
 class test_fsm : public ecl::state_machine<test_fsm, st, st::s_1>
 {
-    void on_ev_1  (const ev_1& e) { (void)(e); std::cout << "event 1 -> ";   }
-    void on_ev_2  (const ev_2& e) { (void)(e); std::cout << "event 2 -> ";   }
-    void on_ev_3  (const ev_3& e) { (void)(e); std::cout << "event 3 -> ";   }
-    void on_ev_4  (const ev_4& e) { (void)(e); std::cout << "event 4 -> ";   }
-    void on_ev_5_1(const ev_5& e) { (void)(e); std::cout << "event 5_1 -> "; }
-    void on_ev_5_2(const ev_5& e) { (void)(e); std::cout << "event 5_2 -> "; }
-    void on_ev_6  (const ev_6& e) { (void)(e); std::cout << "event 6 -> ";   }
+    void on_ev_1  (const ev_1&)   { std::cout << "event 1 -> ";   }
+    void on_ev_2  (const ev_2&)   { std::cout << "event 2 -> ";   }
+    void on_ev_3  (const ev_3&)   { std::cout << "event 3 -> ";   }
+    void on_ev_4  (const ev_4&)   { std::cout << "event 4 -> ";   }
+    void on_ev_5_1(const ev_5&)   { std::cout << "event 5_1 -> "; }
+    void on_ev_5_2(const ev_5&)   { std::cout << "event 5_2 -> "; }
+    void on_ev_6  (const ev_6&)   { std::cout << "event 6 -> ";   }
 
-    bool g_ev_1  (const ev_1& e) { (void)(e); std::cout << "guard 1 -> ";     return true;    }
-    bool g_ev_2  (const ev_2& e) { (void)(e); std::cout << "guard 2 -> ";     return true;    }
-    bool g_ev_3  (const ev_3& e) { (void)(e); std::cout << "guard 3 -> ";     return true;    }
-    bool g_ev_4  (const ev_4& e) { (void)(e); std::cout << "guard 4 -> ";     return true;    }
-    bool g_ev_5_1(const ev_5& e) { (void)(e); std::cout << "guard 5_1 -> ";   return e.val;   }
-    bool g_ev_5_2(const ev_5& e) { (void)(e); std::cout << "guard 5_2 -> ";   return ! e.val; }
-    bool g_ev_6  (const ev_6& e) { (void)(e); std::cout << "guard 6 -> ";     return true;    }
+    bool g_ev_1   (const ev_1&)   { std::cout << "guard 1 -> ";   return true;    }
+    bool g_ev_2   (const ev_2&)   { std::cout << "guard 2 -> ";   return true;    }
+    bool g_ev_3   (const ev_3&)   { std::cout << "guard 3 -> ";   return true;    }
+    bool g_ev_4   (const ev_4&)   { std::cout << "guard 4 -> ";   return true;    }
+    bool g_ev_5_1 (const ev_5& e) { std::cout << "guard 5_1 -> "; return e.val;   }
+    bool g_ev_5_2 (const ev_5& e) { std::cout << "guard 5_2 -> "; return ! e.val; }
+    bool g_ev_6   (const ev_6&)   { std::cout << "guard 6 -> ";   return true;    }
+
     template<typename ev>
-    bool g_false (const ev& e)   { (void)(e); std::cout << "false guard -> "; return false;   }
+    bool g_false (const ev&) { std::cout << "false guard -> "; return false; }
+
     template<typename ev>
-    bool g_true (const ev& e)    { (void)(e); std::cout << "true guard -> ";  return true;    }
+    bool g_true (const ev&)  { std::cout << "true guard -> ";  return true;  }
 
     void on_s_1_enter() { std::cout << "s_1 enter -> "; }
     void on_s_1_exit()  { std::cout << "s_1 exit -> ";  }
@@ -57,18 +59,19 @@ class test_fsm : public ecl::state_machine<test_fsm, st, st::s_1>
     typedef test_fsm f;
 
     typedef transition_table<
-//          | Start  |Event|  Next  |   Callback   |    Guard    |
-// ---------|--------|-----|--------|--------------|-------------|
-        row< st::s_1, ev_1, st::s_2, &f::on_ev_1,   &f::g_ev_1    >,
-        row< st::s_2, ev_2, st::s_3, &f::on_ev_2,   &f::g_ev_2    >,
-        row< st::s_3, ev_3, st::s_4, &f::on_ev_3,   &f::g_ev_3    >,
-        row< st::s_4, ev_4, st::s_5, &f::on_ev_4,   &f::g_ev_4    >,
-        row< st::s_5, ev_5, st::s_1, &f::on_ev_5_1, &f::g_ev_5_1  >,
-        row< st::s_5, ev_5, st::s_3, &f::on_ev_5_2, &f::g_ev_5_2  >,
-// ---------+--------+-----+--------+--------------+-------------|
-        row< st::s_2, ev_6, st::s_4, &f::on_ev_6,   &f::g_ev_6    >,
-        row< st::s_3, ev_6, st::s_5, &f::on_ev_6                  >,
-        row< st::s_5, ev_6, st::s_1, &f::on_ev_6,   &f::g_false   >
+        //    Start    Event    Next       Callback        Guard
+        //  +---------+------+---------+---------------+---------------+
+        row < st::s_1 , ev_1 , st::s_2 , &f::on_ev_1   , &f::g_ev_1    >,
+        row < st::s_2 , ev_2 , st::s_3 , &f::on_ev_2   , &f::g_ev_2    >,
+        row < st::s_3 , ev_3 , st::s_4 , &f::on_ev_3   , &f::g_ev_3    >,
+        row < st::s_4 , ev_4 , st::s_5 , &f::on_ev_4   , &f::g_ev_4    >,
+        row < st::s_5 , ev_5 , st::s_1 , &f::on_ev_5_1 , &f::g_ev_5_1  >,
+        row < st::s_5 , ev_5 , st::s_3 , &f::on_ev_5_2 , &f::g_ev_5_2  >,
+        //  +---------+------+---------+---------------+---------------+
+        row < st::s_2 , ev_6 , st::s_4 , &f::on_ev_6   , &f::g_ev_6    >,
+        row < st::s_3 , ev_6 , st::s_5 , &f::on_ev_6                   >,
+        row < st::s_5 , ev_6 , st::s_1 , &f::on_ev_6   , &f::g_false   >
+        //  +---------+------+---------+---------------+---------------+
     > transition_table_t;
 
     typedef callback_table<

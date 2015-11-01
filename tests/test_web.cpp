@@ -82,7 +82,7 @@ private:
 
 public:
     template<typename T>
-    const char* exec(T& st, ecl::web::request* req)
+    const ecl::web::request* exec(T& st, const ecl::web::request* req)
     {
         (void)st;
 
@@ -109,7 +109,7 @@ public:
             }
         }
 
-        return "GET /400.html HTTP/1.1\n\r";
+        return this->redirect("/400.html");
     }
 };
 
@@ -125,7 +125,7 @@ private:
 
 public:
     template<typename T>
-    const char* exec(T& st, ecl::web::request* req)
+    const ecl::web::request* exec(T& st, const ecl::web::request* req)
     {
         ecl::web::constants::write_status_line(st, req->ver, ecl::web::OK);
 
@@ -158,7 +158,7 @@ class auth : public ecl::web::cgi<NAME...>
 {
 public:
     template<typename T>
-    const char* exec(T& st, ecl::web::request* req)
+    const ecl::web::request* exec(T& st, const ecl::web::request* req)
     {
         std::cout << req->uri              << std::endl;
         std::cout << req->uri_param_string << std::endl;
@@ -176,10 +176,10 @@ public:
 
         if(authorized)
         {
-            return "GET /authorized_index.html HTTP/1.1\n\r";
+            return this->redirect("/authorized_index.html");
         }
 
-        return "GET /index.html HTTP/1.1\n\r";
+        return nullptr;
     }
 };
 
@@ -371,7 +371,7 @@ void start_server(const char* port)
         buffer[bytes_recieved] = 0;
         std::cout << buffer << std::endl;
 
-        ecl::stream<1024, write_sock> out_stream;
+        ecl::stream<1024> out_stream(write_sock);
         server.process_request(buffer, static_cast<std::size_t>(bytes_recieved), out_stream);
         out_stream.flush();
 

@@ -19,7 +19,7 @@ template<std::size_t MAX_REQUEST_SIZE = 1024>
 class request_parser
 {
 public:
-    request* parse(request_raw_t raw)
+    const request* parse(request_raw_t raw)
     {
         memset(m_request_raw, 0, MAX_REQUEST_SIZE);
 

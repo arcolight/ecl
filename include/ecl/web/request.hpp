@@ -1,18 +1,18 @@
 #ifndef ECL_WEB_REQUEST_HPP
 #define ECL_WEB_REQUEST_HPP
 
+#include <cstddef>
+
 #include <ecl/web/constants.hpp>
 #include <ecl/web/headers.hpp>
 #include <ecl/web/uri_param.hpp>
 
 #ifndef MAX_HEADERS_COUNT
-#define MAX_HEADERS_COUNT 64
-// #pragma message "[ECL web/headers.hpp] Defaulting to Max headers coubtn = 64"
+#define MAX_HEADERS_COUNT 64u
 #endif
 
 #ifndef MAX_URI_PARAMETERS
-#define MAX_URI_PARAMETERS 64
-// #pragma message "[ECL web/headers.hpp] Defaulting to Max headers coubtn = 64"
+#define MAX_URI_PARAMETERS 64u
 #endif
 
 namespace ecl
@@ -57,14 +57,20 @@ struct request
         return MAX_HEADERS_COUNT;
     }
 
-    method         met                         { method::GET  };
-    version        ver                         { version::HTTP10 };
-    const char*    uri                         { nullptr };
-    const char*    uri_param_string            { nullptr };
+    constexpr static std::size_t max_uri_parameters_count()             noexcept
+    {
+        return MAX_URI_PARAMETERS;
+    }
+
+    method         met                                 { method::GET     };
+    version        ver                                 { version::HTTP10 };
+    const char*    uri                                 { nullptr         };
+    const char*    uri_param_string                    { nullptr         };
     uri_param      uri_parameters[MAX_URI_PARAMETERS];
-    const char*    body                        { nullptr };
+    std::size_t    uri_parameters_count                { 0               };
+    const char*    body                                { nullptr         };
     header         headers[MAX_HEADERS_COUNT];
-    std::size_t    headers_count               { 0 };
+    std::size_t    headers_count                       { 0               };
 };
 
 } // namespace web

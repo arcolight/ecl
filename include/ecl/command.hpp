@@ -119,7 +119,9 @@ public:
                           std::size_t indent,
                           std::size_t indent_inc = DEFAULT_INDENT_INCREMENT)
                                               noexcept(
-                                                  noexcept(print_indent) &&
+                                                  noexcept(
+                                                      print_indent(st,
+                                                                   indent)) &&
                                                   noexcept(st.operator<<("")) &&
                                                   noexcept(name())
                                               )

@@ -1,9 +1,13 @@
 #ifndef ECL_WEB_PARSER_FSM_HPP
 #define ECL_WEB_PARSER_FSM_HPP
 
+#include <cstring>
+
 #include <ecl/fsm.hpp>
 
 #include <ecl/web/request.hpp>
+
+#include <ecl/web/parser_uri_param_fsm.hpp>
 
 namespace ecl
 {
@@ -30,7 +34,6 @@ struct event_line
 };
 struct empty_line {};
 struct end_of_req {};
-struct rst        {};
 
 class parser_fsm : public state_machine<parser_fsm,
                                         parser_state,
@@ -69,13 +72,15 @@ class parser_fsm : public state_machine<parser_fsm,
         {
             *uri_param_str = 0x00; ++uri_param_str;
             m_request.uri_param_string = uri_param_str;
-        }
 
-        // char* ptr = uri_param_str;
-        // while(*ptr != 0)
-        // {
-        //     ++ptr;
-        // }
+            if(uri_parameters_parser_state::done !=
+                   m_uri_param_parser.start_parse(uri_param_str,
+                                                  m_request.uri_parameters,
+                                                  MAX_URI_PARAMETERS))
+            {
+                return false;
+            }
+        }
 
         size_t method_str_len = strlen(method_str);
         if(0 == strncmp(method_str,
@@ -159,10 +164,10 @@ class parser_fsm : public state_machine<parser_fsm,
         return true;
     }
 
-    typedef parser_state s;
-    typedef parser_fsm   p;
+    using s = parser_state;
+    using p = parser_fsm;
 
-    typedef transition_table<
+    using transition_table_t = transition_table<
         row< s::init,                event_line, s::request_line_parsed, nullptr, &p::g_request_line_parse >,
         row< s::request_line_parsed, event_line, s::header_parse,        nullptr, &p::g_header_parse       >,
         row< s::header_parse,        event_line, s::header_parse,        nullptr, &p::g_header_parse       >,
@@ -176,11 +181,11 @@ class parser_fsm : public state_machine<parser_fsm,
         row< s::headers_parsed,      rst,        s::init,                nullptr, nullptr                  >,
         row< s::body_parsed,         rst,        s::init,                nullptr, nullptr                  >,
         row< s::complete,            rst,        s::init,                nullptr, nullptr                  >
-    > transition_table_t;
+    >;
 
-    typedef callback_table<
+    using callback_table_t = callback_table<
         scb< s::init, &p::on_init_enter, nullptr >
-    > callback_table_t;
+    >;
 
 public:
     template<typename event_t>
@@ -189,13 +194,14 @@ public:
         return transition<event_t, transition_table_t, callback_table_t>(e);
     }
 
-    request* get_request_ptr()
+    const request* get_request_ptr()
     {
         return &m_request;
     }
 
 private:
-    request m_request {};
+    uri_parameter_parser_fsm m_uri_param_parser {};
+    request                  m_request          {};
 };
 
 } // namespace web

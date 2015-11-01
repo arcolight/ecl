@@ -24,3 +24,9 @@
 bin/*
 tests/web_resources/*
 doc/*
+
+ecl.config
+ecl.creator
+ecl.creator.user
+ecl.files
+ecl.includes

@@ -17,6 +17,7 @@
 #include <cctype>
 
 #include <type_traits>
+#include <functional>
 
 #ifdef ECL_WITH_STD_STRING
 #include <string>
@@ -35,12 +36,12 @@ namespace ecl
  * @endcode
  *
  */
-typedef enum class base {
+enum class base {
     h,
     d,
     o,
     b
-} base;
+};
 
 /**
  * @brief Alpha case.
@@ -50,21 +51,21 @@ typedef enum class base {
  * @endcode
  *
  */
-typedef enum class alpha_case {
+enum class alpha_case {
     lower,
     upper
-} cs;
+};
 
 /**
  * @brief Field width.
  *
  */
-typedef struct width
+struct width
 {
     explicit width(std::size_t w) : m_w(w) {}
 
     std::size_t m_w;
-} wd;
+};
 
 /**
  * @brief end object
@@ -78,13 +79,13 @@ struct end {};
 struct reset {};
 
 /**
- * @brief typedef for overflow callback.
+ * @brief alias for overflow callback.
  *
  * @param buf pointer to buffer.
  * @param size size of data.
  *
  */
-typedef void(*flush_function_t)(const char* const buf, std::size_t size);
+using flush_function_t = std::function<void(const char* const buf, std::size_t size)>;
 
 /**
  * @brief Stream class.
@@ -94,15 +95,28 @@ typedef void(*flush_function_t)(const char* const buf, std::size_t size);
  * @tparam FLUSH_F_PTR = nullptr Pointer to @ref flush_function_t
  * that will be called on internal buffer overflow.
  */
-template<std::size_t BUFFER_SIZE, flush_function_t FLUSH_F_PTR = nullptr>
-class stream{
+template<std::size_t BUFFER_SIZE>
+class stream
+{
 public:
-    explicit stream(const base   def_base = base::d,
-                    const std::size_t def_width = 8) :
-        m_def_base(def_base),
-        m_def_width(def_width)
+    explicit stream(flush_function_t  flush_function  = nullptr,
+                    const base        def_base        = base::d,
+                    const std::size_t def_width       = 8) :
+        m_flush_function ( flush_function ),
+        m_def_base       ( def_base       ),
+        m_def_width      ( def_width      )
     {
         reset();
+    }
+
+    /**
+     * @brief Reset Flush function pointer
+     *
+     * @param Flush function pointer
+     */
+    void set_flush_function(flush_function_t f)
+    {
+        m_flush_function = f;
     }
 
     /**
@@ -132,7 +146,7 @@ public:
      *
      * @param c Alpha case. @ref cs
      */
-    stream& operator() (const cs& c)
+    stream& operator() (const alpha_case& c)
     {
         m_case = c;
         return *this;
@@ -250,9 +264,9 @@ public:
         // For GCC 4.7. We can pass nullptr to stream. Check is needed.
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Waddress"
-        if(nullptr != FLUSH_F_PTR)
+        if(nullptr != m_flush_function)
         {
-            FLUSH_F_PTR(m_buf, m_count);
+            m_flush_function(m_buf, m_count);
         }
 #pragma GCC diagnostic pop
         reset();
@@ -331,7 +345,7 @@ private:
         }
 
         do {
-            m_num_buf[p] = (cs::upper == m_case) ?
+            m_num_buf[p] = (alpha_case::upper == m_case) ?
                            static_cast<char>(toupper(m_alphabet[tmp % bs])) :
                            m_alphabet[tmp % bs];
             tmp /= bs;
@@ -493,6 +507,8 @@ private:
     // can be used for all bases till 16.
     const char* m_alphabet = R"(0123456789abcdef)";
 
+    flush_function_t  m_flush_function { nullptr };
+
     char              m_num_buf[66] {}; // (u)int64_t in binary mode takes 64 characters
     char              m_buf[BUFFER_SIZE + 1] {};
     std::size_t       m_count { 0 };
@@ -500,9 +516,9 @@ private:
     const base        m_def_base;
     const std::size_t m_def_width;
 
-    base              m_base  { m_def_base  };
-    std::size_t       m_width { m_def_width };
-    cs                m_case  { cs::lower   };
+    base              m_base  { m_def_base        };
+    std::size_t       m_width { m_def_width       };
+    alpha_case        m_case  { alpha_case::lower };
 };
 
 } // namespace ecl

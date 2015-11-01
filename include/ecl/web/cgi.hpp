@@ -49,6 +49,22 @@ public:
     {
         return check_resource_internal<NAME...>(req);
     }
+
+protected:
+    const request* redirect(const char* uri, 
+                            method      m   = method::GET,
+                            version     v   = version::HTTP11)
+    {
+        m_redirect_request.clear();
+
+        m_redirect_request.met = m;
+        m_redirect_request.ver = v;
+        m_redirect_request.uri = uri;
+
+        return &m_redirect_request;
+    }
+
+    request m_redirect_request {};
 };
 
 } // namespace web

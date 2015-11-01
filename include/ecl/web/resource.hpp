@@ -24,7 +24,7 @@ class resource
 {
 public:
     template<typename T>
-    request_raw_t exec(T& st, request* req)                                const
+    const request* exec(T& st, const request* req)                         const
     {
         if(nullptr != req)
         {

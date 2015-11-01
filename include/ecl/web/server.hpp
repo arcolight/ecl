@@ -19,12 +19,12 @@ public:
     template<typename STREAM>
     void process_request(const char* req_raw, std::size_t, STREAM& st)
     {
+        const request* req = m_parser.parse(req_raw);
         do
         {
-            req_raw = m_resources.template call<STREAM>(st,
-                                                        m_parser.parse(req_raw));
+            req = m_resources.template call<STREAM>(st, req);
         }
-        while(req_raw != nullptr);
+        while(req != nullptr);
     }
 
     resources_t                      m_resources {};

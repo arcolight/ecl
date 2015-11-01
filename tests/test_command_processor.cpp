@@ -248,7 +248,7 @@ public:
 
 }
 
-typedef ecl::stream<1024> help_stream_t;
+using help_stream_t = ecl::stream<1024>;
 
 int main(int argc, char* argv[])
 {

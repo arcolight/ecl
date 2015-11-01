@@ -66,6 +66,16 @@ public:
         return m_p;
     }
 
+    const char* begin()                                           const noexcept
+    {
+        return m_p;
+    }
+
+    const char* end()                                             const noexcept
+    {
+        return m_p + m_sz;
+    }
+
 private:
     str_const(const str_const& other)                                  = delete;
     str_const& operator= (const str_const& other)                      = delete;

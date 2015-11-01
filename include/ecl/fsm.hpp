@@ -45,7 +45,7 @@ protected:
         using guard_t  = bool (derived::*)(const event_t&);
 
     protected:
-        typedef struct transition_info
+        using transition_info_t = struct transition_info
         {
             action_t action;
             guard_t  guard;
@@ -53,7 +53,7 @@ protected:
             state_t  next;
 
             struct transition_info* link;
-        } transition_info_t;
+        };
 
     private:
         transition_layer(const transition_layer& other)                = delete;
