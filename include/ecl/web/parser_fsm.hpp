@@ -7,7 +7,7 @@
 
 #include <ecl/web/request.hpp>
 
-#include <ecl/web/parser_uri_param_fsm.hpp>
+#include <ecl/web/parser_kv_pairs.hpp>
 
 namespace ecl
 {
@@ -74,7 +74,7 @@ class parser_fsm : public state_machine<parser_fsm,
             *uri_param_str = 0x00; ++uri_param_str;
             m_request.uri_param_string = uri_param_str;
 
-            if(uri_parameters_parser_state::done !=
+            if(kv_parser_state::done !=
                    m_uri_param_parser.start_parse(uri_param_str,
                                                   m_request.uri_parameters,
                                                   MAX_URI_PARAMETERS))
@@ -179,7 +179,8 @@ class parser_fsm : public state_machine<parser_fsm,
     using s = parser_state;
     using p = parser_fsm;
 
-    using transition_table_t = transition_table<
+    using transition_table_t = transition_table
+    <
         row< s::init,                event_line, s::request_line_parsed, nullptr, &p::g_request_line_parse >,
         row< s::request_line_parsed, event_line, s::header_parse,        nullptr, &p::g_header_parse       >,
         row< s::header_parse,        event_line, s::header_parse,        nullptr, &p::g_header_parse       >,
@@ -195,8 +196,9 @@ class parser_fsm : public state_machine<parser_fsm,
         row< s::complete,            rst,        s::init,                nullptr, nullptr                  >
     >;
 
-    using callback_table_t = callback_table<
-        scb< s::init, &p::on_init_enter, nullptr >
+    using callback_table_t = callback_table
+    <
+        scb< s::init, &p::on_init_enter >
     >;
 
 public:
@@ -212,7 +214,14 @@ public:
     }
 
 private:
-    uri_parameter_parser_fsm m_uri_param_parser {};
+    kv_parser m_uri_param_parser
+    {
+        str_const("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"),
+        str_const("%+.-"),
+        str_const("="),
+        str_const("&;")
+    };
+
     request                  m_request          {};
 };
 

@@ -9,13 +9,13 @@ namespace web
 
 struct uri_param
 {
-    char* name  { nullptr };
-    char* value { nullptr };
+    const char* name  { "" };
+    const char* value { "" };
 
     void clear()                                                        noexcept
     {
-        name =  nullptr;
-        value = nullptr;
+        name =  "";
+        value = "";
     }
 };
 

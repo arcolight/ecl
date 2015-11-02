@@ -1,5 +1,5 @@
 ARM_LD_FLAGS = --specs=rdimon.specs
-OPTIMIZATION = -O0
+OPTIMIZATION = -O1
 DEBUG = -g3
 
 GCC_WARNINGS = -Wall -Wextra -pedantic -Wswitch -Wnon-virtual-dtor

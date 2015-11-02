@@ -88,17 +88,9 @@ public:
 
         for(auto& h : req->headers)
         {
-            if(h.name == nullptr || h.value == nullptr)
-            {
-                continue;
-            }
-
-            std::cout << "Checking header: " << h.name << " : " << h.value << std::endl;
-
             if((0 == strcmp(ecl::web::constants::get_header_name(ecl::web::CONTENT_TYPE), h.name)) &&
                (nullptr != strstr(h.value, ecl::web::constants::get_content_type(ecl::web::APPLICATION_JSON))))
             {
-                std::cout << "Trying to deserialize " << req->body << std::endl;
                 if(m_doc.deserialize(req->body))
                 {
                     m_doc.serialize(std::cout, true);
@@ -152,8 +144,6 @@ private:
     uint32_t   m_counter { 0 };
 };
 
-static bool authorized = false;
-
 template<typename... NAME>
 class auth : public ecl::web::cgi<NAME...>
 {
@@ -161,22 +151,65 @@ public:
     template<typename T>
     const ecl::web::request* exec(T& st, const ecl::web::request* req)
     {
-        std::cout << req->uri              << std::endl;
-        std::cout << req->uri_param_string << std::endl;
-        for(auto& p : req->uri_parameters)
+        // std::cout << req->uri              << std::endl;
+        // std::cout << req->uri_param_string << std::endl;
+        // for(auto& p : req->uri_parameters)
+        // {
+        //     if(p.name != nullptr)
+        //     {
+        //         std::cout << p.name << " : " << p.value << std::endl;
+        //     }
+        // }
+
+        char buf[128];
+
+        if(strlen(req->body) < 128)
         {
-            if(p.name != nullptr)
+            strcpy(buf, req->body);
+        }
+        else
+        {
+            std::cout << "Too big body :(" << std::endl;
+            return nullptr;
+        }
+
+        ecl::web::uri_param params[16];
+
+        if(ecl::web::kv_parser_state::done !=
+               m_parser.start_parse(buf, params, 16))
+        {
+            std::cout << "Parse failed!" << std::endl;
+            authorized = false;
+        }
+        else
+        {
+            std::cout << "Parse ok!" << std::endl;
+            authorized = false;
+            for(std::size_t i = 0; i < 16; ++i)
             {
-                std::cout << p.name << " : " << p.value << std::endl;
+                if((0 == strcmp(params[i].name, "pass")) &&
+                   (0 == strcmp(params[i].value, "239")))
+                {
+                    authorized = true;
+                    ecl::web::redirect(st, "/authorized_index.html", req->ver);
+                    return nullptr;
+                }
             }
         }
 
-        authorized = true;
-
-        ecl::web::redirect(st, "/authorized_index.html", req->ver);
-
+        ecl::web::redirect(st, "/index.html", req->ver);
         return nullptr;
     }
+
+private:
+    bool authorized { false };
+    ecl::web::kv_parser m_parser
+    {
+        ecl::str_const("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"),
+        ecl::str_const("%+.-"),
+        ecl::str_const("="),
+        ecl::str_const("&;")
+    };
 };
 
 using server_t = ecl::web::server

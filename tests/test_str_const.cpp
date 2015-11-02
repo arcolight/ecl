@@ -10,6 +10,7 @@ int main(int argc, char* argv[])
     (void)(argv);
 
     constexpr str_const test("test!");
+    constexpr str_const test2(test);
 
     std::cout << test << std::endl;
 

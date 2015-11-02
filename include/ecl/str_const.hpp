@@ -35,6 +35,10 @@ public:
         : m_p(str), m_sz(N)
     {}
 
+    constexpr str_const(const str_const& other)                         noexcept
+        : m_p(other.m_p), m_sz(other.m_sz)
+    {}
+
     /**
      * @brief Access by index operator.
      *
@@ -87,7 +91,6 @@ public:
     }
 
 private:
-    str_const(const str_const& other)                                  = delete;
     str_const& operator= (const str_const& other)                      = delete;
     str_const(const str_const&& other)                                 = delete;
     str_const& operator= (const str_const&& other)                     = delete;
