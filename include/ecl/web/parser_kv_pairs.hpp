@@ -184,10 +184,9 @@ private:
     }
 
 public:
-
     kv_parser_state start_parse(char*       uri_p_str,
-                                            uri_param*  params,
-                                            std::size_t max_params)
+                                uri_param*  params,
+                                std::size_t max_params)
     {
         m_token            = uri_p_str;
         m_params           = params;
@@ -234,6 +233,7 @@ public:
         return state();
     }
 
+private:
     // TODO: First key name symbol not digit!
     str_const m_token_chars                  { "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_" };
     str_const m_value_additional_token_chars { "%+.-" };
