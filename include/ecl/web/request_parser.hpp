@@ -36,30 +36,28 @@ public:
 
         char* current = m_request_raw;
         char* next    = nullptr;
-        char* next_cr = nullptr;
-        char* next_lf = nullptr;
 
         do
         {
-            next    = strstr(current, m_crlf);
-            next_cr = strstr(current, m_cr);
-            next_lf = strstr(current, m_lf);
+            next = strchr(current, m_lf);
 
-            if(nullptr == next_cr || nullptr == next_lf)
+            if(nullptr != next)
             {
-                next = std::max(next_cr, next_lf);
+                if(*(next - 1) == m_cr)
+                {
+                    *(next - 1) = 0;
+                }
+
+                *next = 0;
+                ++next;
             }
 
-            if(nullptr == next)
-            {
-                st = m_parser.process_event(end_of_req());
-                break;
-            }
+            bool is_empty_line = (0 == strlen(current));
 
-            bool is_empty_line = (next == current);
-
-            *next = 0x00; ++next;
-            *next = 0x00; ++next;
+//            std::cout << "Current   " << current << std::endl;
+//            std::cout << "Next      " << next    << std::endl;
+//            std::cout << "Empy line " << is_empty_line << std::endl;
+//            std::cout << "-----" << std::endl;
 
             if(is_empty_line)
             {
@@ -68,6 +66,12 @@ public:
             else
             {
                 st = m_parser.process_event(event_line { current });
+            }
+
+            if(nullptr == next)
+            {
+                st = m_parser.process_event(end_of_req());
+                break;
             }
 
             current = next;
@@ -86,9 +90,8 @@ private:
 
     parser_fsm                 m_parser {};
 
-    str_const m_crlf { "\r\n" };
-    str_const m_cr   { "\r"   };
-    str_const m_lf   { "\n"   };
+    const char m_cr   { '\r'   };
+    const char m_lf   { '\n'   };
 };
 
 } // namespace web

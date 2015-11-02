@@ -21,6 +21,7 @@ enum class parser_state
     request_line_parsed,
     header_parse,
     headers_parsed,
+    wait_for_body,
     body_parsed,
     complete
 };
@@ -145,6 +146,17 @@ class parser_fsm : public state_machine<parser_fsm,
 
         *value = 0x00; ++value;
 
+        while(*name == ' ')
+        {
+            *name = 0;
+            ++name;
+        }
+        while(*value == ' ')
+        {
+            *value = 0;
+            ++value;
+        }
+
         m_request.headers[m_request.headers_count].name  = name;
         m_request.headers[m_request.headers_count].value = value;
         ++m_request.headers_count;
@@ -174,7 +186,7 @@ class parser_fsm : public state_machine<parser_fsm,
         row< s::header_parse,        empty_line, s::headers_parsed,      nullptr, nullptr                  >,
         row< s::headers_parsed,      end_of_req, s::complete,            nullptr, nullptr                  >,
         row< s::headers_parsed,      event_line, s::body_parsed,         nullptr, &p::g_body_parsed        >,
-        row< s::body_parsed,         empty_line, s::complete,            nullptr, nullptr                  >,
+        row< s::body_parsed,         end_of_req, s::complete,            nullptr, nullptr                  >,
 
         row< s::request_line_parsed, rst,        s::init,                nullptr, nullptr                  >,
         row< s::header_parse,        rst,        s::init,                nullptr, nullptr                  >,

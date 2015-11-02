@@ -66,11 +66,21 @@ public:
         return m_p;
     }
 
+    /**
+     * @brief begining of the string
+     *
+     * @return Pointer to begining of the constant string
+     */
     const char* begin()                                           const noexcept
     {
         return m_p;
     }
 
+    /**
+     * @brief end of the string
+     *
+     * @return Pointer to end of the constant string
+     */
     const char* end()                                             const noexcept
     {
         return m_p + m_sz;

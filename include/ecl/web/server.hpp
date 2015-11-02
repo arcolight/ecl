@@ -17,7 +17,7 @@ public:
     using resources_t = RESOURCES;
 
     template<typename STREAM>
-    void process_request(const char* req_raw, std::size_t, STREAM& st)
+    void process_request(STREAM& st, const char* req_raw, std::size_t)
     {
         const request* req = m_parser.parse(req_raw);
         do

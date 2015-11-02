@@ -90,7 +90,7 @@ class uri_parameter_parser_fsm : public state_machine
         return transition<event_t, transition_table_t, callback_table_t>(e);
     }
 
-    bool included_in_set(const char c, const str_const& set)
+    bool is_char_in_set(const char c, const str_const& set)
     {
         for(auto& sc: set)
         {
@@ -114,21 +114,23 @@ public:
         m_params_count     = 0;
         m_max_params_count = max_params;
 
+        return uri_parameters_parser_state::done;
+
         while(*uri_p_str != 0)
         {
-            if(included_in_set(*uri_p_str, m_token_chars))
+            if(is_char_in_set(*uri_p_str, m_token_chars))
             {
                 process_event(token_char());
             }
-            else if(included_in_set(*uri_p_str, m_value_additioanl_token_chars))
+            else if(is_char_in_set(*uri_p_str, m_value_additioanl_token_chars))
             {
                 process_event(value_add_token_char());
             }
-            else if(included_in_set(*uri_p_str, m_equal_chars))
+            else if(is_char_in_set(*uri_p_str, m_equal_chars))
             {
                 process_event(equal_sign());
             }
-            else if(included_in_set(*uri_p_str, m_delimiter_chars))
+            else if(is_char_in_set(*uri_p_str, m_delimiter_chars))
             {
                 process_event(delimiter());
             }
@@ -149,8 +151,8 @@ public:
     // TODO: First key name symbol not digit!
     str_const m_token_chars                  { "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789" };
     str_const m_value_additioanl_token_chars { "%+._-" };
-    str_const m_equal_chars                  { "=" };
-    str_const m_delimiter_chars              { "&;" };
+    str_const m_equal_chars                  { "="     };
+    str_const m_delimiter_chars              { "&;"    };
 
     char*       m_token            { nullptr };
     uri_param*  m_params           { nullptr };

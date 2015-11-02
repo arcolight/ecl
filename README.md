@@ -44,6 +44,35 @@ Simple CGI support.
 
 No gcc-arm-none-eabi demo. For such demo we need FreeRTOS, for example, and lwIP.
 
+build
+===
+
+Targets:
+
+    * all - all tests
+    * test_fsm
+    * test_scope_guard
+    * test_circular_buffer
+    * test_bitfield
+    * test_singleton
+    * test_stream
+    * test_json
+    * test_str_const
+    * test_command_processor
+    * test_web
+
+gcc:
+
+    make all
+
+clang:
+
+    CXX=clang++ make all
+
+arm-none-eabi-gcc:
+
+    CXX=arm-none-eabi-g++ ADD_FLAGS=--specs=rdimon.specs make tests_without_web
+
 tests
 ===
 

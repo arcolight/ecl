@@ -58,18 +58,19 @@
                     <script type="text/javascript">
                         $("#data_send").on("click", function() {
                             var jsonToSend = {
-                                val_1 : $("#val_1").val(),
-                                val_2 : $("#val_2").val(),
+                                val_1 : parseInt($("#val_1").val(), 10),
+                                val_2 : parseInt($("#val_2").val(), 10),
                                 val_3 : $("#val_3").val(),
-                                val_4 : $("#val_4").val(),
-                                val_5 : $("#val_5").val()
+                                val_4 : parseInt($("#val_4").val(), 10),
+                                val_5 : parseInt($("#val_5").val(), 10)
                             }
                             var dataToSend = JSON.stringify(jsonToSend);
                             $.ajax({
-                                url: "json_data",
+                                url: "settings",
                                 dataType :'json',
                                 type: "POST",
                                 data: dataToSend,
+                                contentType: "application/json",
                                 success: function(){}
                             });
                         });

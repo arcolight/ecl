@@ -34,7 +34,7 @@ namespace name
     ECL_DECL_NAME_TYPE_STRING(jquery,           "/etc/js/jquery.js")
     ECL_DECL_NAME_TYPE_STRING(info,             "/info")
     ECL_DECL_NAME_TYPE_STRING(auth,             "/auth")
-    ECL_DECL_NAME_TYPE_STRING(json_data,        "/json_data")
+    ECL_DECL_NAME_TYPE_STRING(settings,         "/settings")
 
     ECL_DECL_NAME_TYPE_STRING(page_400,         "/400.html")
     ECL_DECL_NAME_TYPE_STRING(page_403,         "/403.html")
@@ -71,8 +71,8 @@ class settings : public ecl::web::cgi<NAME...>
 {
 private:
     using document_t = ecl::json::object<
-        ecl::json::node<name::val_1, int8_t               >,
-        ecl::json::node<name::val_2, uint8_t              >,
+        ecl::json::node<name::val_1, int16_t              >,
+        ecl::json::node<name::val_2, uint16_t             >,
         ecl::json::node<name::val_3, ecl::json::string<8> >,
         ecl::json::node<name::val_4, int64_t              >,
         ecl::json::node<name::val_5, uint64_t             >
@@ -93,15 +93,16 @@ public:
                 continue;
             }
 
-            if((0 == strcmp(ecl::web::constants::get_header_name(ecl::web::CONTENT_TYPE),
-                            h.name)) &&
-               (0 == strcmp(ecl::web::constants::get_content_type(ecl::web::APPLICATION_JSON),
-                            h.value)))
+            std::cout << "Checking header: " << h.name << " : " << h.value << std::endl;
+
+            if((0 == strcmp(ecl::web::constants::get_header_name(ecl::web::CONTENT_TYPE), h.name)) &&
+               (nullptr != strstr(h.value, ecl::web::constants::get_content_type(ecl::web::APPLICATION_JSON))))
             {
+                std::cout << "Trying to deserialize " << req->body << std::endl;
                 if(m_doc.deserialize(req->body))
                 {
                     m_doc.serialize(std::cout, true);
-//                    return this->redirect(req, "/index.html", nullptr, ecl::web::method::GET);
+                    std::cout << std::endl;
                     return nullptr;
                 }
 
@@ -123,6 +124,8 @@ private:
         ecl::json::node<name::json_3, ecl::json::string<64> >
     >;
 
+    document_t m_doc {};
+
 public:
     template<typename T>
     const ecl::web::request* exec(T& st, const ecl::web::request* req)
@@ -135,7 +138,6 @@ public:
            << "\r\n";
         st << "\r\n";
 
-        (void)(req);
         m_doc.f<name::json_1>() = !m_doc.f<name::json_1>();
         m_doc.f<name::json_2>() = m_counter++;
         m_doc.f<name::json_3>() = "Test json string with \"escaped\" \\characters/.\n\r\tCR LF TAB.";
@@ -147,7 +149,6 @@ public:
     }
 
 private:
-    document_t m_doc {};
     uint32_t   m_counter { 0 };
 };
 
@@ -172,99 +173,39 @@ public:
 
         authorized = true;
 
-        ecl::web::constants::write_status_line(st, req->ver, ecl::web::OK);
-
-        if(authorized)
-        {
-            return this->redirect("/authorized_index.html");
-        }
+        ecl::web::redirect(st, "/authorized_index.html", req->ver);
 
         return nullptr;
     }
 };
 
-using server_t = ecl::web::server<
-    ecl::web::resource_table<
+using server_t = ecl::web::server
+<
+    ecl::web::resource_table
+    <
+//                           Data container type          Type of resource           Gzip   Result code                      Name type
 // static resources
-        ecl::web::resource<
-            res_400_html_t,
-            ecl::web::TEXT_HTML,
-            ecl::web::BAD_REQUEST,
-            name::page_400
-        >,
-/*
-        ecl::web::resource<
-            res_403_html_t,
-            ecl::web::TEXT_HTML,
-            ecl::web::FORBIDDEN,
-            name::page_403
-        >,
-*/
-        ecl::web::resource<
-            res_404_html_t,
-            ecl::web::TEXT_HTML,
-            ecl::web::NOT_FOUND,
-            name::page_404
-        >,
-        ecl::web::resource<
-            res_500_html_t,
-            ecl::web::TEXT_HTML,
-            ecl::web::INTERNAL_SERVER_ERROR,
-            name::page_500
-        >,
+        ecl::web::resource < res_400_html_t,              ecl::web::TEXT_HTML,       false, ecl::web::BAD_REQUEST,           name::page_400               >,
+        ecl::web::resource < res_404_html_t,              ecl::web::TEXT_HTML,       false, ecl::web::NOT_FOUND,             name::page_404               >,
+        ecl::web::resource < res_500_html_t,              ecl::web::TEXT_HTML,       false, ecl::web::INTERNAL_SERVER_ERROR, name::page_500               >,
 // index
-        ecl::web::resource<
-            res_index_html_t,
-            ecl::web::TEXT_HTML,
-            ecl::web::OK,
-            name::index_1, name::index_2
-        >,
+        ecl::web::resource < res_index_html_t,            ecl::web::TEXT_HTML,       true,  ecl::web::OK,                    name::index_1, name::index_2 >,
 // authorized_index
-        ecl::web::resource<
-            res_authorized_index_html_t,
-            ecl::web::TEXT_HTML,
-            ecl::web::OK,
-            name::authorized_index
-        >,
+        ecl::web::resource < res_authorized_index_html_t, ecl::web::TEXT_HTML,       true,  ecl::web::OK,                    name::authorized_index       >,
 // logo
-        ecl::web::resource<
-            res_icon_png_t,
-            ecl::web::IMAGE_PNG,
-            ecl::web::OK,
-            name::icon
-        >,
+        ecl::web::resource < res_icon_png_t,              ecl::web::IMAGE_PNG,       true,  ecl::web::OK,                    name::icon                   >,
 // favicon
-        ecl::web::resource<
-            res_favicon_png_t,
-            ecl::web::IMAGE_PNG,
-            ecl::web::OK,
-            name::favicon
-        >,
+        ecl::web::resource < res_favicon_png_t,           ecl::web::IMAGE_PNG,       true,  ecl::web::OK,                    name::favicon                >,
 // CSS
-        ecl::web::resource<
-            res_style_css_t,
-            ecl::web::TEXT_CSS,
-            ecl::web::OK,
-            name::style
-        >,
+        ecl::web::resource < res_style_css_t,             ecl::web::TEXT_CSS,        true,  ecl::web::OK,                    name::style                  >,
 // jquery
-        ecl::web::resource<
-            res_jquery_js_t,
-            ecl::web::TEXT_JAVASCRIPT,
-            ecl::web::OK,
-            name::jquery
-        >,
+        ecl::web::resource < res_jquery_js_t,             ecl::web::TEXT_JAVASCRIPT, true,  ecl::web::OK,                    name::jquery                 >,
 // CGIs
-        info<
-            name::info
-        >,
-        auth<
-            name::auth
-        >,
-        settings<
-            name::json_data
-        >
+        info     < name::info     >,
+        auth     < name::auth     >,
+        settings < name::settings >
     >,
+// Max request size
     1024
 >;
 
@@ -372,7 +313,7 @@ void start_server(const char* port)
         std::cout << buffer << std::endl;
 
         ecl::stream<1024> out_stream(write_sock);
-        server.process_request(buffer, static_cast<std::size_t>(bytes_recieved), out_stream);
+        server.process_request(out_stream, buffer, static_cast<std::size_t>(bytes_recieved));
         out_stream.flush();
 
         close(new_sd);

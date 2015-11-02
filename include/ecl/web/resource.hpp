@@ -17,6 +17,7 @@ namespace web
 
 template<typename            RES_DATA,
          content_type_header TYPE,
+         bool                GZIP_COMPRESSED,
          status_code         CODE,
          typename...         NAME
 >
@@ -35,9 +36,12 @@ public:
             constants::write_status_line(st, HTTP11, CODE);
         }
 
-        st << constants::get_header_name(CONTENT_TYPE)
-           << ":"
-           << constants::get_content_type(TYPE) << "\r\n";
+        constants::set_content_type_header(st, TYPE);
+        if(GZIP_COMPRESSED)
+        {
+            constants::set_content_encoding_header(st, GZIP);
+        }
+
         st << "\r\n";
         st << RES_DATA::data << "\r\n";
 
