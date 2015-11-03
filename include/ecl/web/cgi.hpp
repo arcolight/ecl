@@ -1,6 +1,8 @@
 #ifndef ECL_WEB_CGI_HPP
 #define ECL_WEB_CGI_HPP
 
+#include <cstring>
+
 #include <ecl/web/request.hpp>
 
 namespace ecl
@@ -51,7 +53,7 @@ public:
     }
 
 protected:
-    const request* redirect(const char* uri, 
+    const request* redirect(const char* uri,
                             method      m   = method::GET,
                             version     v   = version::HTTP11)
     {

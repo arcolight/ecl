@@ -7,7 +7,6 @@
 #include <unistd.h>
 
 #include <ecl/name_type.hpp>
-#include <ecl/json.hpp>
 #include <ecl/web.hpp>
 
 // include generated sources
@@ -15,6 +14,8 @@
 #include "web_resources/authorized_index_html.h"
 #include "web_resources/style_css.h"
 #include "web_resources/jquery_js.h"
+#include "web_resources/resumable_js.h"
+#include "web_resources/chunked_uploader_js.h"
 #include "web_resources/icon_png.h"
 #include "web_resources/favicon_png.h"
 
@@ -22,6 +23,10 @@
 #include "web_resources/403_html.h"
 #include "web_resources/404_html.h"
 #include "web_resources/500_html.h"
+
+#include "cgis.hpp"
+
+#define RECV_BUFFER_SIZE 2048
 
 namespace name
 {
@@ -32,28 +37,17 @@ namespace name
     ECL_DECL_NAME_TYPE_STRING(favicon,          "/favicon.png")
     ECL_DECL_NAME_TYPE_STRING(style,            "/etc/style.css")
     ECL_DECL_NAME_TYPE_STRING(jquery,           "/etc/js/jquery.js")
+    ECL_DECL_NAME_TYPE_STRING(resumable,        "/etc/js/resumable.js")
+    ECL_DECL_NAME_TYPE_STRING(chunked_uploader, "/etc/js/chunked_uploader.js")
     ECL_DECL_NAME_TYPE_STRING(info,             "/info")
     ECL_DECL_NAME_TYPE_STRING(auth,             "/auth")
     ECL_DECL_NAME_TYPE_STRING(settings,         "/settings")
+    ECL_DECL_NAME_TYPE_STRING(upload,           "/upload")
 
     ECL_DECL_NAME_TYPE_STRING(page_400,         "/400.html")
     ECL_DECL_NAME_TYPE_STRING(page_403,         "/403.html")
     ECL_DECL_NAME_TYPE_STRING(page_404,         "/404.html")
     ECL_DECL_NAME_TYPE_STRING(page_500,         "/500.html")
-
-    ECL_DECL_NAME_TYPE(json_1)
-    ECL_DECL_NAME_TYPE(json_2)
-    ECL_DECL_NAME_TYPE(json_3)
-
-    ECL_DECL_NAME_TYPE(val_1)
-    ECL_DECL_NAME_TYPE(val_2)
-    ECL_DECL_NAME_TYPE(val_3)
-    ECL_DECL_NAME_TYPE(val_4)
-    ECL_DECL_NAME_TYPE(val_5)
-    ECL_DECL_NAME_TYPE(val_6)
-    ECL_DECL_NAME_TYPE(val_7)
-    ECL_DECL_NAME_TYPE(val_8)
-    ECL_DECL_NAME_TYPE(val_9)
 } // namespace name
 
 static int new_sd = 0;
@@ -65,152 +59,6 @@ void write_sock(const char* const buf, std::size_t size)
     std::cout << buf;
     send(new_sd, buf, size, 0);
 }
-
-template<typename... NAME>
-class settings : public ecl::web::cgi<NAME...>
-{
-private:
-    using document_t = ecl::json::object<
-        ecl::json::node<name::val_1, int16_t              >,
-        ecl::json::node<name::val_2, uint16_t             >,
-        ecl::json::node<name::val_3, ecl::json::string<8> >,
-        ecl::json::node<name::val_4, int64_t              >,
-        ecl::json::node<name::val_5, uint64_t             >
-    >;
-
-    document_t m_doc;
-
-public:
-    template<typename T>
-    const ecl::web::request* exec(T& st, const ecl::web::request* req)
-    {
-        (void)st;
-
-        for(auto& h : req->headers)
-        {
-            if((0 == strcmp(ecl::web::constants::get_header_name(ecl::web::CONTENT_TYPE), h.name)) &&
-               (nullptr != strstr(h.value, ecl::web::constants::get_content_type(ecl::web::APPLICATION_JSON))))
-            {
-                if(m_doc.deserialize(req->body))
-                {
-                    m_doc.serialize(std::cout, true);
-                    std::cout << std::endl;
-                    return nullptr;
-                }
-
-                break;
-            }
-        }
-
-        return this->redirect("/400.html");
-    }
-};
-
-template<typename... NAME>
-class info : public ecl::web::cgi<NAME...>
-{
-private:
-    using document_t = ecl::json::object<
-        ecl::json::node<name::json_1, bool                  >,
-        ecl::json::node<name::json_2, uint32_t              >,
-        ecl::json::node<name::json_3, ecl::json::string<64> >
-    >;
-
-    document_t m_doc {};
-
-public:
-    template<typename T>
-    const ecl::web::request* exec(T& st, const ecl::web::request* req)
-    {
-        ecl::web::constants::write_status_line(st, req->ver, ecl::web::OK);
-
-        st << ecl::web::constants::get_header_name(ecl::web::CONTENT_TYPE)
-           << ":"
-           << ecl::web::constants::get_content_type(ecl::web::APPLICATION_JSON)
-           << "\r\n";
-        st << "\r\n";
-
-        m_doc.f<name::json_1>() = !m_doc.f<name::json_1>();
-        m_doc.f<name::json_2>() = m_counter++;
-        m_doc.f<name::json_3>() = "Test json string with \"escaped\" \\characters/.\n\r\tCR LF TAB.";
-
-        m_doc.serialize(st);
-        st << "\r\n";
-
-        return nullptr;
-    }
-
-private:
-    uint32_t   m_counter { 0 };
-};
-
-template<typename... NAME>
-class auth : public ecl::web::cgi<NAME...>
-{
-public:
-    template<typename T>
-    const ecl::web::request* exec(T& st, const ecl::web::request* req)
-    {
-        // std::cout << req->uri              << std::endl;
-        // std::cout << req->uri_param_string << std::endl;
-        // for(auto& p : req->uri_parameters)
-        // {
-        //     if(p.name != nullptr)
-        //     {
-        //         std::cout << p.name << " : " << p.value << std::endl;
-        //     }
-        // }
-
-        char buf[128];
-
-        if(strlen(req->body) < 128)
-        {
-            strcpy(buf, req->body);
-        }
-        else
-        {
-            std::cout << "Too big body :(" << std::endl;
-            return nullptr;
-        }
-
-        ecl::web::uri_param params[16];
-
-        if(ecl::web::kv_parser_state::done !=
-               m_parser.start_parse(buf, params, 16))
-        {
-            std::cout << "Parse failed!" << std::endl;
-            authorized = false;
-        }
-        else
-        {
-            std::cout << "Parse ok!" << std::endl;
-            authorized = false;
-            for(std::size_t i = 0; i < 16; ++i)
-            {
-                if((0 == strcmp(params[i].name, "pass")) &&
-                   (0 == strcmp(params[i].value, "239")))
-                {
-                    authorized = true;
-                    ecl::web::redirect(st, "/authorized_index.html", req->ver);
-                    return nullptr;
-                }
-            }
-        }
-
-        ecl::web::redirect(st, "/index.html", req->ver);
-        return nullptr;
-    }
-
-private:
-    bool authorized { false };
-    ecl::web::kv_parser m_parser
-    {
-        ecl::str_const("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"),
-        ecl::str_const("%+.-"),
-        ecl::str_const("="),
-        ecl::str_const("&;")
-    };
-};
 
 using server_t = ecl::web::server
 <
@@ -233,16 +81,21 @@ using server_t = ecl::web::server
         ecl::web::resource < res_style_css_t,             ecl::web::TEXT_CSS,        true,  ecl::web::OK,                    name::style                  >,
 // jquery
         ecl::web::resource < res_jquery_js_t,             ecl::web::TEXT_JAVASCRIPT, true,  ecl::web::OK,                    name::jquery                 >,
+// resumable.js
+        ecl::web::resource < res_resumable_js_t,          ecl::web::TEXT_JAVASCRIPT, true,  ecl::web::OK,                    name::resumable              >,
+// chunked uploader
+        ecl::web::resource < res_chunked_uploader_js_t,   ecl::web::TEXT_JAVASCRIPT, true,  ecl::web::OK,                    name::chunked_uploader       >,
 // CGIs
         info     < name::info     >,
         auth     < name::auth     >,
-        settings < name::settings >
+        settings < name::settings >,
+        upload   < name::upload   >
     >,
 // Max request size
-    1024
+    RECV_BUFFER_SIZE
 >;
 
-static char buffer[1024];
+static char buffer[RECV_BUFFER_SIZE];
 
 [[ noreturn ]]
 void start_server(const char*);
@@ -330,7 +183,7 @@ void start_server(const char* port)
 
         std::cout << "Waiting to recieve data..."  << std::endl;
         ssize_t bytes_recieved;
-        bytes_recieved = recv(new_sd, buffer, 1024, 0);
+        bytes_recieved = recv(new_sd, buffer, RECV_BUFFER_SIZE, 0);
         // If no data arrives, the program will just wait here until some data arrives.
         if (bytes_recieved == 0)
         {
@@ -345,7 +198,7 @@ void start_server(const char* port)
         buffer[bytes_recieved] = 0;
         std::cout << buffer << std::endl;
 
-        ecl::stream<1024> out_stream(write_sock);
+        ecl::stream<RECV_BUFFER_SIZE> out_stream(write_sock);
         server.process_request(out_stream, buffer, static_cast<std::size_t>(bytes_recieved));
         out_stream.flush();
 

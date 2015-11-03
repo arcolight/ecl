@@ -96,6 +96,12 @@ class parser_fsm : public state_machine<parser_fsm,
         {
             m_request.met = method::POST;
         }
+        else if(0 == strncmp(method_str,
+                             constants::get_method(method::PUT),
+                             method_str_len))
+        {
+            m_request.met = method::PUT;
+        }
         else
         {
             return false;

@@ -7,6 +7,7 @@
         <link rel="stylesheet" type="text/css" media="screen" href="/etc/style.css" />
         <link rel="icon" type="image/png" href="/favicon.png">
         <script type="text/javascript" src="/etc/js/jquery.js"></script>
+        <script type="text/javascript" src="/etc/js/chunked_uploader.js"></script>
         <script type="text/javascript">
             $(document).ready(function() {
                 function updateJson() {
@@ -19,11 +20,81 @@
                             $.each(data,function(k,v){
                                 $('#'+k).text(v);
                             });
-                            setTimeout(updateJson, 60000);
+                            setTimeout(updateJson, 600000);
                          }
                     });
                 }
                 updateJson();
+            });
+        </script>
+        <script type="text/javascript">
+            $(document).ready(function()
+            {
+                var upload_form = $('#upload_form'),
+                    file_input = $('#file_input'),
+                    file_list = $('#file_list'),
+                    submit_btn = $('#submit_btn'),
+                    uploaders = [];
+
+                file_input.on('change', onFilesSelected);
+                upload_form.on('submit', onFormSubmit);
+
+                /**
+                 * Loops through the selected files, displays their file name and size
+                 * in the file list, and enables the submit button for uploading.
+                 */
+                function onFilesSelected(e)
+                {
+                    var files = e.target.files,
+                        file;
+
+                    for (var i = 0; i < files.length; i++)
+                    {
+                        file = files[i];
+                        uploaders.push(new ChunkedUploader(file));
+                        file_list.append('<li>' + file.name + '(' + file.size.formatBytes() + ')</li>');
+                    }
+
+                    file_list.show();
+                    submit_btn.attr('disabled', false);
+                }
+
+                /**
+                 * Loops through all known uploads and starts each upload
+                 * process, preventing default form submission.
+                 */
+                function onFormSubmit(e)
+                {
+                    $.each(uploaders, function(i, uploader)
+                    {
+                        uploader.start();
+                    });
+
+                    // Prevent default form submission
+                    e.preventDefault();
+                }
+
+                file_list.on('click', 'button', onPauseClick);
+
+                /**
+                * Toggles pause method of the button's related uploader instance.
+                */
+                function onPauseClick(e)
+                {
+                    var btn = $(this),
+                        uploader = btn.parent('li').data('uploader');
+
+                    if (btn.hasClass('paused'))
+                    {
+                        btn.removeClass('paused').text('Pause');
+                        uploader.resume();
+                    }
+                    else
+                    {
+                        btn.addClass('paused').text('Resume');
+                        uploader.pause();
+                    }
+                }
             });
         </script>
     </head>
@@ -76,6 +147,18 @@
                         });
                     </script>
                     </table>
+                </div>
+                <div class="content">
+                    <form id="upload_form" action="/upload" method="post">
+                        <label for="file_input">Select Files:</label>
+                        <input id="file_input" type="file">
+                        <div>
+                            <input id="submit_btn" type="submit" value="Upload" disabled>
+                        </div>
+                    </form>
+                    <ul id="file_list" style="display: none;">
+                        <!-- File data will be listed here -->
+                    </ul>
                 </div>
             </div>
         </div>
