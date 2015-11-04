@@ -7,7 +7,6 @@
         <link rel="stylesheet" type="text/css" media="screen" href="/etc/style.css" />
         <link rel="icon" type="image/png" href="/favicon.png">
         <script type="text/javascript" src="/etc/js/jquery.js"></script>
-        <script type="text/javascript" src="/etc/js/chunked_uploader.js"></script>
         <script type="text/javascript">
             $(document).ready(function() {
                 function updateJson() {
@@ -32,68 +31,72 @@
             {
                 var upload_form = $('#upload_form'),
                     file_input = $('#file_input'),
-                    file_list = $('#file_list'),
-                    submit_btn = $('#submit_btn'),
-                    uploaders = [];
-
+                    submit_btn = $('#submit_btn');
                 file_input.on('change', onFilesSelected);
                 upload_form.on('submit', onFormSubmit);
-
                 /**
                  * Loops through the selected files, displays their file name and size
                  * in the file list, and enables the submit button for uploading.
                  */
                 function onFilesSelected(e)
                 {
-                    var files = e.target.files,
-                        file;
-
-                    for (var i = 0; i < files.length; i++)
-                    {
-                        file = files[i];
-                        uploaders.push(new ChunkedUploader(file));
-                        file_list.append('<li>' + file.name + '(' + file.size.formatBytes() + ')</li>');
-                    }
-
-                    file_list.show();
+                    // var files = e.target.files,
+                    //     file;
+                    // for (var i = 0; i < files.length; i++)
+                    // {
+                    //     file = files[i];
+                    // }
                     submit_btn.attr('disabled', false);
                 }
-
                 /**
                  * Loops through all known uploads and starts each upload
                  * process, preventing default form submission.
                  */
                 function onFormSubmit(e)
                 {
-                    $.each(uploaders, function(i, uploader)
-                    {
-                        uploader.start();
-                    });
+                    var fileInput = document.getElementById('file_input');
+                    var file = fileInput.files[0];
 
-                    // Prevent default form submission
-                    e.preventDefault();
+                    var file_size = file.size;
+                    var chunk_size = 512;
+                    var range_start = 0;
+                    var range_end = chunk_size;
+                    var chunk;
+
+                    var ch_count = file_size / chunk_size;
+
+                    for(i = 0; i < ch_count; i++)
+                    {
+                        chunk = file['slice'](range_start, range_end);
+
+                        sendChunk(chunk, range_start, range_end, file_size);
+
+                        range_start = range_end;
+                        range_end = range_start + chunk_size;
+
+                        if (range_end > file_size)
+                        {
+                            range_end = file_size;
+                        }
+                    }
+
+                    return false;
                 }
 
-                file_list.on('click', 'button', onPauseClick);
-
-                /**
-                * Toggles pause method of the button's related uploader instance.
-                */
-                function onPauseClick(e)
+                function sendChunk(chunk, range_start, range_end, file_size)
                 {
-                    var btn = $(this),
-                        uploader = btn.parent('li').data('uploader');
+                    var xhr = new XMLHttpRequest();
 
-                    if (btn.hasClass('paused'))
+                    xhr.overrideMimeType('application/octet-stream');
+
+                    xhr.open('POST', '/upload', true);
+                    if(range_start !== 0)
                     {
-                        btn.removeClass('paused').text('Pause');
-                        uploader.resume();
+                        console.log(xhr);
+                        xhr.setRequestHeader('Content-Range', 'bytes ' + range_start + '-' + range_end + '/' + file_size);
                     }
-                    else
-                    {
-                        btn.addClass('paused').text('Resume');
-                        uploader.pause();
-                    }
+
+                    xhr.send(chunk);
                 }
             });
         </script>
@@ -127,8 +130,10 @@
                     <tr><td><b>JSON val_5 number (uint64_t): </b></td><td><input id="val_5" type="number"                      value="" /><br></td></tr>
                     <input id="data_send" type="submit" name="data_send" value="send" /><br>
                     <script type="text/javascript">
-                        $("#data_send").on("click", function() {
-                            var jsonToSend = {
+                        $("#data_send").on("click", function()
+                        {
+                            var jsonToSend =
+                            {
                                 val_1 : parseInt($("#val_1").val(), 10),
                                 val_2 : parseInt($("#val_2").val(), 10),
                                 val_3 : $("#val_3").val(),
@@ -136,7 +141,8 @@
                                 val_5 : parseInt($("#val_5").val(), 10)
                             }
                             var dataToSend = JSON.stringify(jsonToSend);
-                            $.ajax({
+                            $.ajax
+                            ({
                                 url: "settings",
                                 dataType :'json',
                                 type: "POST",
@@ -150,15 +156,10 @@
                 </div>
                 <div class="content">
                     <form id="upload_form" action="/upload" method="post">
-                        <label for="file_input">Select Files:</label>
+                        <label for="file_input">Select File:</label>
                         <input id="file_input" type="file">
-                        <div>
-                            <input id="submit_btn" type="submit" value="Upload" disabled>
-                        </div>
+                        <input id="submit_btn" type="submit" value="Upload" disabled="true">
                     </form>
-                    <ul id="file_list" style="display: none;">
-                        <!-- File data will be listed here -->
-                    </ul>
                 </div>
             </div>
         </div>

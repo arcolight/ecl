@@ -1,6 +1,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <iostream>
+#include <iomanip>
 
 #include <sys/socket.h>
 #include <netdb.h>
@@ -14,8 +15,6 @@
 #include "web_resources/authorized_index_html.h"
 #include "web_resources/style_css.h"
 #include "web_resources/jquery_js.h"
-#include "web_resources/resumable_js.h"
-#include "web_resources/chunked_uploader_js.h"
 #include "web_resources/icon_png.h"
 #include "web_resources/favicon_png.h"
 
@@ -37,8 +36,6 @@ namespace name
     ECL_DECL_NAME_TYPE_STRING(favicon,          "/favicon.png")
     ECL_DECL_NAME_TYPE_STRING(style,            "/etc/style.css")
     ECL_DECL_NAME_TYPE_STRING(jquery,           "/etc/js/jquery.js")
-    ECL_DECL_NAME_TYPE_STRING(resumable,        "/etc/js/resumable.js")
-    ECL_DECL_NAME_TYPE_STRING(chunked_uploader, "/etc/js/chunked_uploader.js")
     ECL_DECL_NAME_TYPE_STRING(info,             "/info")
     ECL_DECL_NAME_TYPE_STRING(auth,             "/auth")
     ECL_DECL_NAME_TYPE_STRING(settings,         "/settings")
@@ -81,10 +78,6 @@ using server_t = ecl::web::server
         ecl::web::resource < res_style_css_t,             ecl::web::TEXT_CSS,        true,  ecl::web::OK,                    name::style                  >,
 // jquery
         ecl::web::resource < res_jquery_js_t,             ecl::web::TEXT_JAVASCRIPT, true,  ecl::web::OK,                    name::jquery                 >,
-// resumable.js
-        ecl::web::resource < res_resumable_js_t,          ecl::web::TEXT_JAVASCRIPT, true,  ecl::web::OK,                    name::resumable              >,
-// chunked uploader
-        ecl::web::resource < res_chunked_uploader_js_t,   ecl::web::TEXT_JAVASCRIPT, true,  ecl::web::OK,                    name::chunked_uploader       >,
 // CGIs
         info     < name::info     >,
         auth     < name::auth     >,
@@ -196,6 +189,18 @@ void start_server(const char* port)
 
         std::cout << bytes_recieved << " bytes recieved :" << std::endl;
         buffer[bytes_recieved] = 0;
+        // for(ssize_t i = 0; i < bytes_recieved; ++i)
+        // {
+        //     if(std::isprint(buffer[i]))
+        //     {
+        //         std::cout << buffer[i];
+        //     }
+        //     else
+        //     {
+        //         std::cout << std::hex << std::setw(2) << std::setfill('0') << int(buffer[i]) << std::dec;
+        //     }
+        // }
+        // std::cout << std::endl;
         std::cout << buffer << std::endl;
 
         ecl::stream<RECV_BUFFER_SIZE> out_stream(write_sock);

@@ -25,7 +25,7 @@ class resource
 {
 public:
     template<typename T>
-    const request* exec(T& st, const request* req)                         const
+    status_code exec(T& st, const request* req)                            const
     {
         if(nullptr != req)
         {
@@ -45,7 +45,7 @@ public:
         st << "\r\n";
         st << RES_DATA::data << "\r\n";
 
-        return nullptr;
+        return CODE;
     }
 
     template<typename N>

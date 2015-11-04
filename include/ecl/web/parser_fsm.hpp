@@ -28,10 +28,11 @@ enum class parser_state
 
 struct event_line
 {
-    explicit event_line(char* l) : line(l)
+    explicit event_line(char* l, std::size_t s) : line(l), size(s)
     {}
 
-    char* line { nullptr };
+    char*  line { nullptr };
+    size_t size { 0       };
 };
 struct empty_line {};
 struct end_of_req {};

@@ -27,15 +27,17 @@ template<typename... NAME>
 class upload : public ecl::web::cgi<NAME...>
 {
 public:
-    template<typename T>
-    const ecl::web::request* exec(T& st, const ecl::web::request* req)
+    upload()
     {
-        std::cout << "-= CHUNK START =- " << std::endl;
-        // std::cout << req->body << std::endl;
-        std::cout << "-= CHUNK  END  =- " << std::endl;
+
+    }
+
+    template<typename T>
+    ecl::web::status_code exec(T& st, const ecl::web::request* req)
+    {
         ecl::web::constants::write_status_line(st, req->ver, ecl::web::OK);
 
-        return nullptr;
+        return ecl::web::OK;
     }
 };
 
@@ -56,7 +58,7 @@ private:
 
 public:
     template<typename T>
-    const ecl::web::request* exec(T& st, const ecl::web::request* req)
+    ecl::web::status_code exec(T& st, const ecl::web::request* req)
     {
         (void)st;
 
@@ -69,14 +71,16 @@ public:
                 {
                     m_doc.serialize(std::cout, true);
                     std::cout << std::endl;
-                    return nullptr;
+                    return ecl::web::OK;
                 }
 
                 break;
             }
         }
 
-        return this->redirect("/400.html");
+        ecl::web::redirect(st, "/400.html", req->ver);
+
+        return ecl::web::BAD_REQUEST;
     }
 };
 
@@ -95,7 +99,7 @@ private:
 
 public:
     template<typename T>
-    const ecl::web::request* exec(T& st, const ecl::web::request* req)
+    ecl::web::status_code exec(T& st, const ecl::web::request* req)
     {
         ecl::web::constants::write_status_line(st, req->ver, ecl::web::OK);
 
@@ -110,7 +114,7 @@ public:
         m_doc.serialize(st);
         st << "\r\n";
 
-        return nullptr;
+        return ecl::web::OK;
     }
 
 private:
@@ -122,7 +126,7 @@ class auth : public ecl::web::cgi<NAME...>
 {
 public:
     template<typename T>
-    const ecl::web::request* exec(T& st, const ecl::web::request* req)
+    ecl::web::status_code exec(T& st, const ecl::web::request* req)
     {
         char buf[128];
 
@@ -133,7 +137,7 @@ public:
         else
         {
             std::cout << "Too big body :(" << std::endl;
-            return nullptr;
+            return ecl::web::OK;
         }
 
         ecl::web::uri_param params[16];
@@ -155,13 +159,13 @@ public:
                 {
                     authorized = true;
                     ecl::web::redirect(st, "/authorized_index.html", req->ver);
-                    return nullptr;
+                    return ecl::web::OK;
                 }
             }
         }
 
         ecl::web::redirect(st, "/index.html", req->ver);
-        return nullptr;
+        return ecl::web::OK;
     }
 
 private:

@@ -33,6 +33,7 @@ struct request
         uri = nullptr;
         uri_param_string = nullptr;
         body = nullptr;
+        body_size = 0;
 
         for(auto& h : headers)
         {
@@ -64,11 +65,16 @@ struct request
 
     method         met                                 { method::GET     };
     version        ver                                 { version::HTTP10 };
+
     const char*    uri                                 { nullptr         };
     const char*    uri_param_string                    { nullptr         };
+
     uri_param      uri_parameters[MAX_URI_PARAMETERS];
     std::size_t    uri_parameters_count                { 0               };
+
     const char*    body                                { nullptr         };
+    std::size_t    body_size                           { 0               };
+
     header         headers[MAX_HEADERS_COUNT];
     std::size_t    headers_count                       { 0               };
 };

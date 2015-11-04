@@ -19,20 +19,18 @@ template<std::size_t MAX_REQUEST_SIZE = 1024>
 class request_parser
 {
 public:
-    const request* parse(request_raw_t raw)
+    const request* parse(request_raw_t raw, size_t size)
     {
         memset(m_request_raw, 0, MAX_REQUEST_SIZE);
 
-        parser_state st = m_parser.process_event(rst());
-
-        std::size_t r_size = strlen(raw);
-
-        if(r_size > MAX_REQUEST_SIZE)
+        if(size > MAX_REQUEST_SIZE)
         {
             return nullptr;
         }
 
-        strncpy(m_request_raw, raw, MAX_REQUEST_SIZE - 1);
+        memcpy(m_request_raw, raw, size);
+
+        parser_state st = m_parser.process_event(rst());
 
         char* current = m_request_raw;
         char* next    = nullptr;
@@ -90,8 +88,8 @@ private:
 
     parser_fsm                 m_parser {};
 
-    const char m_cr   { '\r'   };
-    const char m_lf   { '\n'   };
+    const char m_cr   { '\r' };
+    const char m_lf   { '\n' };
 };
 
 } // namespace web
