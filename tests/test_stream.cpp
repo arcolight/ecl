@@ -100,7 +100,7 @@ void out_nums(int8_t  i8,  uint8_t  u8,
     "int32_t: " << i32 << " | " << "uint32_t: " << u32 << "\r\n" <<
     "int64_t: " << i64 << " | " << "uint64_t: " << u64 << "\r\n";
     std::cout << l << std::endl;
-    l << reset();
+    l << rst();
 
     l(base::o)(8)  << "Octal:"            << "\r\n" <<
     "int8_t:  " << i8  << " | " << "uint8_t:  " << u8  << "\r\n" <<
@@ -108,7 +108,7 @@ void out_nums(int8_t  i8,  uint8_t  u8,
     "int32_t: " << i32 << " | " << "uint32_t: " << u32 << "\r\n" <<
     "int64_t: " << i64 << " | " << "uint64_t: " << u64 << "\r\n";
     std::cout << l << std::endl;
-    l << reset();
+    l << rst();
 
     l(base::d)(8)  << "Decimal:"          << "\r\n" <<
     "int8_t:  " << i8  << " | " << "uint8_t:  " << u8  << "\r\n" <<
@@ -116,7 +116,7 @@ void out_nums(int8_t  i8,  uint8_t  u8,
     "int32_t: " << i32 << " | " << "uint32_t: " << u32 << "\r\n" <<
     "int64_t: " << i64 << " | " << "uint64_t: " << u64 << "\r\n";
     std::cout << l << std::endl;
-    l << reset();
+    l << rst();
 
     l(base::h)(8)  << "Hex:"              << "\r\n" <<
     "int8_t:  " << i8  << " | " << "uint8_t:  " << u8  << "\r\n" <<
@@ -124,7 +124,7 @@ void out_nums(int8_t  i8,  uint8_t  u8,
     "int32_t: " << i32 << " | " << "uint32_t: " << u32 << "\r\n" <<
     "int64_t: " << i64 << " | " << "uint64_t: " << u64 << "\r\n";
     std::cout << l << std::endl;
-    l << reset();
+    l << rst();
 }
 
 void printf_floats(float_t f, double_t d)
@@ -153,7 +153,7 @@ void out_floats(float_t f, double_t d)
     "float:  " << f << " | " << "double: " << d << "\r\n";
 
     std::cout << l << std::endl;
-    l << reset();
+    l << rst();
 }
 
 void out_bool_char(bool b, char c)
@@ -162,7 +162,7 @@ void out_bool_char(bool b, char c)
 
     l << "bool: " << b << " | " << "char: " << c << "\r\n";
     std::cout << l << std::endl;
-    l << reset();
+    l << rst();
 }
 
 int main(int argc, char** argv)

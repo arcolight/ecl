@@ -15,11 +15,11 @@ namespace ecl
 namespace web
 {
 
-template<typename            RES_DATA,
-         content_type_header TYPE,
-         bool                GZIP_COMPRESSED,
-         status_code         CODE,
-         typename...         NAME
+template<typename     RES_DATA,
+         content_type TYPE,
+         bool         GZIP_COMPRESSED,
+         status_code  CODE,
+         typename...  NAME
 >
 class resource
 {
@@ -29,17 +29,17 @@ public:
     {
         if(nullptr != req)
         {
-            constants::write_status_line(st, req->ver, CODE);
+            write_status_line(st, req->ver, CODE);
         }
         else
         {
-            constants::write_status_line(st, HTTP11, CODE);
+            write_status_line(st, version::HTTP11, CODE);
         }
 
-        constants::set_content_type_header(st, TYPE);
+        set_content_type_header(st, TYPE);
         if(GZIP_COMPRESSED)
         {
-            constants::set_content_encoding_header(st, GZIP);
+            set_content_encoding_header(st, content_encoding::GZIP);
         }
 
         st << "\r\n";

@@ -63,21 +63,21 @@ using server_t = ecl::web::server
     <
 //                           Data container type          Type of resource           Gzip   Result code                      Name type
 // static resources
-        ecl::web::resource < res_400_html_t,              ecl::web::TEXT_HTML,       false, ecl::web::BAD_REQUEST,           name::page_400               >,
-        ecl::web::resource < res_404_html_t,              ecl::web::TEXT_HTML,       false, ecl::web::NOT_FOUND,             name::page_404               >,
-        ecl::web::resource < res_500_html_t,              ecl::web::TEXT_HTML,       false, ecl::web::INTERNAL_SERVER_ERROR, name::page_500               >,
+        ecl::web::resource < res_400_html_t,              ecl::web::content_type::TEXT_HTML,       false, ecl::web::status_code::BAD_REQUEST,           name::page_400               >,
+        ecl::web::resource < res_404_html_t,              ecl::web::content_type::TEXT_HTML,       false, ecl::web::status_code::NOT_FOUND,             name::page_404               >,
+        ecl::web::resource < res_500_html_t,              ecl::web::content_type::TEXT_HTML,       false, ecl::web::status_code::INTERNAL_SERVER_ERROR, name::page_500               >,
 // index
-        ecl::web::resource < res_index_html_t,            ecl::web::TEXT_HTML,       true,  ecl::web::OK,                    name::index_1, name::index_2 >,
+        ecl::web::resource < res_index_html_t,            ecl::web::content_type::TEXT_HTML,       true,  ecl::web::status_code::OK,                    name::index_1, name::index_2 >,
 // authorized_index
-        ecl::web::resource < res_authorized_index_html_t, ecl::web::TEXT_HTML,       true,  ecl::web::OK,                    name::authorized_index       >,
+        ecl::web::resource < res_authorized_index_html_t, ecl::web::content_type::TEXT_HTML,       true,  ecl::web::status_code::OK,                    name::authorized_index       >,
 // logo
-        ecl::web::resource < res_icon_png_t,              ecl::web::IMAGE_PNG,       true,  ecl::web::OK,                    name::icon                   >,
+        ecl::web::resource < res_icon_png_t,              ecl::web::content_type::IMAGE_PNG,       true,  ecl::web::status_code::OK,                    name::icon                   >,
 // favicon
-        ecl::web::resource < res_favicon_png_t,           ecl::web::IMAGE_PNG,       true,  ecl::web::OK,                    name::favicon                >,
+        ecl::web::resource < res_favicon_png_t,           ecl::web::content_type::IMAGE_PNG,       true,  ecl::web::status_code::OK,                    name::favicon                >,
 // CSS
-        ecl::web::resource < res_style_css_t,             ecl::web::TEXT_CSS,        true,  ecl::web::OK,                    name::style                  >,
+        ecl::web::resource < res_style_css_t,             ecl::web::content_type::TEXT_CSS,        true,  ecl::web::status_code::OK,                    name::style                  >,
 // jquery
-        ecl::web::resource < res_jquery_js_t,             ecl::web::TEXT_JAVASCRIPT, true,  ecl::web::OK,                    name::jquery                 >,
+        ecl::web::resource < res_jquery_js_t,             ecl::web::content_type::TEXT_JAVASCRIPT, true,  ecl::web::status_code::OK,                    name::jquery                 >,
 // CGIs
         info     < name::info     >,
         auth     < name::auth     >,

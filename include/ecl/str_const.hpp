@@ -27,7 +27,7 @@ class str_const
 {
 public:
     template<std::size_t N>
-    constexpr explicit str_const(const char(&a)[N])                     noexcept
+    constexpr str_const(const char(&a)[N])                              noexcept
         : m_p(a), m_sz(N-1)
     {}
 
@@ -88,6 +88,22 @@ public:
     const char* end()                                             const noexcept
     {
         return m_p + m_sz;
+    }
+
+    /**
+     * @brief      stream operator
+     *
+     * @param      stream reference to stream object
+     *
+     * @tparam     T      type of the stream
+     *
+     * @return     reference to stream object
+     */
+    template<typename T>
+    T& operator<<(T& stream)                                               const
+    {
+        stream << m_p;
+        return stream;
     }
 
 private:

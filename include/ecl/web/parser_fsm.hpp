@@ -28,11 +28,10 @@ enum class parser_state
 
 struct event_line
 {
-    explicit event_line(char* l, std::size_t s) : line(l), size(s)
+    explicit event_line(char* l) : line(l)
     {}
 
     char*  line { nullptr };
-    size_t size { 0       };
 };
 struct empty_line {};
 struct end_of_req {};
@@ -86,19 +85,19 @@ class parser_fsm : public state_machine<parser_fsm,
 
         size_t method_str_len = strlen(method_str);
         if(0 == strncmp(method_str,
-                        constants::get_method(method::GET),
+                        to_string(method::GET),
                         method_str_len))
         {
             m_request.met = method::GET;
         }
         else if(0 == strncmp(method_str,
-                             constants::get_method(method::POST),
+                             to_string(method::POST),
                              method_str_len))
         {
             m_request.met = method::POST;
         }
         else if(0 == strncmp(method_str,
-                             constants::get_method(method::PUT),
+                             to_string(method::PUT),
                              method_str_len))
         {
             m_request.met = method::PUT;
@@ -112,19 +111,19 @@ class parser_fsm : public state_machine<parser_fsm,
 
         size_t version_str_len = strlen(version_str);
         if(0 == strncmp(version_str,
-                        constants::get_version(version::HTTP10),
+                        to_string(version::HTTP10),
                         version_str_len))
         {
             m_request.ver = version::HTTP10;
         }
         else if(0 == strncmp(version_str,
-                             constants::get_version(version::HTTP11),
+                             to_string(version::HTTP11),
                              version_str_len))
         {
             m_request.ver = version::HTTP11;
         }
         else if(0 == strncmp(version_str,
-                             constants::get_version(version::HTTP20),
+                             to_string(version::HTTP20),
                              version_str_len))
         {
             m_request.ver = version::HTTP20;

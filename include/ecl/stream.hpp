@@ -76,7 +76,7 @@ struct end {};
  * @brief reset object
  *
  */
-struct reset {};
+struct rst {};
 
 /**
  * @brief alias for overflow callback.
@@ -85,7 +85,10 @@ struct reset {};
  * @param size size of data.
  *
  */
-using flush_function_t = std::function<void(const char* const buf, std::size_t size)>;
+using flush_function_t = std::function
+                         <
+                             void(const char* const buf, std::size_t size)
+                         >;
 
 /**
  * @brief Stream class.
@@ -98,161 +101,30 @@ using flush_function_t = std::function<void(const char* const buf, std::size_t s
 template<std::size_t BUFFER_SIZE>
 class stream
 {
+private:
+    void reset()                                                        noexcept
+    {
+        for(auto &c: m_buf)
+        {
+            c = 0;
+        }
+
+        m_count = 0;
+
+        m_base =  m_def_base;
+        m_width = m_def_width;
+    }
+
 public:
     explicit stream(flush_function_t  flush_function  = nullptr,
                     const base        def_base        = base::d,
-                    const std::size_t def_width       = 8) :
+                    const std::size_t def_width       = 8)              noexcept
+    :
         m_flush_function ( flush_function ),
         m_def_base       ( def_base       ),
         m_def_width      ( def_width      )
     {
         reset();
-    }
-
-    /**
-     * @brief Reset Flush function pointer
-     *
-     * @param Flush function pointer
-     */
-    void set_flush_function(flush_function_t f)
-    {
-        m_flush_function = f;
-    }
-
-    /**
-     * @brief Numeric system base change.
-     *
-     * @param b Numeric base enumeration. @ref base
-     */
-    stream& operator() (const base& b)
-    {
-        m_base = b;
-        return *this;
-    }
-
-    /**
-     * @brief Field width change.
-     *
-     * @param w Field width. @ref width
-     */
-    stream& operator() (const std::size_t w)
-    {
-        m_width = w;
-        return *this;
-    }
-
-    /**
-     * @brief Alpha case change.
-     *
-     * @param c Alpha case. @ref cs
-     */
-    stream& operator() (const alpha_case& c)
-    {
-        m_case = c;
-        return *this;
-    }
-
-    /**
-     * @brief Field width change.
-     *
-     * @param w Field width. @ref width
-     */
-    stream& operator() (const width& w)
-    {
-        m_width = w.m_w;
-        return *this;
-    }
-
-    /**
-     * @brief Field width change.
-     *
-     * @param w Field width. @ref width
-     */
-    stream& operator<< (const width& w)
-    {
-        m_width = w.m_w;
-        return *this;
-    }
-
-    /**
-     * @brief Numeric system base change.
-     *
-     * @param b Numeric base enumeration. @ref base
-     */
-    stream& operator<< (const base& b)
-    {
-        m_base = b;
-        return *this;
-    }
-
-    /**
-     * @brief Stream reset.
-     * @details Reset will cause erasing all characters from stream.
-     *
-     * @param r reset object. @ref reset
-     */
-    stream& operator<< (const reset& r)
-    {
-        (void)(r);
-        reset();
-        return *this;
-    }
-
-    /**
-     * @brief End of stream.
-     * @details End will cause @ref flush and @ref reset.
-     *
-     * @param end end of stream object. @ref end
-     */
-    stream& operator<< (const end& end)
-    {
-        (void)(end);
-        flush();
-        reset();
-        return *this;
-    }
-
-    template<std::size_t N>
-    stream& operator<< (const uint8_t(&d)[N])
-    {
-        print_binary(d, N);
-        return *this;
-    }
-
-    template<typename T>
-    stream& operator<< (const T& val)
-    {
-        print_val(val);
-        return *this;
-    }
-
-    operator const char* ()                                                const
-    {
-        return m_buf;
-    }
-
-    operator char* ()
-    {
-        return m_buf;
-    }
-
-    const char* data()                                                     const
-    {
-        return m_buf;
-    }
-
-    char* data()
-    {
-        return m_buf;
-    }
-
-    /**
-     * @brief Characters count.
-     * @return Count of characters in stream.
-     */
-    std::size_t count()                                                    const
-    {
-        return m_count;
     }
 
     /**
@@ -272,6 +144,150 @@ public:
         reset();
     }
 
+    /**
+     * @brief Reset Flush function pointer
+     *
+     * @param Flush function pointer
+     */
+    void set_flush_function(flush_function_t f)                         noexcept
+    {
+        m_flush_function = f;
+    }
+
+    /**
+     * @brief Numeric system base change.
+     *
+     * @param b Numeric base enumeration. @ref base
+     */
+    stream& operator() (const base& b)                                  noexcept
+    {
+        m_base = b;
+        return *this;
+    }
+
+    /**
+     * @brief Field width change.
+     *
+     * @param w Field width. @ref width
+     */
+    stream& operator() (const std::size_t w)                            noexcept
+    {
+        m_width = w;
+        return *this;
+    }
+
+    /**
+     * @brief Alpha case change.
+     *
+     * @param c Alpha case. @ref cs
+     */
+    stream& operator() (const alpha_case& c)                            noexcept
+    {
+        m_case = c;
+        return *this;
+    }
+
+    /**
+     * @brief Field width change.
+     *
+     * @param w Field width. @ref width
+     */
+    stream& operator() (const width& w)                                 noexcept
+    {
+        m_width = w.m_w;
+        return *this;
+    }
+
+    /**
+     * @brief Field width change.
+     *
+     * @param w Field width. @ref width
+     */
+    stream& operator<< (const width& w)                                 noexcept
+    {
+        m_width = w.m_w;
+        return *this;
+    }
+
+    /**
+     * @brief Numeric system base change.
+     *
+     * @param b Numeric base enumeration. @ref base
+     */
+    stream& operator<< (const base& b)                                  noexcept
+    {
+        m_base = b;
+        return *this;
+    }
+
+    /**
+     * @brief Stream reset.
+     * @details Reset will cause erasing all characters from stream.
+     *
+     * @param r reset object. @ref reset
+     */
+    stream& operator<< (const rst&)                                     noexcept
+    {
+        reset();
+        return *this;
+    }
+
+    /**
+     * @brief End of stream.
+     * @details End will cause @ref flush and @ref reset.
+     *
+     * @param end end of stream object. @ref end
+     */
+    stream& operator<< (const end&)                                     noexcept
+    {
+        flush();
+        reset();
+        return *this;
+    }
+
+    template<std::size_t N>
+    stream& operator<< (const uint8_t(&d)[N])
+    {
+        print_binary(d, N);
+        return *this;
+    }
+
+    template<typename T>
+    stream& operator<< (const T& val)
+    {
+        print_val(val);
+        return *this;
+    }
+
+    operator const char* ()                                       const noexcept
+    {
+        return m_buf;
+    }
+
+    operator char* ()                                                   noexcept
+    {
+        return m_buf;
+    }
+
+    const char* data()                                            const noexcept
+    {
+        return m_buf;
+    }
+
+    char* data()                                                        noexcept
+    {
+        return m_buf;
+    }
+
+    /**
+     * @brief Characters count.
+     * @return Count of characters in stream.
+     */
+    std::size_t count()                                           const noexcept
+    {
+        return m_count;
+    }
+
     constexpr static std::size_t m_s_size { BUFFER_SIZE };
 
 private:
@@ -280,21 +296,8 @@ private:
     stream(const stream&& other)                                       = delete;
     stream& operator= (const stream&& other)                           = delete;
 
-    void reset()
-    {
-        for(auto &c: m_buf)
-        {
-            c = 0;
-        }
-
-        m_count = 0;
-
-        m_base =  m_def_base;
-        m_width = m_def_width;
-    }
-
     template<typename T>
-    void print_num_signed(const T& val)
+    void print_num_signed(const T& val)                                 noexcept
     {
         if(val < 0)
         {
@@ -317,7 +320,7 @@ private:
     }
 
     template<typename T>
-    void print_num_unsigned(const T& val)
+    void print_num_unsigned(const T& val)                               noexcept
     {
         T tmp = val;
 
@@ -458,7 +461,7 @@ private:
         m_buf[BUFFER_SIZE] = 0;
     }
 
-    void print_binary(const uint8_t* const bin_data, std::size_t size)
+    void print_binary(const uint8_t* const bin_data, std::size_t size)  noexcept
     {
         for(std::size_t i = 0; i < size; ++i)
         {
@@ -501,7 +504,9 @@ private:
     template<typename T>
     void print_val(const T& val)
     {
-        T::print(*this, val); // custom types should support print function
+        // We don't know how to handle this type,
+        // maybe it knows hot to be streamed
+        val.operator<<(*this);
     }
 
     // can be used for all bases till 16.
@@ -509,7 +514,7 @@ private:
 
     flush_function_t  m_flush_function { nullptr };
 
-    char              m_num_buf[66] {}; // (u)int64_t in binary mode takes 64 characters
+    char              m_num_buf[66] {};
     char              m_buf[BUFFER_SIZE + 1] {};
     std::size_t       m_count { 0 };
 

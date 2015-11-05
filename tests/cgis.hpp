@@ -35,9 +35,9 @@ public:
     template<typename T>
     ecl::web::status_code exec(T& st, const ecl::web::request* req)
     {
-        ecl::web::constants::write_status_line(st, req->ver, ecl::web::OK);
+        ecl::web::write_status_line(st, req->ver, ecl::web::status_code::OK);
 
-        return ecl::web::OK;
+        return ecl::web::status_code::OK;
     }
 };
 
@@ -64,14 +64,14 @@ public:
 
         for(auto& h : req->headers)
         {
-            if((0 == strcmp(ecl::web::constants::get_header_name(ecl::web::CONTENT_TYPE), h.name)) &&
-               (nullptr != strstr(h.value, ecl::web::constants::get_content_type(ecl::web::APPLICATION_JSON))))
+            if((0 == strcmp(ecl::web::to_string(ecl::web::header_name::CONTENT_TYPE), h.name)) &&
+               (nullptr != strstr(h.value, ecl::web::to_string(ecl::web::content_type::APPLICATION_JSON))))
             {
                 if(m_doc.deserialize(req->body))
                 {
                     m_doc.serialize(std::cout, true);
                     std::cout << std::endl;
-                    return ecl::web::OK;
+                    return ecl::web::status_code::OK;
                 }
 
                 break;
@@ -80,7 +80,7 @@ public:
 
         ecl::web::redirect(st, "/400.html", req->ver);
 
-        return ecl::web::BAD_REQUEST;
+        return ecl::web::status_code::BAD_REQUEST;
     }
 };
 
@@ -101,9 +101,9 @@ public:
     template<typename T>
     ecl::web::status_code exec(T& st, const ecl::web::request* req)
     {
-        ecl::web::constants::write_status_line(st, req->ver, ecl::web::OK);
+        ecl::web::write_status_line(st, req->ver, ecl::web::status_code::OK);
 
-        ecl::web::constants::set_content_type_header(st, ecl::web::APPLICATION_JSON);
+        ecl::web::set_content_type_header(st, ecl::web::content_type::APPLICATION_JSON);
 
         st << "\r\n";
 
@@ -114,7 +114,7 @@ public:
         m_doc.serialize(st);
         st << "\r\n";
 
-        return ecl::web::OK;
+        return ecl::web::status_code::OK;
     }
 
 private:
@@ -137,7 +137,7 @@ public:
         else
         {
             std::cout << "Too big body :(" << std::endl;
-            return ecl::web::OK;
+            return ecl::web::status_code::OK;
         }
 
         ecl::web::uri_param params[16];
@@ -159,13 +159,13 @@ public:
                 {
                     authorized = true;
                     ecl::web::redirect(st, "/authorized_index.html", req->ver);
-                    return ecl::web::OK;
+                    return ecl::web::status_code::OK;
                 }
             }
         }
 
         ecl::web::redirect(st, "/index.html", req->ver);
-        return ecl::web::OK;
+        return ecl::web::status_code::OK;
     }
 
 private:
