@@ -14,7 +14,7 @@ struct uri_param
 
     void clear()                                                        noexcept
     {
-        name =  "";
+        name  = "";
         value = "";
     }
 };

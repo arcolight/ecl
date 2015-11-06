@@ -9,12 +9,13 @@ namespace web
 
 struct header
 {
+
     const char* name  { "" };
     const char* value { "" };
 
     void clear()                                                        noexcept
     {
-        name =  "";
+        name  = "";
         value = "";
     }
 };

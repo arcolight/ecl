@@ -7,14 +7,6 @@
 #include <ecl/web/headers.hpp>
 #include <ecl/web/uri_param.hpp>
 
-#ifndef MAX_HEADERS_COUNT
-#define MAX_HEADERS_COUNT 64u
-#endif
-
-#ifndef MAX_URI_PARAMETERS
-#define MAX_URI_PARAMETERS 64u
-#endif
-
 namespace ecl
 {
 
@@ -23,6 +15,13 @@ namespace web
 
 using request_raw_t = const char*;
 
+template
+<
+    std::size_t MAX_URI_LENGTH     = 128 ,
+    std::size_t MAX_URI_PARAMETERS = 32  ,
+    std::size_t MAX_HEADER_LENGTH  = 128 ,
+    std::size_t MAX_HEADERS_COUNT  = 32
+>
 struct request
 {
     void clear()
@@ -32,8 +31,6 @@ struct request
 
         uri = nullptr;
         uri_param_string = nullptr;
-        body = nullptr;
-        body_size = 0;
 
         for(auto& h : headers)
         {
@@ -53,14 +50,24 @@ struct request
         clear();
     }
 
-    constexpr static std::size_t max_headers_count()                    noexcept
+    constexpr static std::size_t max_uri_length()                       noexcept
     {
-        return MAX_HEADERS_COUNT;
+        return MAX_URI_LENGTH;
     }
 
     constexpr static std::size_t max_uri_parameters_count()             noexcept
     {
         return MAX_URI_PARAMETERS;
+    }
+
+    constexpr static std::size_t max_header_length()                    noexcept
+    {
+        return MAX_HEADER_LENGTH;
+    }
+
+    constexpr static std::size_t max_headers_count()                    noexcept
+    {
+        return MAX_HEADERS_COUNT;
     }
 
     method         met                                 { method::GET     };
@@ -71,9 +78,6 @@ struct request
 
     uri_param      uri_parameters[MAX_URI_PARAMETERS];
     std::size_t    uri_parameters_count                { 0               };
-
-    const char*    body                                { nullptr         };
-    std::size_t    body_size                           { 0               };
 
     header         headers[MAX_HEADERS_COUNT];
     std::size_t    headers_count                       { 0               };
