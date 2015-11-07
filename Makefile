@@ -25,6 +25,7 @@ BF = bitfield
 SINGLETON = singleton
 STREAM = stream
 STR_CONST = str_const
+STATIC_MAP = static_map
 CMD = command_processor
 WEB = web
 STATIC_MAP = static_map
@@ -93,6 +94,9 @@ test_$(JSON): out_dir
 
 test_$(STR_CONST): out_dir
 	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(STR_CONST)_$(CXX).map $(TESTS_DIR)/test_$(STR_CONST).cpp -o $(BIN_DIR)/$(STR_CONST)_$(CXX)
+
+test_$(STATIC_MAP): out_dir
+	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(STATIC_MAP)_$(CXX).map $(TESTS_DIR)/test_$(STATIC_MAP).cpp -o $(BIN_DIR)/$(STATIC_MAP)_$(CXX)
 
 test_$(CMD): out_dir
 	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(CMD)_$(CXX).map $(TESTS_DIR)/test_$(CMD).cpp -o $(BIN_DIR)/$(CMD)_$(CXX)

@@ -212,12 +212,13 @@ public:
     class iterator
     {
         public:
-            typedef iterator self_type;
-            typedef T value_type;
-            typedef T& reference;
-            typedef T* pointer;
-            typedef std::bidirectional_iterator_tag iterator_category;
-            typedef ptrdiff_t difference_type;
+            using self_type         = iterator;
+            using value_type        = T;
+            using reference         = T&;
+            using pointer           = T*;
+            using iterator_category = std::bidirectional_iterator_tag;
+            using difference_type   = ptrdiff_t;
+
             iterator(std::size_t ind, circular_buffer<T,
                                                       CAPACITY,
                                                       ERASE_ELEMENTS>& data) :
@@ -306,12 +307,13 @@ public:
     class const_iterator
     {
         public:
-            typedef const_iterator self_type;
-            typedef const T value_type;
-            typedef const T& reference;
-            typedef const T* pointer;
-            typedef std::bidirectional_iterator_tag iterator_category;
-            typedef ptrdiff_t difference_type;
+            using self_type         = iterator;
+            using value_type        = const T;
+            using reference         = const T&;
+            using pointer           = const T*;
+            using iterator_category = std::bidirectional_iterator_tag;
+            using difference_type   = ptrdiff_t;
+
             const_iterator(std::size_t ind,
                            const       circular_buffer<T,
                                                        CAPACITY,
@@ -398,8 +400,8 @@ public:
             const circular_buffer<T, CAPACITY, ERASE_ELEMENTS>& data_;
     };
 
-    typedef std::reverse_iterator<iterator> reverse_iterator;
-    typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
+    using reverse_iterator       = std::reverse_iterator<iterator>;
+    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
     iterator begin()                                                    noexcept
     {

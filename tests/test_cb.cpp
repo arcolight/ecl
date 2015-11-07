@@ -72,7 +72,14 @@ int main(int argc, char* argv[])
 
     size_t count = random_variable % (CB_SIZE*2) + 1;
 
-    std::cout << "CB size: " << CB_SIZE << std::endl;
+    std::cout << "CB size: " << CB_SIZE << std::endl << std::endl;
+
+    std::cout << "CB before clear." << std::endl;
+    dump(cb);
+
+    std::cout << "CB after clear." << std::endl;
+    cb.clear();
+    dump(cb);
 
     std::cout << " * push [1; " << count << "]" << std::endl;
 

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstdlib>
 
 #include <ecl/static_map.hpp>
 
@@ -10,22 +11,30 @@ enum class E
     e4
 };
 
-using map_t = static_map<E, const char*>;
+constexpr auto m = ecl::create_map<E, const char*>
+(
+    "",
+    std::pair<E, const char*>(E::e1, "e1"),
+    std::pair<E, const char*>(E::e2, "e2"),
+    std::pair<E, const char*>(E::e3, "e3")
+    // { E::e1, "e1" },
+    // { E::e2, "e2" },
+    // { E::e3, "e3" }
+);
 
-// constexpr map_t::list_t l =
-// ;
-
-const map_t m
+int main(int, char**, char**)
 {
-    { E::e1, "e1" },
-    { E::e2, "e2" },
-    { E::e3, "e3" }
-};
+    std::cout << "map elements count: " << m.size() << std::endl;
 
-int main(int argc, char* argv[], char** env)
-{
-    std::cout << m[E::e1] << std::endl;
-    std::cout << m[E::e2] << std::endl;
-    std::cout << m[E::e3] << std::endl;
-    std::cout << m[E::e4] << std::endl;
+    std::cout << "range-for interation over map [second elements in pair]: ";
+    for(auto& p : m)
+    {
+        std::cout << p.second << " ";
+    }
+    std::cout << std::endl;
+
+    std::cout << "map[E::e1]: " << m[E::e1] << std::endl;
+    std::cout << "map[E::e2]: " << m[E::e2] << std::endl;
+    std::cout << "map[E::e3]: " << m[E::e3] << std::endl;
+    std::cout << "map[E::e4]: " << m[E::e4] << std::endl;
 }
