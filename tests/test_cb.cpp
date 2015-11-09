@@ -11,9 +11,9 @@
 
 typedef ecl::circular_buffer<uint8_t, CB_SIZE, true> circular_buffer_t;
 
-static void dump(circular_buffer_t& c);
+static void dump(const circular_buffer_t& c);
 
-static void dump(circular_buffer_t& c)
+static void dump(const circular_buffer_t& c)
 {
     std::cout << " * back:  " << static_cast<uint32_t>(c.back())  << std::endl
               << " * front: " << static_cast<uint32_t>(c.front()) << std::endl;
@@ -40,7 +40,7 @@ static void dump(circular_buffer_t& c)
     std::cout << "]" << std::endl;
 
     std::cout << " * by iterator (C++03):" << std::endl << "[ ";
-    for(circular_buffer_t::iterator it = c.begin(); it != c.end(); ++it)
+    for(circular_buffer_t::const_iterator it = c.begin(); it != c.end(); ++it)
     {
         std::cout << static_cast<uint32_t>(*it) << " ";
     }

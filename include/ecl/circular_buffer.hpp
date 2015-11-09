@@ -307,7 +307,7 @@ public:
     class const_iterator
     {
         public:
-            using self_type         = iterator;
+            using self_type         = const_iterator;
             using value_type        = const T;
             using reference         = const T&;
             using pointer           = const T*;
@@ -324,7 +324,6 @@ public:
 
             self_type& operator++()                                     noexcept
             {
-                self_type tmp = *this;
                 if(CAPACITY == index_)
                 {
                     index_ = 0;
@@ -334,7 +333,7 @@ public:
                     ++index_;
                 }
 
-                return tmp;
+                return *this;
             }
 
             self_type operator++(int)                                   noexcept
