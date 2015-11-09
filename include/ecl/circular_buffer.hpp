@@ -240,10 +240,9 @@ public:
                 return *this;
             }
 
-            self_type operator++(int junk)                              noexcept
+            self_type operator++(int)                                   noexcept
             {
-                (void)(junk);
-
+                self_type tmp = *this;
                 if(CAPACITY == index_)
                 {
                     index_ = 0;
@@ -253,7 +252,7 @@ public:
                     ++index_;
                 }
 
-                return *this;
+                return tmp;
             }
 
             self_type& operator--()                                     noexcept
@@ -270,9 +269,9 @@ public:
                 return *this;
             }
 
-            self_type operator--(int junk)                              noexcept
+            self_type operator--(int)                                   noexcept
             {
-                (void)(junk);
+                self_type tmp = *this;
                 if(0 == index_)
                 {
                     index_ = CAPACITY;
@@ -281,7 +280,8 @@ public:
                 {
                     --index_;
                 }
-                return *this;
+
+                return tmp;
             }
 
             reference operator*()                                       noexcept
@@ -324,6 +324,7 @@ public:
 
             self_type& operator++()                                     noexcept
             {
+                self_type tmp = *this;
                 if(CAPACITY == index_)
                 {
                     index_ = 0;
@@ -333,13 +334,12 @@ public:
                     ++index_;
                 }
 
-                return *this;
+                return tmp;
             }
 
-            self_type operator++(int junk)                              noexcept
+            self_type operator++(int)                                   noexcept
             {
-                (void)(junk);
-
+                self_type tmp = *this;
                 if(CAPACITY == index_)
                 {
                     index_ = 0;
@@ -349,7 +349,7 @@ public:
                     ++index_;
                 }
 
-                return *this;
+                return tmp;
             }
 
             self_type& operator--()                                     noexcept
@@ -366,9 +366,9 @@ public:
                 return *this;
             }
 
-            self_type operator--(int junk)                              noexcept
+            self_type operator--(int)                                   noexcept
             {
-                (void)(junk);
+                self_type tmp = *this;
                 if(0 == index_)
                 {
                     index_ = CAPACITY;
@@ -377,7 +377,7 @@ public:
                 {
                     --index_;
                 }
-                return *this;
+                return tmp;
             }
 
             reference operator*()                                 const noexcept

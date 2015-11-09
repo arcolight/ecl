@@ -5,20 +5,22 @@
 #include <type_traits>
 #include <array>
 
+#include <ecl/rb_tree.hpp>
+
 namespace ecl
 {
 
 template<typename K, typename V, std::size_t N>
 class static_map
 {
+    using tree_node_t = typename rb_tree<K, V>::node_t;
 public:
     using pair_t = std::pair<K, V>;
 
     template<typename... Args>
-    constexpr explicit static_map (V&& not_found_element,
-                                   Args&&... args) :
-        m_pairs     { { args... } },
-        m_not_found { not_found_element }
+    constexpr explicit static_map (Args&&... args) :
+        m_nodes { { std::forward<Args>(args)... } }
+        // m_pairs     { { args... } }
     {
         static_assert(std::is_nothrow_default_constructible<V>::value,
             "Value type should be nothrow default constructible.");
@@ -26,7 +28,7 @@ public:
 
     const V& operator[](const K& k)                               const noexcept
     {
-        for(auto& p : m_pairs)
+        for(auto& p : m_nodes)
         {
             if(p.first == k)
             {
@@ -49,36 +51,36 @@ public:
 
     const pair_t* begin()                                         const noexcept
     {
-        return m_pairs.begin();
+        return m_nodes.begin();
     }
 
     const pair_t* end()                                           const noexcept
     {
-        return m_pairs.end();
+        return m_nodes.end();
     }
 
     const pair_t* rbegin()                                        const noexcept
     {
-        return m_pairs.rbegin();
+        return m_nodes.rbegin();
     }
 
     const pair_t* rend()                                          const noexcept
     {
-        return m_pairs.rend();
+        return m_nodes.rend();
     }
 
 private:
-    const std::array<pair_t, N> m_pairs {};
-    const V m_not_found                 {};
+//    const std::array<pair_t, N> m_pairs     {};
+    const V                          m_not_found {};
+
+    rb_tree<K, V>                    m_tree;
+    const std::array<tree_node_t, N> m_nodes;
 };
 
 template<typename K, typename V, typename... Args>
-constexpr inline static_map<K, V, sizeof...(Args)> create_map(
-                                                       V&& not_found_element,
-                                                       Args&&... args)
+constexpr inline static_map<K, V, sizeof...(Args)> create_map(Args&&... args)
 {
-    return static_map<K, V, sizeof...(Args)>(std::forward<V>(not_found_element),
-                                             std::forward<Args>(args)...);
+    return static_map<K, V, sizeof...(Args)>(std::forward<Args>(args)...);
 }
 
 } // namespace ecl

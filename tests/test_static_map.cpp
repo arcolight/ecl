@@ -13,7 +13,6 @@ enum class E
 
 constexpr auto m = ecl::create_map<E, const char*>
 (
-    "",
     std::pair<E, const char*>(E::e1, "e1"),
     std::pair<E, const char*>(E::e2, "e2"),
     std::pair<E, const char*>(E::e3, "e3")

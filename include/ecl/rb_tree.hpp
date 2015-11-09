@@ -2,127 +2,101 @@
 #define ECL_STATIC_RB_TREE
 
 #include <cstddef>
+#include <utility>
 
 namespace ecl
 {
 
 enum class rb_color
 {
-    BLACK,
-    RED
+    BLACK = true  ,
+    RED   = false
 };
 
-template<typename T, std::size_t N>
+template<typename K, typename V>
+struct rb_tree_node
+{
+    using node_t = rb_tree_node<K, V>;
+    using pair_t = std::pair<K, V>;
+
+    constexpr rb_tree_node(pair_t&& p) :
+        data { std::forward<pair_t>(p) }
+    {}
+
+    rb_color color  { rb_color::RED };
+
+    node_t*  left   { nullptr };
+    node_t*  right  { nullptr };
+    node_t*  parent { nullptr };
+
+    pair_t   data   {};
+};
+
+template<typename K, typename V, typename Compare = std::less<K>>
 class rb_tree
 {
 public:
+    using key_type    = K;
+    using mapped_type = V;
+    using value_type  = std::pair<const K, V>;
+    using key_compare = Compare;
 
-    template<typename T>
-    struct rb_tree_node
+    using node_t      = rb_tree_node<K, V>;
+
+    class iterator
     {
-        rb_color         color  { rb_color::BLACK };
 
-        rb_tree_node<T>* left   { nullptr         };
-        rb_tree_node<T>* right  { nullptr         };
-        rb_tree_node<T>* parent { nullptr         };
-
-        T*               data   { nullptr         };
     };
 
-    using node_t = rb_tree_node<T>;
+    class const_iterator
+    {
+
+    };
 
     rb_tree()
     {
     }
 
-private:
-    void rotate_left(node_t* x)
+    node_t*& find(const key_type& k)
     {
-        node_t* y = x->right;
+        node_t*& current = m_root;
 
-        x->right = y->left;
-
-        if(nullptr != y->left)
+        while(nullptr != current)
         {
-            y->left->parent = x;
-        }
-
-        if (nullptr != y)
-        {
-            y->parent = x->parent;
-        }
-
-        if (nullptr != x->parent)
-        {
-            if (x == x->parent->left)
+            if(m_compare(k, current->data.first))
             {
-                x->parent->left = y;
+                current = current->left;
             }
-            else
+            else if(m_compare(current->data.first, k))
             {
-                x->parent->right = y;
+                current = current->right;
             }
         }
-        else
-        {
-            m_root = y;
-        }
 
-        y->left = x;
-
-        if (nullptr != x)
-        {
-            x->parent = y;
-        }
+        return current;
     }
 
-    void rotate_right(node_t* x)
+    node_t* insert(node_t* n)
     {
-        node_t* y = x->left;
-
-        x->left = y->right;
-        if (nullptr != y->right)
+        if(nullptr == n)
         {
-            y->right->parent = x;
+            return nullptr;
         }
-
-        if (nullptr != y)
-        {
-            y->parent = x->parent;
-        }
-
-        if (x->parent)
-        {
-            if (x == x->parent->right)
-            {
-                x->parent->right = y;
-            }
-            else
-            {
-                x->parent->left = y;
-            }
-        }
-        else
-        {
-            m_root = y;
-        }
-
-        y->right = x;
-
-        if (nullptr != x)
-        {
-            x->parent = y;
-        }
-    }
-
-    void fix(node_t* x)
-    {
-
     }
 
 private:
-    node_t  m_nodes[N];
-    node_t* m_root { nullptr };
+    void rotate_left(node_t* n)
+    {
+    }
+
+    void rotate_right(node_t* n)
+    {
+    }
+
+private:
+    node_t*     m_root       { nullptr };
+    std::size_t m_node_count { 0 };
+    key_compare m_compare    {};
 };
 
 } // namespace ecl
