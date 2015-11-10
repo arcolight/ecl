@@ -243,10 +243,8 @@ protected:
         }
 
         template<std::size_t CNT>
-        static void on_exit_chain(derived& fsm, const state_t s)
+        static void on_exit_chain(derived& /* fsm */, const state_t /* s */)
         {
-            (void)(fsm);
-            (void)(s);
         }
 
         template<std::size_t CNT, typename callback, typename... tail>
@@ -265,10 +263,8 @@ protected:
         }
 
         template<std::size_t CNT>
-        static void on_enter_chain(derived& fsm, const state_t s)
+        static void on_enter_chain(derived& /* fsm */, const state_t /* s */)
         {
-            (void)(fsm);
-            (void)(s);
         }
     };
 

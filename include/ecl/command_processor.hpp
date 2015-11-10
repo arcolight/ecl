@@ -67,16 +67,11 @@ private:
     }
 
     template<typename ST>
-    bool call(ST& st,
-              const char* const nm,
-              const std::size_t argc,
-              const char**      argv)                             const noexcept
+    bool call(ST& /* st */,
+              const char* const /* nm */,
+              const std::size_t /* argc */,
+              const char** /* argv */)                            const noexcept
     {
-        (void)(st);
-        (void)(nm);
-        (void)(argc);
-        (void)(argv);
-
 //        help(st);
 
         return false;
@@ -95,13 +90,10 @@ private:
     }
 
     template<typename ST>
-    static void show_help_internal(ST& st,
-                                   std::size_t indent,
-                                   std::size_t indent_increment)        noexcept
+    static void show_help_internal(ST& /* st */,
+                                   std::size_t /* indent */,
+                                   std::size_t /* indent_increment */)  noexcept
     {
-        (void)st;
-        (void)indent;
-        (void)indent_increment;
     }
 
     std::size_t  m_argc { 0 };

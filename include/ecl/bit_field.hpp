@@ -170,10 +170,9 @@ private:
     }
 
     template<uint8_t OFFSET>
-    void pack_(uint8_t* array)                                    const noexcept
+    void pack_(uint8_t* /* array */)                              const noexcept
     {
         static_assert((OFFSET <= SIZE * 8), "offset out of bound");
-        (void)array;
     }
 
     template<uint8_t OFFSET, typename F, typename... TAIL>
@@ -198,10 +197,9 @@ private:
     }
 
     template<uint8_t OFFSET>
-    void unpack_(uint8_t* array)                                  const noexcept
+    void unpack_(uint8_t* /* array */)                            const noexcept
     {
         static_assert((OFFSET <= SIZE * 8), "offset out of bound");
-        (void)array;
     }
 
     template<uint8_t OFFSET, typename F, typename... TAIL>

@@ -286,15 +286,11 @@ private:
     }
 
     template<typename STREAM>
-    void serialize_internal(STREAM& st,
-                            bool beautify,
-                            std::size_t indent,
-                            std::size_t indent_increment)                  const
+    void serialize_internal(STREAM&     /* st               */,
+                            bool        /* beautify         */,
+                            std::size_t /* indent           */,
+                            std::size_t /* indent_increment */)            const
     {
-        (void)st;
-        (void)beautify;
-        (void)indent;
-        (void)indent_increment;
     }
 
     // Deserialization
@@ -322,10 +318,8 @@ private:
         return deserialize_internal(s, length);
     }
 
-    bool deserialize_internal(const char*& s, std::size_t& length)
+    bool deserialize_internal(const char*& /* s */, std::size_t& /* length */)
     {
-        (void)s;
-        (void)length;
         return true;
     }
 

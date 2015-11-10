@@ -11,11 +11,11 @@ enum class E
     e4
 };
 
-const auto m = ecl::create_map<E, const char*>
+const auto m = ecl::create_map<const E, const char*>
 (
-    std::pair<E, const char*>(E::e1, "e1"),
-    std::pair<E, const char*>(E::e2, "e2"),
-    std::pair<E, const char*>(E::e3, "e3")
+    std::pair<const E, const char*>(E::e1, "e1"),
+    std::pair<const E, const char*>(E::e2, "e2"),
+    std::pair<const E, const char*>(E::e3, "e3")
 );
 
 int main(int, char**, char**)

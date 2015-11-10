@@ -92,9 +92,8 @@ class command : public virtual detail::cmd_core<cmd>
 {
 public:
     template<typename ST>
-    bool dispatch(ST& st)
+    bool dispatch(ST& /* st */)
     {
-        (void)(st);
         this->execute(*static_cast<cmd*>(this));
 
         return true;

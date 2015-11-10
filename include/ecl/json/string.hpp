@@ -88,14 +88,10 @@ public:
      */
     template<typename STREAM>
     void serialize(STREAM& st,
-                   bool beautify,
-                   std::size_t indent,
-                   std::size_t indent_increment)                           const
+                   bool /* beautify */,
+                   std::size_t /* indent */,
+                   std::size_t /* indent_increment */)                     const
     {
-        (void)beautify;
-        (void)indent;
-        (void)indent_increment;
-
         st << "\"";
 
         for(std::size_t i = 0; i < strlen(m_val.data()) && i < SIZE; ++i)
