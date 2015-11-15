@@ -1,5 +1,5 @@
 ARM_LD_FLAGS = --specs=rdimon.specs
-OPTIMIZATION = -O2
+OPTIMIZATION = -O0
 DEBUG = -g3
 
 GCC_WARNINGS = -Wall -Wextra -pedantic -Wswitch -Wnon-virtual-dtor
@@ -26,7 +26,7 @@ SINGLETON = singleton
 STREAM = stream
 STR_CONST = str_const
 STATIC_MAP = static_map
-RB_TREE = rb_tree
+TREE = tree
 CMD = command_processor
 WEB = web
 STATIC_MAP = static_map
@@ -99,8 +99,8 @@ test_$(STR_CONST): out_dir
 test_$(STATIC_MAP): out_dir
 	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(STATIC_MAP)_$(CXX).map $(TESTS_DIR)/test_$(STATIC_MAP).cpp -o $(BIN_DIR)/$(STATIC_MAP)_$(CXX)
 
-test_$(RB_TREE): out_dir
-	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(RB_TREE)_$(CXX).map $(TESTS_DIR)/test_$(RB_TREE).cpp -o $(BIN_DIR)/$(RB_TREE)_$(CXX)
+test_$(TREE): out_dir
+	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(TREE)_$(CXX).map $(TESTS_DIR)/test_$(TREE).cpp -o $(BIN_DIR)/$(TREE)_$(CXX)
 
 test_$(CMD): out_dir
 	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(CMD)_$(CXX).map $(TESTS_DIR)/test_$(CMD).cpp -o $(BIN_DIR)/$(CMD)_$(CXX)
