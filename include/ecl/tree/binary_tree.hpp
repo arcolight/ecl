@@ -8,44 +8,51 @@
 #include <type_traits>
 #include <iterator>
 
+#ifdef ECL_ENABLE_TREE_SHARED_PTR
+#include <memory>
+#endif // ECL_ENABLE_TREE_SHARED_PTR
+
 namespace ecl
 {
 
 namespace tree
 {
 
+enum class pointer_type
+{
+      RAW
+#ifdef ECL_ENABLE_TREE_SHARED_PTR
+    , SHARED
+#endif // ECL_ENABLE_TREE_SHARED_PTR
+};
+
+template<pointer_type P, typename T>
+struct pointer_wrap {};
+
 template<typename T>
-struct exists
+struct pointer_wrap<pointer_type::RAW, T>
 {
-    static const bool value = true;
+    using type = typename std::add_pointer<T>::type;
 };
 
-template <typename T, typename Enable = void>
-struct pointer_wrap
+#ifdef ECL_ENABLE_TREE_SHARED_PTR
+template<typename T>
+struct pointer_wrap<pointer_type::SHARED, T>
 {
-    using type = T;
+    using type = std::shared_ptr<T>;
 };
-
-template <typename T>
-struct pointer_wrap
-<
-    T,
-    typename std::enable_if<exists<typename T::type>::value>::type
->
-{
-    using type = typename T::type;
-};
+#endif // ECL_ENABLE_TREE_SHARED_PTR
 
 template
 <
     typename K,
     typename V,
-    template<typename, typename> class N,
-    template<typename> class Pointer = std::add_pointer
+    pointer_type PT,
+    template<typename, typename, pointer_type> class N
 >
 struct node_base
 {
-    using pointer     = typename pointer_wrap<Pointer<N<K, V>>>::type;
+    using pointer     = typename pointer_wrap<PT, N<K, V, PT>>::type;
 
     using key_type    = typename std::add_const<K>::type;
     using value_type  = V;
@@ -100,7 +107,7 @@ struct node_base
         std::swap(right,  other.right );
         std::swap(parent, other.parent);
         std::swap(val,    other.val   );
-        key = other.key;
+        std::swap(key,    other.key   );
     }
 
     pointer min()                                                 const noexcept
@@ -144,17 +151,18 @@ struct node_base
 template
 <
     typename K,
-    typename V
+    typename V,
+    pointer_type PT = pointer_type::RAW
 >
-struct node : public node_base<K, V, ecl::tree::node>
+struct node : public node_base<K, V, PT, ecl::tree::node>
 {
     // Full namespace is workaround for clang bug
     // about template-template parameters
     //
     // http://stackoverflow.com/questions/17687459/clang-not-accepting-use-of-template-template-parameter-when-using-crtp
-    using base = node_base<K, V, ecl::tree::node>;
+    using base = node_base<K, V, PT, ecl::tree::node>;
 
-    using node_base<K, V, ecl::tree::node>::node_base;
+    using node_base<K, V, PT, ecl::tree::node>::node_base;
     using typename base::pointer;
 };
 
@@ -162,13 +170,14 @@ template
 <
     typename K,
     typename V,
-    typename Compare = std::less<const K>,
-    typename N = node<K, V>
+    pointer_type PT                                     = pointer_type::RAW,
+    typename Compare                                    = std::less<const K>,
+    template <typename, typename, pointer_type> class N = node
 >
 class binary_tree
 {
 public:
-    using node_t      = N;
+    using node_t      = N<K, V, PT>;
     using pointer     = typename node_t::pointer;
 
     using key_type    = typename node_t::key_type;
@@ -180,6 +189,11 @@ public:
         return insert_from_root(n);
     }
 
+    std::size_t count()                                           const noexcept
+    {
+        return m_size;
+    }
+
 protected:
     pointer insert_from_root(pointer n)
     {
@@ -187,6 +201,7 @@ protected:
         {
             m_root = n;
             m_root->parent = pointer(&m_header);
+            ++m_size;
             return m_root;
         }
 
@@ -201,6 +216,7 @@ protected:
             {
                 node_to->left = n;
                 n->parent = node_to;
+                ++m_size;
                 return n;
             }
 
@@ -212,6 +228,7 @@ protected:
             {
                 node_to->right = n;
                 n->parent = node_to;
+                ++m_size;
                 return n;
             }
 
@@ -397,9 +414,9 @@ public:
         using self_type  = iterator;
         using value_type = V;
         using reference  = V&;
-        // using pointer    = V*;
+        using pointer    = V*;
 
-        iterator(pointer n) : base_iterator(n)
+        iterator(binary_tree::pointer n) : base_iterator(n)
         {}
 
         self_type& operator++()                                         noexcept
@@ -455,9 +472,9 @@ public:
         using self_type  = const_iterator;
         using value_type = const V;
         using reference  = const V&;
-        // using pointer    = const V*;
+        using pointer    = const V*;
 
-        const_iterator(pointer n) : base_iterator(n)
+        const_iterator(binary_tree::pointer n) : base_iterator(n)
         {}
 
         self_type& operator++()                                         noexcept
@@ -548,6 +565,7 @@ public:
 protected:
     node_t      m_header;
     pointer     m_root    {};
+    std::size_t m_size    { 0 };
 };
 
 } // namespace tree

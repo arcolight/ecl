@@ -9,10 +9,16 @@ namespace ecl
 namespace tree
 {
 
-template<typename K, typename V, typename Compare = std::less<const K>>
-class balanced_binary_tree : public binary_tree<K, V, Compare>
+template
+<
+    typename K,
+    typename V,
+    pointer_type PT = pointer_type::RAW,
+    typename Compare = std::less<const K>
+>
+class balanced_binary_tree : public binary_tree<K, V, PT, Compare>
 {
-    using base = binary_tree<K, V, Compare>;
+    using base = binary_tree<K, V, PT, Compare>;
     using typename base::key_compare;
 public:
     using typename base::pointer;

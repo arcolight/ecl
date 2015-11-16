@@ -1,6 +1,6 @@
 ARM_LD_FLAGS = --specs=rdimon.specs
-OPTIMIZATION = -O0
-DEBUG = -g3
+OPTIMIZATION = -O3
+DEBUG = -g0
 
 GCC_WARNINGS = -Wall -Wextra -pedantic -Wswitch -Wnon-virtual-dtor
 CLANG_WARNINGS = -Weverything -Wno-padded -Wno-c++98-compat -Wno-covered-switch-default -Wno-exit-time-destructors
@@ -14,7 +14,9 @@ CXXFLAGS = -std=c++11 -fPIC -fno-rtti -fno-exceptions -fvisibility=hidden $(SECU
 GCC_FLAGS = $(CXXFLAGS) $(GCC_WARNINGS) -fstack-protector -fstack-check -fbounds-check -ggdb
 CLANG_FLAGS = $(CXXFLAGS) $(CLANG_WARNINGS)
 
-FLAGS = $(CXXFLAGS) $(WARNINGS) $(ADD_FLAGS) $(ADD_WARN)
+DEFINES = -DECL_ENABLE_TREE_SHARED_PTR
+
+FLAGS = $(CXXFLAGS) $(WARNINGS) $(ADD_FLAGS) $(ADD_WARN) $(DEFINES)
 
 DOXYGEN_CONFIG = doxygen.config
 

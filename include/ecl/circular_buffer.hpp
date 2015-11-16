@@ -35,6 +35,8 @@ public:
                       "T must be nothrow copy-constructible!");
         static_assert(std::is_pod<T>::value, "T must be POD!");
         static_assert(CAPACITY > 0, "Size must be greater than zero!");
+
+        clear();
     }
 
     /**

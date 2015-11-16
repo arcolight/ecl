@@ -8,18 +8,12 @@
 
 #include <random>
 
-#define NODES_COUNT 10
-
-// using tree_t      = ecl::rb_tree<std::size_t, const char*>;
-// using tree_node_t = typename tree_t::node_t;
-
-// static tree_node_t nodes [NODES_COUNT] = {};
-// static const char* values[NODES_COUNT];
+#define NODES_COUNT 100
 
 using tree_t         = ecl::tree::balanced_binary_tree<int, std::string>;
 using tree_node_t    = typename tree_t::node_t;
 
-using rb_tree_t      = ecl::tree::red_black_tree<int, std::string>;
+using rb_tree_t      = ecl::tree::red_black_tree<int, std::string, ecl::tree::pointer_type::SHARED>;
 using rb_tree_node_t = typename rb_tree_t::node_t;
 
 static tree_node_t nodes [] =
@@ -49,7 +43,6 @@ static tree_node_t nodes [] =
     { 7,  "7"  },
     { 19, "19" }
 };
-// static const char* values[NODES_COUNT];
 
 int main(int, char**, char**)
 {
@@ -64,9 +57,9 @@ int main(int, char**, char**)
     tree_t t2;
 
     std::default_random_engine e1;
-    std::uniform_int_distribution<int> uniform_dist(0, 100);
+    std::uniform_int_distribution<int> uniform_dist(0, NODES_COUNT);
 
-    for(std::size_t i = 0; i < 100; ++i)
+    for(std::size_t i = 0; i < NODES_COUNT; ++i)
     {
         int v = uniform_dist(e1);
         std::cout << "[BT] Inserting node: (" << v << "; " << std::to_string(v) << ")" << std::endl;
@@ -75,7 +68,7 @@ int main(int, char**, char**)
 
     rb_tree_t rb_t;
 
-    for(std::size_t i = 0; i < 100; ++i)
+    for(std::size_t i = 0; i < NODES_COUNT; ++i)
     {
         int v = uniform_dist(e1);
         std::cout << "[RB] Inserting node: (" << v << "; " << std::to_string(v) << ")" << std::endl;
