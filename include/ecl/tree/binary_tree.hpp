@@ -14,15 +14,38 @@ namespace ecl
 namespace tree
 {
 
+template<typename T>
+struct exists
+{
+    static const bool value = true;
+};
+
+template <typename T, typename Enable = void>
+struct pointer_wrap
+{
+    using type = T;
+};
+
+template <typename T>
+struct pointer_wrap
+<
+    T,
+    typename std::enable_if<exists<typename T::type>::value>::type
+>
+{
+    using type = typename T::type;
+};
+
 template
 <
     typename K,
     typename V,
-    template<typename, typename> class P
+    template<typename, typename> class N,
+    template<typename> class Pointer = std::add_pointer
 >
 struct node_base
 {
-    using pointer     = P<K, V>*;
+    using pointer     = typename pointer_wrap<Pointer<N<K, V>>>::type;
 
     using key_type    = typename std::add_const<K>::type;
     using value_type  = V;
@@ -76,8 +99,8 @@ struct node_base
         std::swap(left,   other.left  );
         std::swap(right,  other.right );
         std::swap(parent, other.parent);
-        key = other.key;
         std::swap(val,    other.val   );
+        key = other.key;
     }
 
     pointer min()                                                 const noexcept
@@ -110,12 +133,12 @@ struct node_base
         return this == x->parent->right;
     }
 
-    pointer left    { nullptr };
-    pointer right   { nullptr };
-    pointer parent  { nullptr };
+    pointer    left   {};
+    pointer    right  {};
+    pointer    parent {};
 
-    key_type   key {};
-    value_type val {};
+    key_type   key    {};
+    value_type val    {};
 };
 
 template
@@ -151,6 +174,11 @@ public:
     using key_type    = typename node_t::key_type;
     using value_type  = typename node_t::value_type;
     using key_compare = Compare;
+
+    pointer insert(pointer n)
+    {
+        return insert_from_root(n);
+    }
 
 protected:
     pointer insert_from_root(pointer n)
@@ -196,14 +224,14 @@ protected:
         }
     }
 
-    std::pair<pointer, pointer> find(const key_type& k)           const noexcept
+    pointer& find(const key_type& k)                              const noexcept
     {
         pointer previous = nullptr;
         pointer current  = m_root;
 
         if(nullptr == m_root)
         {
-            return std::make_pair(nullptr, nullptr);
+            return m_root;
         }
 
         while(nullptr != current)
@@ -519,7 +547,7 @@ public:
 
 protected:
     node_t      m_header;
-    pointer     m_root    { nullptr };
+    pointer     m_root    {};
 };
 
 } // namespace tree

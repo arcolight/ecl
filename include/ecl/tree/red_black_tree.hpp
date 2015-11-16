@@ -3,6 +3,8 @@
 
 #include <ecl/tree/binary_tree.hpp>
 
+#include <memory>
+
 namespace ecl
 {
 
@@ -20,15 +22,15 @@ template
     typename K,
     typename V
 >
-struct red_black_node : public node_base<K, V, ecl::tree::red_black_node>
+struct red_black_node : public node_base<K, V, ecl::tree::red_black_node, std::shared_ptr>
 {
     // Full namespace is workaround for clang bug
     // about template-template parameters
     //
     // http://stackoverflow.com/questions/17687459/clang-not-accepting-use-of-template-template-parameter-when-using-crtp
-    using base = node_base<K, V, ecl::tree::red_black_node>;
+    using base = node_base<K, V, ecl::tree::red_black_node, std::shared_ptr>;
 
-    using node_base<K, V, ecl::tree::red_black_node>::node_base;
+    using node_base<K, V, ecl::tree::red_black_node, std::shared_ptr>::node_base;
     using typename base::pointer;
 
     node_color color { node_color::RED };

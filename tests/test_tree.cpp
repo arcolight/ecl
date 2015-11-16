@@ -79,7 +79,7 @@ int main(int, char**, char**)
     {
         int v = uniform_dist(e1);
         std::cout << "[RB] Inserting node: (" << v << "; " << std::to_string(v) << ")" << std::endl;
-        rb_t.insert(new rb_tree_node_t(v, std::to_string(v)));
+        rb_t.insert(std::make_shared<rb_tree_node_t>(v, std::to_string(v)));
     }
     // for(auto& n : t)
     // {
