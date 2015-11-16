@@ -199,9 +199,13 @@ protected:
     {
         if(nullptr == m_root)
         {
-            m_root = n;
-            m_root->parent = pointer(&m_header);
+            m_root          = n;
+            m_root->parent  = pointer(&m_header);
+            m_header.left  = m_root;
+            m_header.right = m_root;
+
             ++m_size;
+
             return m_root;
         }
 

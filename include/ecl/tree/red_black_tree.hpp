@@ -57,13 +57,22 @@ public:
     pointer insert(pointer n)
     {
         pointer result = this->insert_from_root(n);
+
+        m_root->color = node_color::BLACK;
+
         fixup(result);
+
         return result;
     }
 
 private:
     void fixup(pointer x)                                               noexcept
     {
+        if(x == m_root)
+        {
+            return;
+        }
+
         pointer y = nullptr;
 
         while ( x->parent->color == node_color::RED )
