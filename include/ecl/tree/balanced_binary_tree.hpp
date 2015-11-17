@@ -23,6 +23,11 @@ class balanced_binary_tree : public binary_tree<K, V, PT, Compare>
 public:
     using typename base::pointer;
     using base::insert;
+
+    // using base::iterator;
+    // using base::const_iterator;
+    // using base::reverse_iterator;
+    // using base::const_reverse_iterator;
 };
 
 } // namespace tree

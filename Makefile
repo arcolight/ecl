@@ -1,6 +1,6 @@
 ARM_LD_FLAGS = --specs=rdimon.specs
-OPTIMIZATION = -O3
-DEBUG = -g0
+OPTIMIZATION = -O0
+DEBUG = -g3
 
 GCC_WARNINGS = -Wall -Wextra -pedantic -Wswitch -Wnon-virtual-dtor
 CLANG_WARNINGS = -Weverything -Wno-padded -Wno-c++98-compat -Wno-covered-switch-default -Wno-exit-time-destructors

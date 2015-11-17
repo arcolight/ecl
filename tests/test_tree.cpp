@@ -8,12 +8,12 @@
 
 #include <random>
 
-#define NODES_COUNT 100
+#define NODES_COUNT 1000
 
 using tree_t         = ecl::tree::balanced_binary_tree<int, std::string>;
 using tree_node_t    = typename tree_t::node_t;
 
-using rb_tree_t      = ecl::tree::red_black_tree<int, std::string, ecl::tree::pointer_type::SHARED>;
+using rb_tree_t      = ecl::tree::red_black_tree<int, std::string/*, ecl::tree::pointer_type::SHARED*/>;
 using rb_tree_node_t = typename rb_tree_t::node_t;
 
 static tree_node_t nodes [] =
@@ -48,23 +48,29 @@ int main(int, char**, char**)
 {
     tree_t t1;
 
-    for(auto& n : nodes)
-    {
-        std::cout << "Inserting node: (" << n.key << "; " << n.val << ")" << std::endl;
-        t1.insert(&n);
-    }
+    // for(auto& n : nodes)
+    // {
+    //     std::cout << "Inserting node: (" << n.key << "; " << n.val << ")" << std::endl;
+    //     t1.insert(&n);
+    // }
 
     tree_t t2;
 
     std::default_random_engine e1;
     std::uniform_int_distribution<int> uniform_dist(0, NODES_COUNT);
 
-    for(std::size_t i = 0; i < NODES_COUNT; ++i)
-    {
-        int v = uniform_dist(e1);
-        std::cout << "[BT] Inserting node: (" << v << "; " << std::to_string(v) << ")" << std::endl;
-        t2.insert(new tree_node_t(v, std::to_string(v)));
-    }
+    // for(std::size_t i = 0; i < NODES_COUNT; ++i)
+    // {
+    //     int v = uniform_dist(e1);
+    //     std::cout << "[BT] Inserting node: (" << v << "; " << std::to_string(v) << ")" << std::endl;
+    //     tree_node_t::pointer p = new tree_node_t(v, std::to_string(v));
+    //     if(t2.insert( p) != p)
+    //     {
+    //         delete p;
+    //     }
+
+    //     std::cout << "find: " << v << std::endl << *(t2.find(v)) << std::endl;
+    // }
 
     rb_tree_t rb_t;
 
@@ -72,7 +78,14 @@ int main(int, char**, char**)
     {
         int v = uniform_dist(e1);
         std::cout << "[RB] Inserting node: (" << v << "; " << std::to_string(v) << ")" << std::endl;
-        rb_t.insert(std::make_shared<rb_tree_node_t>(v, std::to_string(v)));
+//        rb_t.insert(std::make_shared<rb_tree_node_t>(v, std::to_string(v)));
+
+        rb_tree_node_t::pointer p = new rb_tree_node_t(v, std::to_string(v));
+        std::cout << "Pinter = " << std::hex << p << std::dec << std::endl;
+        if(rb_t.insert(p) != p)
+        {
+            delete p;
+        }
     }
     // for(auto& n : t)
     // {
