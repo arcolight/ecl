@@ -166,4 +166,12 @@ int main(int, char**, char**)
     {
         std::cout << "[RB iterator] : " << v << std::endl;
     }
+
+    auto rb_it_begin = rb_t2.rbegin();
+    auto rb_it_end = rb_t2.rend();
+
+    for(auto rb_it = rb_t2.rbegin(); rb_it != rb_it_end; ++rb_it)
+    {
+        std::cout << "[RB reverse iterator] : " << *rb_it << std::endl;
+    }
 }

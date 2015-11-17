@@ -252,6 +252,7 @@ protected:
         {
             if(m_n == m_e)
             {
+                m_n = m_e->right;
                 return;
             }
 
@@ -270,11 +271,6 @@ protected:
                 {
                     m_n = y;
                     y = y->parent;
-                    if(nullptr == y)
-                    {
-                        m_n = m_e;
-                        return;
-                    }
                 }
 
                 if(m_n->left != y)
