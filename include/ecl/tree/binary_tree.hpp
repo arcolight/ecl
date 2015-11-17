@@ -7,9 +7,6 @@
 #include <functional>
 #include <type_traits>
 #include <iterator>
-#include <algorithm>
-
-#include <iomanip>
 
 #ifdef ECL_ENABLE_TREE_SHARED_PTR
 #include <memory>
@@ -131,28 +128,6 @@ struct node_base
             result = result->right;
         }
         return result;
-    }
-
-    void print_indent(std::size_t indent)
-    {
-        for(std::size_t i = 0; i < indent; ++i)
-        {
-            std::cout << " ";
-        }
-    }
-
-    void print(const char* s, std::size_t indent)
-    {
-        print_indent(indent);
-        std::cout << s << key << std::endl;
-        if(nullptr != left)
-        {
-            left->print("l. ", indent + 1);
-        }
-        if(nullptr != right)
-        {
-            right->print("r. ", indent + 1);
-        }
     }
 
     inline pointer grandparent()
@@ -455,12 +430,17 @@ public:
 
     iterator insert(pointer n)
     {
-        return insert_from_root(n);
+        return insert_from_root(n, true, true);
     }
 
     std::size_t count()                                           const noexcept
     {
         return m_size;
+    }
+
+    pointer root()                                                      noexcept
+    {
+        return m_root;
     }
 
     iterator find(const key_type& k)                              const noexcept
@@ -471,17 +451,14 @@ public:
         {
             if(key_compare()(current->key, k))
             {
-                std::cout << k << " > " << current->key << std::endl;
                 current  = current->right;
             }
             else if(key_compare()(k, current->key))
             {
-                std::cout << k << " < " << current->key << std::endl;
                 current  = current->left;
             }
             else
             {
-                std::cout << "Found!" << std::endl;
                 return iterator(current);
             }
         }
@@ -490,7 +467,7 @@ public:
     }
 
 protected:
-    iterator insert_from_root(pointer n)
+    iterator insert_from_root(pointer n, bool most_left, bool most_right)
     {
         if(nullptr == m_root)
         {
@@ -505,145 +482,139 @@ protected:
             return m_root;
         }
 
-        return insert_from_node(n, m_root);
+        return insert_from_node(n, m_root, most_left, most_right);
     }
 
-    iterator insert_from_node(pointer n, pointer node_to)
+    iterator insert_from_node(pointer n,
+                              pointer node_to,
+                              bool    most_left,
+                              bool    most_right)
     {
         if(key_compare()(n->key, node_to->key))
         {
-            std::cout << n->key << " < " << node_to->key << std::endl;
             if(nullptr == node_to->left)
             {
                 node_to->left = n;
                 n->parent = node_to;
 
+                if(most_left)
+                {
+                    m_header.left = n;
+                }
+
                 ++m_size;
 
                 return iterator(n);
             }
 
-            return insert_from_node(n, node_to->left);
+            return insert_from_node(n, node_to->left, most_left & true, false);
         }
         else if(key_compare()(node_to->key, n->key))
         {
-            std::cout << n->key << " > " << node_to->key << std::endl;
             if(nullptr == node_to->right)
             {
                 node_to->right = n;
                 n->parent = node_to;
 
+                if(most_right)
+                {
+                    m_header.right = n;
+                }
+
                 ++m_size;
 
                 return iterator(n);
             }
 
-            return insert_from_node(n, node_to->right);
+            return insert_from_node(n, node_to->right, false, most_right & true);
         }
         else // equality
         {
-            std::cout << n->key << " = " << node_to->key << std::endl;
             node_to->val = n->val;
             return node_to;
         }
     }
 
+    void link_as_left(pointer c, pointer f)                             noexcept
+    {
+        if((nullptr == c) && (nullptr == f))
+        {
+            return;
+        }
+
+        if(nullptr != f)
+        {
+            f->left   = c;
+        }
+
+        if(nullptr != c)
+        {
+            c->parent = f;
+        }
+    }
+
+    void link_as_right(pointer c, pointer f)                            noexcept
+    {
+        if((nullptr == c) && (nullptr == f))
+        {
+            return;
+        }
+
+        if(nullptr != f)
+        {
+            f->right  = c;
+        }
+
+        if(nullptr != c)
+        {
+            c->parent = f;
+        }
+    }
+
     pointer rotate_left(pointer n)                                      noexcept
     {
-        std::cout << "rotate left" << std::endl;
+        pointer p = n->parent;
+        pointer r = n->right;
+        pointer rl = (nullptr == r) ? nullptr : r->left;
+        if(nullptr != p)
+        {
+            if(p->left == n)
+            {
+                link_as_left(r, p);
+            }
+            if(p->right == n)
+            {
+                link_as_right(r, p);
+            }
+        }
 
-        pointer saved_left  = n->left;
-        pointer saved_g     = n->grandparent();
-        n->left             = n->parent;
-        n->left->parent     = n;
-        n->left->right      = saved_left;
-        n->parent           = saved_g;
-        saved_g->left       = n;
+        link_as_left(n, r);
+        link_as_right(rl, n);
 
         return n;
     }
 
     pointer rotate_right(pointer n)                                     noexcept
     {
-        std::cout << "rotate right" << std::endl;
+        pointer p = n->parent;
+        pointer l = n->left;
+        pointer lr = (nullptr == l) ? nullptr : l->right;
+        if(nullptr != p)
+        {
+            if(p->left == n)
+            {
+                link_as_left(l, p);
+            }
+            if(p->right == n)
+            {
+                link_as_right(l, p);
+            }
+        }
 
-        pointer saved_right = n->right;
-        pointer saved_g     = n->grandparent();
-        n->right            = n->parent;
-        n->right->parent    = n;
-        n->right->left      = saved_right;
-        n->parent           = saved_g;
-        saved_g->right      = n;
+        link_as_right(n, l);
+        link_as_left(lr, n);
 
         return n;
-    }
-
-    pointer big_rotate_left(pointer n)                                  noexcept
-    {
-        std::cout << "big rotate left" << std::endl;
-
-        pointer saved_r   = n->right;
-        pointer saved_rl  = saved_r->left;
-        pointer saved_par = n->parent;
-
-        if(nullptr != saved_par)
-        {
-            if(saved_par->left == n)
-            {
-                saved_par->left = saved_r;
-            }
-            else
-            {
-                saved_par->right = saved_r;
-            }
-        }
-
-        saved_r->left    = n;
-        n->parent        = saved_r;
-
-        saved_r->parent  = saved_par;
-
-        if(nullptr != saved_rl)
-        {
-            saved_rl->parent = n;
-        }
-        n->right         = saved_rl;
-
-        return n->parent;
-    }
-
-    pointer big_rotate_right(pointer n)                                 noexcept
-    {
-        std::cout << "big rotate right" << std::endl;
-
-        pointer saved_l   = n->left;
-        pointer saved_lr  = saved_l->right;
-        pointer saved_par = n->parent;
-
-        if(nullptr != saved_par)
-        {
-            if(saved_par->left == n)
-            {
-                saved_par->left = saved_l;
-            }
-            else
-            {
-                saved_par->right = saved_l;
-            }
-        }
-
-        saved_l->right   = n;
-        n->parent        = saved_l;
-
-        saved_l->parent  = saved_par;
-
-        if(nullptr != saved_lr)
-        {
-            saved_lr->parent = n;
-        }
-        n->left          = saved_lr;
-
-        return n->parent;
     }
 
 protected:

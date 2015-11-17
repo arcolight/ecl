@@ -3,8 +3,6 @@
 
 #include <ecl/tree/binary_tree.hpp>
 
-#include <memory>
-
 namespace ecl
 {
 
@@ -13,15 +11,15 @@ namespace tree
 
 enum class node_color
 {
-    BLACK = true  ,
-    RED   = false
+      BLACK = true
+    , RED   = false
 };
 
 template
 <
-    typename K,
-    typename V,
-    pointer_type PT = pointer_type::RAW
+      typename     K
+    , typename     V
+    , pointer_type PT = pointer_type::RAW
 >
 struct red_black_node : public node_base<K, V, PT, ecl::tree::red_black_node>
 {
@@ -32,53 +30,26 @@ struct red_black_node : public node_base<K, V, PT, ecl::tree::red_black_node>
     using base = node_base<K, V, PT, ecl::tree::red_black_node>;
 
     using node_base<K, V, PT, ecl::tree::red_black_node>::node_base;
-    using typename base::pointer;
     using base::grandparent;
     using base::uncle;
-
-    using base::print_indent;
-    using base::key;
-    using base::left;
-    using base::right;
-    void print(const char* s, std::size_t indent)
-    {
-        print_indent(indent);
-        if(color == node_color::BLACK)
-        {
-            std::cout << s << key << " [B]" << std::endl;
-        }
-        else
-        {
-            std::cout << s << key << " [R]"<< std::endl;
-        }
-        if(nullptr != left)
-        {
-            left->print("l. ", indent + 1);
-        }
-        if(nullptr != right)
-        {
-            right->print("r. ", indent + 1);
-        }
-    }
 
     node_color color { node_color::RED };
 };
 
 template
 <
-    typename K,
-    typename V,
-    pointer_type PT  = pointer_type::RAW,
-    typename Compare = std::less<const K>
+      typename     K
+    , typename     V
+    , pointer_type PT      = pointer_type::RAW
+    , typename     Compare = std::less<const K>
 >
 class red_black_tree : public binary_tree<K, V, PT, Compare, red_black_node>
 {
     using base = binary_tree<K, V, PT, Compare, red_black_node>;
-    using typename base::key_compare;
     using base::m_root;
+
     using base::m_header;
 public:
-    using typename base::node_t;
     using typename base::pointer;
 
     using typename base::iterator;
@@ -86,16 +57,19 @@ public:
     using typename base::reverse_iterator;
     using typename base::const_reverse_iterator;
 
+    using base::root;
+    using base::count;
+
     iterator insert(pointer n)
     {
-        iterator result = this->insert_from_root(n);
+        iterator result = this->base::insert(n);
         n->color = node_color::RED;
-
-        m_root->print("p. ", 0);
 
         insert_case1(n);
 
-        m_root->print("p. ", 0);
+        std::cout << "most left:  " << m_header.left->key   << std::endl
+                  << "most right: " << m_header.right->key  << std::endl
+                  << "root:       " << m_header.parent->key << std::endl;
 
         return result;
     }
@@ -113,7 +87,7 @@ private:
      */
     void insert_case1(pointer n)
     {
-        std::cout << "case 1." << std::endl;
+        std::cout << "case 1" << std::endl;
         if(nullptr == n->parent)
         {
             n->color = node_color::BLACK;
@@ -136,7 +110,7 @@ private:
      */
     void insert_case2(pointer n)
     {
-        std::cout << "case 2." << std::endl;
+        std::cout << "case 2" << std::endl;
         if(node_color::BLACK == n->parent->color)
         {
             return;
@@ -160,7 +134,7 @@ private:
      */
     void insert_case3(pointer n)
     {
-        std::cout << "case 3." << std::endl;
+        std::cout << "case 3" << std::endl;
         pointer u = n->uncle();
 
         if((nullptr != u)                &&
@@ -184,7 +158,7 @@ private:
     /**
      *  Case 4
      *  ======
-     *  rotate left case:
+     *  rotate left around P:
      *
      *         -- G [B] --                             -- G [B] --
      *      /              \                        /              \
@@ -197,18 +171,22 @@ private:
      */
     void insert_case4(pointer n)
     {
-        std::cout << "case 4." << std::endl;
+        std::cout << "case 4" << std::endl;
         pointer g = n->grandparent();
 
         if((n == n->parent->right) && (n->parent == g->left))
         {
-            this->rotate_left(n);
+            std::cout << "rotate left around " << n->parent->key << std::endl;
+            this->rotate_left(n->parent);
             n->color = node_color::BLACK;
+            n = n->left;
         }
         else if((n == n->parent->left) && (n->parent == g->right))
         {
-            this->rotate_right(n);
+            std::cout << "rotate right around " << n->parent->key << std::endl;
+            this->rotate_right(n->parent);
             n->color = node_color::BLACK;
+            n = n->right;
         }
 
         insert_case5(n);
@@ -217,7 +195,7 @@ private:
     /**
      *  Case 5
      *  ======
-     *  big rotate right case:
+     *  rotate right around G:
      *
      *             G [B]                       -- P [B] --
      *           /      \                   /              \
@@ -230,7 +208,7 @@ private:
      */
     void insert_case5(pointer n)
     {
-        std::cout << "case 5." << std::endl;
+        std::cout << "case 5" << std::endl;
         pointer g = n->grandparent();
 
         n->parent->color = node_color::BLACK;
@@ -238,19 +216,22 @@ private:
 
         if((n == n->parent->left) && (n->parent == g->left))
         {
-            this->big_rotate_right(g);
+            std::cout << "rotate right around " << g->key << std::endl;
+            this->rotate_right(g);
         }
         else
         {
-            this->big_rotate_left(g);
+            std::cout << "rotate left around " << g->key << std::endl;
+            this->rotate_left(g);
         }
 
         if(m_root == g)
         {
             m_root = g->parent;
+            m_root->parent = nullptr;
+            m_header.parent = m_root;
         }
     }
-
 };
 
 } // namespace tree
