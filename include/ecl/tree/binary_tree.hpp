@@ -207,12 +207,18 @@ protected:
         using iterator_category = std::bidirectional_iterator_tag;
         using difference_type   = ptrdiff_t;
 
-        base_iterator(pointer n)                                        noexcept
+        base_iterator(pointer n, pointer e)                             noexcept
             : m_n(n)
+            , m_e(e)
         {}
 
         void increment()                                                noexcept
         {
+            if(m_n == m_e)
+            {
+                return;
+            }
+
             if(nullptr != m_n->right)
             {
                 m_n = m_n->right;
@@ -228,6 +234,11 @@ protected:
                 {
                     m_n = y;
                     y = y->parent;
+                    if(nullptr == y)
+                    {
+                        m_n = m_e;
+                        return;
+                    }
                 }
 
                 if(m_n->right != y)
@@ -239,6 +250,11 @@ protected:
 
         void decrement()                                                noexcept
         {
+            if(m_n == m_e)
+            {
+                return;
+            }
+
             if(nullptr != m_n->left)
             {
                 m_n = m_n->left;
@@ -254,6 +270,11 @@ protected:
                 {
                     m_n = y;
                     y = y->parent;
+                    if(nullptr == y)
+                    {
+                        m_n = m_e;
+                        return;
+                    }
                 }
 
                 if(m_n->left != y)
@@ -264,6 +285,7 @@ protected:
         }
 
         pointer m_n { nullptr };
+        pointer m_e { nullptr };
     };
 
 public:
@@ -273,6 +295,7 @@ public:
         using base_iterator::increment;
         using base_iterator::decrement;
         using base_iterator::m_n;
+        using base_iterator::m_e;
 
     public:
         using self_type  = iterator;
@@ -280,7 +303,8 @@ public:
         using reference  = V&;
         using pointer    = V*;
 
-        iterator(binary_tree::pointer n) : base_iterator(n)
+        iterator(binary_tree::pointer n, binary_tree::pointer e)
+            : base_iterator(n, e)
         {}
 
         self_type& operator++()                                         noexcept
@@ -316,12 +340,22 @@ public:
 
         bool operator==(const self_type& rhs)                              const
         {
-            return m_n == rhs.m_n;
+            return (m_n == rhs.m_n) && (m_e == rhs.m_e);
         }
 
         bool operator!=(const self_type& rhs)                              const
         {
-            return m_n != rhs.m_n;
+            return !operator==(rhs);
+        }
+
+        bool operator==(const binary_tree::pointer& rhs)                   const
+        {
+            return m_n == rhs;
+        }
+
+        bool operator!=(const binary_tree::pointer& rhs)                   const
+        {
+            return !operator==(rhs);
         }
     };
 
@@ -331,6 +365,7 @@ public:
         using base_iterator::increment;
         using base_iterator::decrement;
         using base_iterator::m_n;
+        using base_iterator::m_e;
 
     public:
         using self_type  = const_iterator;
@@ -338,7 +373,8 @@ public:
         using reference  = const V&;
         using pointer    = const V*;
 
-        const_iterator(binary_tree::pointer n) : base_iterator(n)
+        const_iterator(binary_tree::pointer n, binary_tree::pointer e)
+            : base_iterator(n, e)
         {}
 
         self_type& operator++()                                         noexcept
@@ -374,12 +410,22 @@ public:
 
         bool operator==(const self_type& rhs)                              const
         {
-            return m_n == rhs.m_n;
+            return (m_n == rhs.m_n) && (m_e == rhs.m_e);
         }
 
         bool operator!=(const self_type& rhs)                              const
         {
-            return m_n != rhs.m_n;
+            return !operator==(rhs);
+        }
+
+        bool operator==(const binary_tree::pointer& rhs)                   const
+        {
+            return m_n == rhs;
+        }
+
+        bool operator!=(const binary_tree::pointer& rhs)                   const
+        {
+            return !operator==(rhs);
         }
     };
 
@@ -388,22 +434,22 @@ public:
 
     iterator begin()                                                    noexcept
     {
-        return iterator(m_header.left);
+        return iterator(m_header.left, pointer(&m_header));
     }
 
     iterator end()                                                      noexcept
     {
-        return iterator(m_header.right);
+        return iterator(pointer(&m_header), pointer(&m_header));
     }
 
     const_iterator begin()                                        const noexcept
     {
-        return const_iterator(m_header.left);
+        return const_iterator(m_header.left, pointer(&m_header));
     }
 
     const_iterator end()                                          const noexcept
     {
-        return const_iterator(m_header.right);
+        return const_iterator(pointer(&m_header), pointer(&m_header));
     }
 
     reverse_iterator rbegin()                                           noexcept
@@ -459,11 +505,11 @@ public:
             }
             else
             {
-                return iterator(current);
+                return iterator(current, pointer(&m_header));
             }
         }
 
-        return iterator(current);
+        return iterator(current, pointer(&m_header));
     }
 
 protected:
@@ -479,7 +525,7 @@ protected:
 
             ++m_size;
 
-            return m_root;
+            return iterator(m_root, pointer(&m_header));
         }
 
         return insert_from_node(n, m_root, most_left, most_right);
@@ -504,7 +550,7 @@ protected:
 
                 ++m_size;
 
-                return iterator(n);
+                return iterator(n, pointer(&m_header));
             }
 
             return insert_from_node(n, node_to->left, most_left & true, false);
@@ -523,7 +569,7 @@ protected:
 
                 ++m_size;
 
-                return iterator(n);
+                return iterator(n, pointer(&m_header));
             }
 
             return insert_from_node(n, node_to->right, false, most_right & true);
@@ -531,7 +577,7 @@ protected:
         else // equality
         {
             node_to->val = n->val;
-            return node_to;
+            return iterator(node_to, pointer(&m_header));
         }
     }
 
