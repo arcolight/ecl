@@ -200,6 +200,11 @@ public:
     using value_type  = typename node_t::value_type;
     using key_compare = Compare;
 
+    ~binary_tree()
+    {
+
+    }
+
 // Iterators start
 protected:
     struct base_iterator
@@ -430,22 +435,22 @@ public:
 
     iterator begin()                                                    noexcept
     {
-        return iterator(m_header.left, pointer(&m_header));
+        return iterator(m_header_ptr->left, m_header_ptr);
     }
 
     iterator end()                                                      noexcept
     {
-        return iterator(pointer(&m_header), pointer(&m_header));
+        return iterator(m_header_ptr, m_header_ptr);
     }
 
     const_iterator begin()                                        const noexcept
     {
-        return const_iterator(m_header.left, pointer(&m_header));
+        return const_iterator(m_header_ptr->left, m_header_ptr);
     }
 
     const_iterator end()                                          const noexcept
     {
-        return const_iterator(pointer(&m_header), pointer(&m_header));
+        return const_iterator(m_header_ptr, m_header_ptr);
     }
 
     reverse_iterator rbegin()                                           noexcept
@@ -501,11 +506,11 @@ public:
             }
             else
             {
-                return iterator(current, pointer(&m_header));
+                return iterator(current, m_header_ptr);
             }
         }
 
-        return iterator(current, pointer(&m_header));
+        return iterator(current, m_header_ptr);
     }
 
 protected:
@@ -513,15 +518,15 @@ protected:
     {
         if(nullptr == m_root)
         {
-            m_root          = n;
-            m_root->parent  = nullptr;
-            m_header.left   = m_root;
-            m_header.right  = m_root;
-            m_header.parent = m_root;
+            m_root               = n;
+            m_root->parent       = nullptr;
+            m_header_ptr->left   = m_root;
+            m_header_ptr->right  = m_root;
+            m_header_ptr->parent = m_root;
 
             ++m_size;
 
-            return iterator(m_root, pointer(&m_header));
+            return iterator(m_root, m_header_ptr);
         }
 
         return insert_from_node(n, m_root, most_left, most_right);
@@ -541,12 +546,12 @@ protected:
 
                 if(most_left)
                 {
-                    m_header.left = n;
+                    m_header_ptr->left = n;
                 }
 
                 ++m_size;
 
-                return iterator(n, pointer(&m_header));
+                return iterator(n, m_header_ptr);
             }
 
             return insert_from_node(n, node_to->left, most_left & true, false);
@@ -560,12 +565,12 @@ protected:
 
                 if(most_right)
                 {
-                    m_header.right = n;
+                    m_header_ptr->right = n;
                 }
 
                 ++m_size;
 
-                return iterator(n, pointer(&m_header));
+                return iterator(n, m_header_ptr);
             }
 
             return insert_from_node(n, node_to->right, false, most_right & true);
@@ -573,7 +578,7 @@ protected:
         else // equality
         {
             node_to->val = n->val;
-            return iterator(node_to, pointer(&m_header));
+            return iterator(node_to, m_header_ptr);
         }
     }
 
@@ -660,9 +665,12 @@ protected:
     }
 
 protected:
+    pointer     m_header_ptr { &m_header };
+    pointer     m_root       {};
+    std::size_t m_size       { 0 };
+
+private:
     node_t      m_header;
-    pointer     m_root    {};
-    std::size_t m_size    { 0 };
 };
 
 } // namespace tree

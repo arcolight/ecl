@@ -8,7 +8,7 @@
 
 #include <random>
 
-#define NODES_COUNT 20
+#define NODES_COUNT 20000
 
 using tree_t         = ecl::tree::balanced_binary_tree<int, std::string>;
 using tree_node_t    = typename tree_t::node_t;
@@ -81,7 +81,7 @@ void print_indent(std::size_t indent)
 }
 
 template<typename N>
-void print(const N* n, std::size_t indent = 0)
+void print(N n, std::size_t indent = 0)
 {
     if(nullptr != n->right)
     {
@@ -150,24 +150,24 @@ int main(int, char**, char**)
         int v = uniform_dist(e1);
         std::cout << "[RB] Inserting node: (" << v << "; " << std::to_string(v) << ")" << std::endl;
         // rb_t2.insert(std::make_shared<rb_tree_node_t>(v, std::to_string(v)));
+        // rb_t2.insert(/*std::make_unique*/std::unique_ptr<rb_tree_node_t>(v, std::to_string(v)));
 
         rb_tree_node_t::pointer p = new rb_tree_node_t(v, std::to_string(v));
         // std::cout << "Pointer = " << std::hex << p << std::dec << std::endl;
         if(rb_t2.insert(p) != p)
         {
-            std::cout << "[RB] Deleting node: (" << v << "; " << std::to_string(v) << ")" << std::endl;
+            // std::cout << "[RB] Deleting node: (" << v << "; " << std::to_string(v) << ")" << std::endl;
             delete p;
         }
-
-        print(rb_t2.root());
     }
+
+    print(rb_t2.root());
 
     for(auto& v : rb_t2)
     {
         std::cout << "[RB iterator] : " << v << std::endl;
     }
 
-    auto rb_it_begin = rb_t2.rbegin();
     auto rb_it_end = rb_t2.rend();
 
     for(auto rb_it = rb_t2.rbegin(); rb_it != rb_it_end; ++rb_it)

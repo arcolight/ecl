@@ -48,7 +48,7 @@ class red_black_tree : public binary_tree<K, V, PT, Compare, red_black_node>
     using base = binary_tree<K, V, PT, Compare, red_black_node>;
     using base::m_root;
 
-    using base::m_header;
+    using base::m_header_ptr;
 public:
     using typename base::pointer;
 
@@ -216,7 +216,7 @@ private:
         {
             m_root = g->parent;
             m_root->parent = nullptr;
-            m_header.parent = m_root;
+            m_header_ptr->parent = m_root;
         }
     }
 };
