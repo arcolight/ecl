@@ -67,10 +67,6 @@ public:
 
         insert_case1(n);
 
-        std::cout << "most left:  " << m_header.left->key   << std::endl
-                  << "most right: " << m_header.right->key  << std::endl
-                  << "root:       " << m_header.parent->key << std::endl;
-
         return result;
     }
 
@@ -87,7 +83,6 @@ private:
      */
     void insert_case1(pointer n)
     {
-        std::cout << "case 1" << std::endl;
         if(nullptr == n->parent)
         {
             n->color = node_color::BLACK;
@@ -110,7 +105,6 @@ private:
      */
     void insert_case2(pointer n)
     {
-        std::cout << "case 2" << std::endl;
         if(node_color::BLACK == n->parent->color)
         {
             return;
@@ -134,7 +128,6 @@ private:
      */
     void insert_case3(pointer n)
     {
-        std::cout << "case 3" << std::endl;
         pointer u = n->uncle();
 
         if((nullptr != u)                &&
@@ -171,19 +164,16 @@ private:
      */
     void insert_case4(pointer n)
     {
-        std::cout << "case 4" << std::endl;
         pointer g = n->grandparent();
 
         if((n == n->parent->right) && (n->parent == g->left))
         {
-            std::cout << "rotate left around " << n->parent->key << std::endl;
             this->rotate_left(n->parent);
             n->color = node_color::BLACK;
             n = n->left;
         }
         else if((n == n->parent->left) && (n->parent == g->right))
         {
-            std::cout << "rotate right around " << n->parent->key << std::endl;
             this->rotate_right(n->parent);
             n->color = node_color::BLACK;
             n = n->right;
@@ -208,7 +198,6 @@ private:
      */
     void insert_case5(pointer n)
     {
-        std::cout << "case 5" << std::endl;
         pointer g = n->grandparent();
 
         n->parent->color = node_color::BLACK;
@@ -216,12 +205,10 @@ private:
 
         if((n == n->parent->left) && (n->parent == g->left))
         {
-            std::cout << "rotate right around " << g->key << std::endl;
             this->rotate_right(g);
         }
         else
         {
-            std::cout << "rotate left around " << g->key << std::endl;
             this->rotate_left(g);
         }
 
