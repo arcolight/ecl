@@ -4,9 +4,8 @@
 
 #include <ecl/bit_field.hpp>
 
-// #include <gtest/gtest.h>
-
-struct test_struct {
+struct test_struct
+{
     uint8_t  f0  { 0 };
     uint16_t f1  { 0 };
     uint32_t f2  { 0 };
@@ -22,13 +21,15 @@ struct test_struct {
     uint64_t f12 { 0 };
 };
 
-struct test_struct_2 {
-  uint8_t f0 { 0 };
-  uint8_t f1 { 0 };
+struct test_struct_2
+{
+    uint8_t f0 { 0 };
+    uint8_t f1 { 0 };
 };
 
-struct test_struct_3 {
-  uint8_t array[10];
+struct test_struct_3
+{
+    uint8_t array[10];
 };
 
 #define TEST_STRUCT_PACK_SIZE_BYTES 29
@@ -46,29 +47,35 @@ struct test_struct_3 {
 #define F11_SIZE                    31
 #define F12_SIZE                    64
 
-typedef ecl::bit_field<TEST_STRUCT_PACK_SIZE_BYTES, test_struct,
-   ECL_FIELD(test_struct, f0,  F0_SIZE),
-   ECL_FIELD(test_struct, f1,  F1_SIZE),
-   ECL_FIELD(test_struct, f2,  F2_SIZE),
-   ECL_FIELD(test_struct, f3,  F3_SIZE),
-   ECL_FIELD(test_struct, f4,  F4_SIZE),
-   ECL_FIELD(test_struct, f5,  F5_SIZE),
-   ECL_FIELD(test_struct, f6,  F6_SIZE),
-   ECL_FIELD(test_struct, f7,  F7_SIZE),
-   ECL_FIELD(test_struct, f8,  F8_SIZE),
-   ECL_FIELD(test_struct, f9,  F9_SIZE),
-   ECL_FIELD(test_struct, f10, F10_SIZE),
-   ECL_FIELD(test_struct, f11, F11_SIZE),
-   ECL_FIELD(test_struct, f12, F12_SIZE)
+typedef ecl::bit_field
+<
+    test_struct,
+    ECL_FIELD(test_struct, f0,  F0_SIZE),
+    ECL_FIELD(test_struct, f1,  F1_SIZE),
+    ECL_FIELD(test_struct, f2,  F2_SIZE),
+    ECL_FIELD(test_struct, f3,  F3_SIZE),
+    ECL_FIELD(test_struct, f4,  F4_SIZE),
+    ECL_FIELD(test_struct, f5,  F5_SIZE),
+    ECL_FIELD(test_struct, f6,  F6_SIZE),
+    ECL_FIELD(test_struct, f7,  F7_SIZE),
+    ECL_FIELD(test_struct, f8,  F8_SIZE),
+    ECL_FIELD(test_struct, f9,  F9_SIZE),
+    ECL_FIELD(test_struct, f10, F10_SIZE),
+    ECL_FIELD(test_struct, f11, F11_SIZE),
+    ECL_FIELD(test_struct, f12, F12_SIZE)
 > test_bit_field_t;
 
-typedef ecl::bit_field<1, test_struct_2,
-   ECL_FIELD(test_struct_2, f0, 1),
-   ECL_FIELD(test_struct_2, f1, 1)
+typedef ecl::bit_field
+<
+    test_struct_2,
+    ECL_FIELD(test_struct_2, f0, 1),
+    ECL_FIELD(test_struct_2, f1, 1)
 > test_bit_field_2_t;
 
-typedef ecl::bit_field<10, test_struct_3,
-   ECL_FIELD(test_struct_3, array, 80)
+typedef ecl::bit_field
+<
+    test_struct_3,
+    ECL_FIELD(test_struct_3, array, 80)
 > test_bit_field_3_t;
 
 namespace numerical_chars
@@ -108,10 +115,10 @@ void dump_bit_field(test_bit_field_t const& bf);
 void dump_bit_field(test_bit_field_t const& bf)
 {
     std::cout <<
-      bf.f0 << " " << bf.f1 << " " << bf.f2  << " " << bf.f3  << " " <<
-      bf.f4 << " " << bf.f5 << " " << bf.f6  << " " << bf.f7  << " " <<
-      bf.f8 << " " << bf.f9 << " " << bf.f10 << " " << bf.f11 << " " <<
-      bf.f12 << std::endl;
+       bf.f0  << " " << bf.f1 << " " << bf.f2  << " " << bf.f3  << " " <<
+       bf.f4  << " " << bf.f5 << " " << bf.f6  << " " << bf.f7  << " " <<
+       bf.f8  << " " << bf.f9 << " " << bf.f10 << " " << bf.f11 << " " <<
+       bf.f12 << std::endl;
 
     // printf("Fields:\n\r"
     //        "f0:  %u\n\r"
@@ -144,8 +151,11 @@ int main(int argc, char** argv)
     size_t st_size = sizeof(test_struct_2);
 
     std::cout << "Bit field test."  << std::endl;
-    std::cout << "struct size:    " << st_size << std::endl;
-    std::cout << "bit field size: " << bf_size << std::endl;
+    std::cout << "sizeof(struct):    " << st_size << std::endl;
+    std::cout << "sizeof(bit_field): " << bf_size << std::endl;
+    std::cout << "bit_field.size:    " << bf.size << std::endl;
+
+    static_assert(TEST_STRUCT_PACK_SIZE_BYTES == bf.size, "Static size calculation mismatch!");
 
     bf.f0 =  1;
     bf.f1 =  2;
