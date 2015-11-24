@@ -56,33 +56,54 @@ protected:
     }
 };
 
+namespace
+{
+    template<typename F, typename... Fs>
+    constexpr std::size_t calc_size()
+    {
+        return F::size() + calc_size<Fs...>();
+    }
+
+    template<>
+    constexpr std::size_t calc_size<void>()
+    {
+        return 0;
+    }
+
+    template<typename... Fs>
+    constexpr std::size_t size_in_bytes()
+    {
+        return (calc_size<Fs..., void>() + 7) / 8;
+    }
+}
+
 /**
  * @brief bit_field class.
  * @details bit_field class. Bit field class can pack struct into byte array,
  * according to fields definition, allowing to work with fields like with the
  * struct fields.
  *
- * @tparam SIZE Size of bit field in bytes(!). compile time check for adequacy.
  * @tparam BASE Base struct type.
  * @tparam FIELDS List of the fields.
  */
-template <std::size_t SIZE, typename BASE, typename... FIELDS>
+template <typename BASE, typename... FIELDS>
 class bit_field final : public FIELDS...
 {
 public:
+    constexpr static std::size_t size { size_in_bytes<FIELDS...>() };
+
     struct packed_data
     {
-        uint8_t data[SIZE];
+        uint8_t data[size];
     };
 
     using packed_data_t = struct packed_data;
 
     bit_field () : FIELDS()...
     {
-        check<0, FIELDS...>();
     }
 
-    bit_field(const bit_field<SIZE, BASE, FIELDS...>& other)
+    bit_field(const bit_field<BASE, FIELDS...>& other)
     {
         set_data(other);
     }
@@ -97,8 +118,8 @@ public:
         return m_array;
     }
 
-    bit_field<SIZE, BASE, FIELDS...>&
-    operator= (const bit_field<SIZE, BASE, FIELDS...>& other)           noexcept
+    bit_field<BASE, FIELDS...>&
+    operator= (const bit_field<BASE, FIELDS...>& other)
     {
         set_data(other);
         return *this;
@@ -114,7 +135,7 @@ public:
      */
     void set_data(const uint8_t* const data)                            noexcept
     {
-        for(std::size_t i = 0; i < SIZE; ++i)
+        for(std::size_t i = 0; i < size; ++i)
         {
             m_array[i] = data[i];
         }
@@ -153,26 +174,11 @@ public:
         }
     }
 
-    constexpr static std::size_t size { SIZE };
-
 private:
-    template<std::size_t SUM>
-    constexpr bool check()                                        const noexcept
-    {
-        static_assert((SIZE * 8 >= SUM), "array to small");
-        return true;
-    }
-
-    template<std::size_t SUM, typename F, typename... TAIL>
-    constexpr bool check()                                        const noexcept
-    {
-        return check<SUM + F::size(), TAIL...>();
-    }
-
     template<uint8_t OFFSET>
     void pack_(uint8_t* /* array */)                              const noexcept
     {
-        static_assert((OFFSET <= SIZE * 8), "offset out of bound");
+        static_assert((OFFSET <= size * 8), "offset out of bound");
     }
 
     template<uint8_t OFFSET, typename F, typename... TAIL>
@@ -199,7 +205,7 @@ private:
     template<uint8_t OFFSET>
     void unpack_(uint8_t* /* array */)                            const noexcept
     {
-        static_assert((OFFSET <= SIZE * 8), "offset out of bound");
+        static_assert((OFFSET <= size * 8), "offset out of bound");
     }
 
     template<uint8_t OFFSET, typename F, typename... TAIL>
@@ -225,7 +231,7 @@ private:
         unpack_<(OFFSET + F::size()) % 8, TAIL...>(array);
     }
 
-    uint8_t m_array[SIZE] {};
+    uint8_t m_array[size] {};
 };
 
 } // namespace ecl
