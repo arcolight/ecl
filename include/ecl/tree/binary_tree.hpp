@@ -8,51 +8,21 @@
 #include <type_traits>
 #include <iterator>
 
-#ifdef ECL_ENABLE_TREE_SHARED_PTR
-#include <memory>
-#endif // ECL_ENABLE_TREE_SHARED_PTR
-
 namespace ecl
 {
 
 namespace tree
 {
 
-enum class pointer_type
-{
-      RAW
-#ifdef ECL_ENABLE_TREE_SHARED_PTR
-    , SHARED
-#endif // ECL_ENABLE_TREE_SHARED_PTR
-};
-
-template<pointer_type P, typename T>
-struct pointer_wrap {};
-
-template<typename T>
-struct pointer_wrap<pointer_type::RAW, T>
-{
-    using type = typename std::add_pointer<T>::type;
-};
-
-#ifdef ECL_ENABLE_TREE_SHARED_PTR
-template<typename T>
-struct pointer_wrap<pointer_type::SHARED, T>
-{
-    using type = std::shared_ptr<T>;
-};
-#endif // ECL_ENABLE_TREE_SHARED_PTR
-
 template
 <
     typename K,
     typename V,
-    pointer_type PT,
-    template<typename, typename, pointer_type> class N
+    template<typename, typename> class N
 >
 struct node_base
 {
-    using pointer     = typename pointer_wrap<PT, N<K, V, PT>>::type;
+    using pointer     = N<K, V>*;
 
     using key_type    = typename std::add_const<K>::type;
     using value_type  = V;
@@ -166,19 +136,18 @@ struct node_base
 
 template
 <
-    typename K,
-    typename V,
-    pointer_type PT = pointer_type::RAW
+      typename K
+    , typename V
 >
-struct node : public node_base<K, V, PT, ecl::tree::node>
+struct node : public node_base<K, V, ecl::tree::node>
 {
     // Full namespace is workaround for clang bug
     // about template-template parameters
     //
     // http://stackoverflow.com/questions/17687459/clang-not-accepting-use-of-template-template-parameter-when-using-crtp
-    using base = node_base<K, V, PT, ecl::tree::node>;
+    using base = node_base<K, V, ecl::tree::node>;
 
-    using node_base<K, V, PT, ecl::tree::node>::node_base;
+    using node_base<K, V, ecl::tree::node>::node_base;
     using typename base::pointer;
 };
 
@@ -186,14 +155,13 @@ template
 <
     typename K,
     typename V,
-    pointer_type PT                                     = pointer_type::RAW,
     typename Compare                                    = std::less<const K>,
-    template <typename, typename, pointer_type> class N = node
+    template <typename, typename> class N = node
 >
 class binary_tree
 {
 public:
-    using node_t      = N<K, V, PT>;
+    using node_t      = N<K, V>;
     using pointer     = typename node_t::pointer;
 
     using key_type    = typename node_t::key_type;
@@ -492,6 +460,40 @@ public:
 
     iterator find(const key_type& k)                              const noexcept
     {
+        return iterator(find_node(k), m_header_ptr);
+    }
+
+    pointer erase(const key_type& k)                                    noexcept
+    {
+        pointer p = find_node(k);
+        if(nullptr == p)
+        {
+            return nullptr;
+        }
+
+        if(nullptr == p->left && nullptr == p->right)
+        {
+            if(p->parent != nullptr)
+            {
+                if(p->parent->left == p)
+                {
+                    p->parent->left = nullptr;
+                }
+                else
+                {
+                    p->parent->right = nullptr;
+                }
+            }
+
+            return p;
+        }
+
+
+    }
+
+protected:
+    pointer find_node(const key_type& k)
+    {
         pointer current = m_root;
 
         while(nullptr != current)
@@ -506,14 +508,13 @@ public:
             }
             else
             {
-                return iterator(current, m_header_ptr);
+                return current;
             }
         }
 
-        return iterator(current, m_header_ptr);
+        return current;
     }
 
-protected:
     iterator insert_from_root(pointer n, bool most_left, bool most_right)
     {
         if(nullptr == m_root)

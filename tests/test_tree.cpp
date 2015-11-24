@@ -13,7 +13,7 @@
 using tree_t         = ecl::tree::balanced_binary_tree<int, std::string>;
 using tree_node_t    = typename tree_t::node_t;
 
-using rb_tree_t      = ecl::tree::red_black_tree<int, std::string/*, ecl::tree::pointer_type::SHARED*/>;
+using rb_tree_t      = ecl::tree::red_black_tree<int, std::string>;
 using rb_tree_node_t = typename rb_tree_t::node_t;
 
 static tree_node_t nodes [] =
@@ -149,8 +149,6 @@ int main(int, char**, char**)
     {
         int v = uniform_dist(e1);
         std::cout << "[RB] Inserting node: (" << v << "; " << std::to_string(v) << ")" << std::endl;
-        // rb_t2.insert(std::make_shared<rb_tree_node_t>(v, std::to_string(v)));
-        // rb_t2.insert(/*std::make_unique*/std::unique_ptr<rb_tree_node_t>(v, std::to_string(v)));
 
         rb_tree_node_t::pointer p = new rb_tree_node_t(v, std::to_string(v));
         // std::cout << "Pointer = " << std::hex << p << std::dec << std::endl;

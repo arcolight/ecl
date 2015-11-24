@@ -17,19 +17,18 @@ enum class node_color
 
 template
 <
-      typename     K
-    , typename     V
-    , pointer_type PT = pointer_type::RAW
+      typename K
+    , typename V
 >
-struct red_black_node : public node_base<K, V, PT, ecl::tree::red_black_node>
+struct red_black_node : public node_base<K, V, ecl::tree::red_black_node>
 {
     // Full namespace is workaround for clang bug
     // about template-template parameters
     //
     // http://stackoverflow.com/questions/17687459/clang-not-accepting-use-of-template-template-parameter-when-using-crtp
-    using base = node_base<K, V, PT, ecl::tree::red_black_node>;
+    using base = node_base<K, V, ecl::tree::red_black_node>;
 
-    using node_base<K, V, PT, ecl::tree::red_black_node>::node_base;
+    using node_base<K, V, ecl::tree::red_black_node>::node_base;
     using base::grandparent;
     using base::uncle;
 
@@ -40,12 +39,11 @@ template
 <
       typename     K
     , typename     V
-    , pointer_type PT      = pointer_type::RAW
     , typename     Compare = std::less<const K>
 >
-class red_black_tree : public binary_tree<K, V, PT, Compare, red_black_node>
+class red_black_tree : public binary_tree<K, V, Compare, red_black_node>
 {
-    using base = binary_tree<K, V, PT, Compare, red_black_node>;
+    using base = binary_tree<K, V, Compare, red_black_node>;
     using base::m_root;
 
     using base::m_header_ptr;

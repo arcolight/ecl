@@ -11,14 +11,13 @@ namespace tree
 
 template
 <
-      typename     K
-    , typename     V
-    , pointer_type PT      = pointer_type::RAW
-    , typename     Compare = std::less<const K>
+      typename K
+    , typename V
+    , typename Compare = std::less<const K>
 >
-class balanced_binary_tree : public binary_tree<K, V, PT, Compare>
+class balanced_binary_tree : public binary_tree<K, V, Compare>
 {
-    using base = binary_tree<K, V, PT, Compare>;
+    using base = binary_tree<K, V, Compare>;
 public:
     using typename base::pointer;
     using typename base::iterator;
@@ -27,6 +26,7 @@ public:
     using typename base::const_reverse_iterator;
 
     using base::insert;
+    using base::find;
 };
 
 } // namespace tree
