@@ -162,19 +162,17 @@ private:
      */
     void insert_case4(pointer n)
     {
-        pointer g = n->grandparent();
-
-        if((n == n->parent->right) && (n->parent == g->left))
+        if(n->is_right() && n->parent->is_left())
         {
             this->rotate_left(n->parent);
             n->color = node_color::BLACK;
-            n = n->left;
+            n        = n->left;
         }
-        else if((n == n->parent->left) && (n->parent == g->right))
+        else if(n->is_left() && n->parent->is_right())
         {
             this->rotate_right(n->parent);
             n->color = node_color::BLACK;
-            n = n->right;
+            n        = n->right;
         }
 
         insert_case5(n);
@@ -199,9 +197,9 @@ private:
         pointer g = n->grandparent();
 
         n->parent->color = node_color::BLACK;
-        g->color = node_color::RED;
+        g->color         = node_color::RED;
 
-        if((n == n->parent->left) && (n->parent == g->left))
+        if(n->is_left() && n->parent->is_left())
         {
             this->rotate_right(g);
         }
@@ -212,8 +210,8 @@ private:
 
         if(m_root == g)
         {
-            m_root = g->parent;
-            m_root->parent = nullptr;
+            m_root               = g->parent;
+            m_root->parent       = nullptr;
             m_header_ptr->parent = m_root;
         }
     }

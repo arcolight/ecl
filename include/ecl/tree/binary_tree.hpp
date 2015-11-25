@@ -22,10 +22,12 @@ template
 >
 struct node_base
 {
-    using pointer     = N<K, V>*;
+    using pointer       = N<K, V>*;
 
-    using key_type    = typename std::add_const<K>::type;
-    using value_type  = V;
+    using const_pointer = const N<K, V>*;
+
+    using key_type      = typename std::add_const<K>::type;
+    using value_type    = V;
 
     node_base()
     {
@@ -83,7 +85,7 @@ struct node_base
     pointer min()                                                 const noexcept
     {
         pointer result = this;
-        while(nullptr != result->left)
+        while(result->have_left())
         {
             result = result->left;
         }
@@ -93,14 +95,14 @@ struct node_base
     pointer max()                                                 const noexcept
     {
         pointer result = this;
-        while(nullptr != result->right)
+        while(result->have_right())
         {
             result = result->right;
         }
         return result;
     }
 
-    inline pointer grandparent()
+    inline pointer grandparent()                                  const noexcept
     {
         if(nullptr == parent)
         {
@@ -110,7 +112,7 @@ struct node_base
         return parent->parent;
     }
 
-    inline pointer uncle()
+    inline pointer uncle()                                        const noexcept
     {
         pointer g = grandparent();
         if(nullptr == g)
@@ -118,12 +120,51 @@ struct node_base
             return nullptr;
         }
 
-        if(parent == g->left)
+        if(parent->is_left())
         {
             return g->right;
         }
 
         return g->left;
+    }
+
+    inline bool is_left()                                         const noexcept
+    {
+        const_pointer t = static_cast<const_pointer>(this);
+
+        return t == t->parent->left;
+    }
+
+    inline bool is_right()                                        const noexcept
+    {
+        const_pointer t = static_cast<const_pointer>(this);
+
+        return t == t->parent->right;
+    }
+
+    inline bool have_left()                                       const noexcept
+    {
+        return nullptr != left;
+    }
+
+    inline bool have_right()                                      const noexcept
+    {
+        return nullptr != right;
+    }
+
+    inline bool have_both()                                       const noexcept
+    {
+        return have_left() && have_right();
+    }
+
+    inline bool have_no_child()                                   const noexcept
+    {
+        return !have_left() && !have_right();
+    }
+
+    inline bool have_parent()                                     const noexcept
+    {
+        return nullptr != parent;
     }
 
     pointer    left   {};
@@ -155,7 +196,7 @@ template
 <
     typename K,
     typename V,
-    typename Compare                                    = std::less<const K>,
+    typename Compare = std::less<const K>,
     template <typename, typename> class N = node
 >
 class binary_tree
@@ -192,10 +233,10 @@ protected:
                 return;
             }
 
-            if(nullptr != m_n->right)
+            if(m_n->have_right())
             {
                 m_n = m_n->right;
-                while(nullptr != m_n->left)
+                while(m_n->have_left())
                 {
                     m_n = m_n->left;
                 }
@@ -229,10 +270,10 @@ protected:
                 return;
             }
 
-            if(nullptr != m_n->left)
+            if(m_n->have_left())
             {
                 m_n = m_n->left;
-                while(nullptr != m_n->right)
+                while(m_n->have_right())
                 {
                     m_n = m_n->right;
                 }
@@ -468,14 +509,16 @@ public:
         pointer p = find_node(k);
         if(nullptr == p)
         {
-            return nullptr;
+            return p;
         }
 
-        if(nullptr == p->left && nullptr == p->right)
+        pointer replacer = nullptr;
+
+        if(p->have_no_child()) // No childrens
         {
             if(p->parent != nullptr)
             {
-                if(p->parent->left == p)
+                if(p->is_left())
                 {
                     p->parent->left = nullptr;
                 }
@@ -484,15 +527,62 @@ public:
                     p->parent->right = nullptr;
                 }
             }
-
-            return p;
+        }
+        else if(p->have_right() && !p->have_left()) // One right child
+        {
+            p->right->parent = p->parent;
+            if(p->parent != nullptr)
+            {
+                if(p->is_left())
+                {
+                    p->parent->left = p->right;
+                }
+                else
+                {
+                    p->parent->right = p->right;
+                }
+            }
+        }
+        else if(p->have_left() && !p->have_right()) // One left child
+        {
+            p->left->parent = p->parent;
+            if(p->parent != nullptr)
+            {
+                if(p->is_left())
+                {
+                    p->parent->left = p->left;
+                }
+                else
+                {
+                    p->parent->left = p->right;
+                }
+            }
+        }
+        else // Both childrens
+        {
+            if(nullptr != p->parent)
+            {
+                if(p->is_left())
+                {
+                    p->parent->left = nullptr;
+                }
+                else
+                {
+                    p->parent->right = nullptr;
+                }
+            }
         }
 
+        if(p->have_parent())
+        {
 
+        }
+
+        return p;
     }
 
 protected:
-    pointer find_node(const key_type& k)
+    pointer find_node(const key_type& k)                          const noexcept
     {
         pointer current = m_root;
 

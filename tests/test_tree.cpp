@@ -1,4 +1,3 @@
-// #include <ecl/tree/rb_tree.hpp>
 #include <iostream>
 
 #include <ecl/tree/balanced_binary_tree.hpp>
@@ -8,12 +7,18 @@
 
 #include <random>
 
-#define NODES_COUNT 20000
+#define NODES_COUNT    100
 
-using tree_t         = ecl::tree::balanced_binary_tree<int, std::string>;
+#define TREE_PREFIX    "[BT] | "
+#define RB_TREE_PREFIX "[RB] | "
+
+using key_type       = int;
+using value_type     = std::string;
+
+using tree_t         = ecl::tree::balanced_binary_tree<key_type, value_type>;
 using tree_node_t    = typename tree_t::node_t;
 
-using rb_tree_t      = ecl::tree::red_black_tree<int, std::string>;
+using rb_tree_t      = ecl::tree::red_black_tree<key_type, value_type>;
 using rb_tree_node_t = typename rb_tree_t::node_t;
 
 static tree_node_t nodes [] =
@@ -83,7 +88,24 @@ void print_indent(std::size_t indent)
 template<typename N>
 void print(N n, std::size_t indent = 0)
 {
-    if(nullptr != n->right)
+    if(n->have_right())
+    {
+        print(n->right, indent + 1);
+    }
+
+    print_indent(indent);
+    std::cout << "[N] " << n->key << std::endl;
+
+    if(n->have_left())
+    {
+        print(n->left, indent + 1);
+    }
+}
+
+template<>
+void print<rb_tree_node_t*>(rb_tree_node_t* n, std::size_t indent)
+{
+    if(n->have_right())
     {
         print(n->right, indent + 1);
     }
@@ -98,78 +120,142 @@ void print(N n, std::size_t indent = 0)
         std::cout << "[R] " << n->key << std::endl;
     }
 
-    if(nullptr != n->left)
+    if(n->have_left())
     {
         print(n->left, indent + 1);
     }
 }
 
-
-int main(int, char**, char**)
+template<typename T>
+void fill_tree_dynamic(const char* prefix, T& tree, key_type from, key_type to, std::size_t count)
 {
-    std::default_random_engine e1;
-    std::uniform_int_distribution<int> uniform_dist(0, NODES_COUNT);
+    std::size_t ins_count = 0;
 
-    // tree_t t1;
+    std::cout << prefix << "inserting dynamicaly created nodes."  << std::endl;
+    std::cout << prefix << "nodes key from: " << from  << std::endl;
+    std::cout << prefix << "nodes key to:   " << to    << std::endl;
+    std::cout << prefix << "nodes count:    " << count << std::endl;
 
-    // for(auto& n : nodes)
-    // {
-    //     std::cout << "[BT] Inserting node: (" << n.key << "; " << n.val << ")" << std::endl;
-    //     t1.insert(&n);
-    // }
+    std::default_random_engine e;
+    std::uniform_int_distribution<int> uniform_dist(from, to);
 
-    // tree_t t2;
-
-    // for(std::size_t i = 0; i < NODES_COUNT; ++i)
-    // {
-    //     int v = uniform_dist(e1);
-    //     std::cout << "[BT] Inserting node: (" << v << "; " << std::to_string(v) << ")" << std::endl;
-    //     tree_node_t::pointer p = new tree_node_t(v, std::to_string(v));
-    //     std::cout << "Pointer = " << std::hex << p << std::dec << std::endl;
-    //     if(t2.insert( p) != p)
-    //     {
-    //         std::cout << "[BT] Deleting node: (" << v << "; " << std::to_string(v) << ")" << std::endl;
-    //         delete p;
-    //     }
-
-    //     std::cout << "find: " << v << std::endl << *(t2.find(v)) << std::endl;
-    // }
-
-    // rb_tree_t rb_t1;
-
-    // for(auto& n : rb_nodes)
-    // {
-    //     std::cout << "[RB] Inserting node: (" << n.key << "; " << n.val << ")" << std::endl;
-    //     rb_t1.insert(&n);
-    // }
-
-    rb_tree_t rb_t2;
-
-    for(std::size_t i = 0; i < NODES_COUNT; ++i)
+    for(std::size_t i = 0; i < count; ++i)
     {
-        int v = uniform_dist(e1);
-        std::cout << "[RB] Inserting node: (" << v << "; " << std::to_string(v) << ")" << std::endl;
+        int v = uniform_dist(e);
+        typename T::node_t::pointer p = new typename T::node_t(v, std::to_string(v));
 
-        rb_tree_node_t::pointer p = new rb_tree_node_t(v, std::to_string(v));
-        // std::cout << "Pointer = " << std::hex << p << std::dec << std::endl;
-        if(rb_t2.insert(p) != p)
+        std::cout << prefix << "insert (" << v << "; " << std::to_string(v) << ") : ";
+
+        if(tree.insert(p) != p)
         {
-            // std::cout << "[RB] Deleting node: (" << v << "; " << std::to_string(v) << ")" << std::endl;
+            std::cout << "already exists in tree, deleting." << std::endl;
             delete p;
+        }
+        else
+        {
+            std::cout << "done." << std::endl;
+            ++ins_count;
         }
     }
 
-    print(rb_t2.root());
+    std::cout << prefix << "done. inserted: " << ins_count << std::endl << std::endl;
+}
 
-    for(auto& v : rb_t2)
+template<typename T, std::size_t N>
+void fill_tree_static(const char* prefix, T& tree, typename T::node_t (&nodes)[N])
+{
+    std::size_t count = 0;
+
+    std::cout << prefix << "inserting staticaly allocated nodes from array." << std::endl;
+    std::cout << prefix << "nodes count: " << N << std::endl;
+
+    for(auto& n: nodes)
     {
-        std::cout << "[RB iterator] : " << v << std::endl;
+        std::cout << prefix << "inserting node (" << n.key << "; " << n.val << ") : ";
+        if(tree.insert(&n) != &n)
+        {
+            std::cout << "already exists in tree." << std::endl;
+        }
+        else
+        {
+            std::cout << "done." << std::endl;
+            ++count;
+        }
     }
 
-    auto rb_it_end = rb_t2.rend();
+    std::cout << prefix << "done. inserted: " << count << std::endl << std::endl;
+}
 
-    for(auto rb_it = rb_t2.rbegin(); rb_it != rb_it_end; ++rb_it)
+template<typename T>
+void dump_tree(const char* prefix, T& tree)
+{
+    std::cout << prefix << "printing tree." << std::endl;
+    print(tree.root());
+    std::cout << prefix << "done." << std::endl << std::endl;
+
+    std::cout << prefix << "iterating over tree." << std::endl;
+
+    for(auto& v : tree)
     {
-        std::cout << "[RB reverse iterator] : " << *rb_it << std::endl;
+        std::cout << prefix << "iterator : " << v << std::endl;
     }
+
+    auto it_end = tree.rend();
+
+    for(auto it = tree.rbegin(); it != it_end; ++it)
+    {
+        std::cout << prefix << "reverse iterator : " << *it << std::endl;
+    }
+
+    std::cout << prefix << "done." << std::endl << std::endl;
+}
+
+template<typename T>
+void erase(const char* prefix, T& tree, key_type from, key_type to)
+{
+    std::size_t count = 0;
+
+    std::cout << prefix << "erasing nodes."   << std::endl;
+    std::cout << prefix << "nodes key from: " << from  << std::endl;
+    std::cout << prefix << "nodes key to:   " << to    << std::endl;
+
+    for(key_type i = from; i < to; ++i)
+    {
+        std::cout << prefix << "erasing node " << i << ": ";
+        if(nullptr != tree.erase(i))
+        {
+            ++count;
+            std::cout << "done." << std::endl;
+        }
+        else
+        {
+            std::cout << "no such node." << std::endl;
+        }
+        dump_tree(prefix, tree);
+    }
+
+    std::cout << prefix << "done. erased: " << count << std::endl;
+}
+
+int main(int, char**, char**)
+{
+    tree_t t1;
+    tree_t t2;
+
+    rb_tree_t rb_t1;
+    rb_tree_t rb_t2;
+
+    fill_tree_static(TREE_PREFIX, t1, nodes);
+    dump_tree(TREE_PREFIX, t1);
+
+    fill_tree_static(RB_TREE_PREFIX, rb_t1, rb_nodes);
+    dump_tree(RB_TREE_PREFIX, rb_t1);
+
+    fill_tree_dynamic(TREE_PREFIX, t2, 0, NODES_COUNT, NODES_COUNT);
+    dump_tree(TREE_PREFIX, t2);
+
+    fill_tree_dynamic(RB_TREE_PREFIX, rb_t2, 0, NODES_COUNT, NODES_COUNT);
+    dump_tree(RB_TREE_PREFIX, rb_t2);
+
+    erase(TREE_PREFIX, t1, 0, NODES_COUNT);
 }
