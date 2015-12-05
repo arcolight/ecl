@@ -1,7 +1,7 @@
 #ifndef ECL_RB_TREE
 #define ECL_RB_TREE
 
-#include <ecl/tree/binary_tree.hpp>
+#include <ecl/tree/binary_tree_base.hpp>
 
 namespace ecl
 {
@@ -19,36 +19,35 @@ template
 <
       typename K
     , typename V
+    , template <typename> class Compare = std::less
 >
-struct red_black_node : public node_base<K, V, ecl::tree::red_black_node>
+struct red_black_node : public node_base<K, V, Compare, ecl::tree::red_black_node>
 {
     // Full namespace is workaround for clang bug
     // about template-template parameters
     //
     // http://stackoverflow.com/questions/17687459/clang-not-accepting-use-of-template-template-parameter-when-using-crtp
-    using base = node_base<K, V, ecl::tree::red_black_node>;
+    using base = node_base<K, V, Compare, ecl::tree::red_black_node>;
 
-    using node_base<K, V, ecl::tree::red_black_node>::node_base;
-    using base::grandparent;
-    using base::uncle;
+    using node_base<K, V, Compare, ecl::tree::red_black_node>::node_base;
 
     node_color color { node_color::RED };
 };
 
 template
 <
-      typename     K
-    , typename     V
-    , typename     Compare = std::less<const K>
+      typename K
+    , typename V
+    , template <typename> class Compare = std::less
 >
-class red_black_tree : public binary_tree<K, V, Compare, red_black_node>
+class red_black_tree : public binary_tree_base<K, V, Compare, red_black_node>
 {
-    using base = binary_tree<K, V, Compare, red_black_node>;
-    using base::m_root;
+    using base = binary_tree_base<K, V, Compare, red_black_node>;
 
-    using base::m_header_ptr;
+    using base::m_header;
 public:
     using typename base::pointer;
+    using typename base::const_pointer;
 
     using typename base::iterator;
     using typename base::const_iterator;
@@ -208,11 +207,10 @@ private:
             this->rotate_left(g);
         }
 
-        if(m_root == g)
+        if(m_header.parent == g)
         {
-            m_root               = g->parent;
-            m_root->parent       = nullptr;
-            m_header_ptr->parent = m_root;
+            m_header.parent = g->parent;
+            m_header.parent->parent = nullptr;
         }
     }
 };

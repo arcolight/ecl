@@ -1,5 +1,5 @@
-#ifndef ECL_BINARY_TREE
-#define ECL_BINARY_TREE
+#ifndef ECL_BINARY_TREE_BASE
+#define ECL_BINARY_TREE_BASE
 
 #include <cstddef>
 
@@ -16,18 +16,25 @@ namespace tree
 
 template
 <
-    typename K,
-    typename V,
-    template<typename, typename> class N
+      typename K
+    , typename V
+    , template <typename> class Compare
+    , template <typename, typename, template <typename> class> class N
 >
 struct node_base
 {
-    using pointer       = N<K, V>*;
+    using node_t        = N<K, V, Compare>;
 
-    using const_pointer = const N<K, V>*;
+    using pointer       = typename std::add_pointer<node_t>::type;
+    using const_pointer = typename std::add_pointer
+                                   <
+                                       typename std::add_const<node_t>::type
+                                   >::type;
 
     using key_type      = typename std::add_const<K>::type;
     using value_type    = V;
+
+    using key_compare   = Compare<key_type>;
 
     node_base()
     {
@@ -82,9 +89,9 @@ struct node_base
         std::swap(key,    other.key   );
     }
 
-    pointer min()                                                 const noexcept
+    inline pointer most_left()                                          noexcept
     {
-        pointer result = this;
+        pointer result = static_cast<pointer>(this);
         while(result->have_left())
         {
             result = result->left;
@@ -92,9 +99,19 @@ struct node_base
         return result;
     }
 
-    pointer max()                                                 const noexcept
+    inline const_pointer most_left()                              const noexcept
     {
-        pointer result = this;
+        const_pointer result = static_cast<const_pointer>(this);
+        while(result->have_left())
+        {
+            result = result->left;
+        }
+        return result;
+    }
+
+    inline pointer most_right()                                         noexcept
+    {
+        pointer result = static_cast<pointer>(this);
         while(result->have_right())
         {
             result = result->right;
@@ -102,9 +119,19 @@ struct node_base
         return result;
     }
 
-    inline pointer grandparent()                                  const noexcept
+    inline const_pointer most_right()                             const noexcept
     {
-        if(nullptr == parent)
+        const_pointer result = static_cast<const_pointer>(this);
+        while(result->have_right())
+        {
+            result = result->right;
+        }
+        return result;
+    }
+
+    inline pointer grandparent()                                        noexcept
+    {
+        if( ! have_parent())
         {
             return nullptr;
         }
@@ -112,9 +139,35 @@ struct node_base
         return parent->parent;
     }
 
-    inline pointer uncle()                                        const noexcept
+    inline const_pointer grandparent()                            const noexcept
+    {
+        if( ! have_parent())
+        {
+            return nullptr;
+        }
+
+        return parent->parent;
+    }
+
+    inline pointer uncle()                                              noexcept
     {
         pointer g = grandparent();
+        if(nullptr == g)
+        {
+            return nullptr;
+        }
+
+        if(parent->is_left())
+        {
+            return g->right;
+        }
+
+        return g->left;
+    }
+
+    inline const_pointer uncle()                                  const noexcept
+    {
+        const_pointer g = grandparent();
         if(nullptr == g)
         {
             return nullptr;
@@ -162,9 +215,194 @@ struct node_base
         return !have_left() && !have_right();
     }
 
+    inline bool have_only_one_child()                             const noexcept
+    {
+        return ( have_left() && !have_right()) |
+               (!have_left() &&  have_right());
+    }
+
     inline bool have_parent()                                     const noexcept
     {
         return nullptr != parent;
+    }
+
+    inline pointer insert(pointer n)                                    noexcept
+    {
+        if(key_compare()(n->key, key))
+        {
+            if( ! have_left())
+            {
+                left = n;
+                n->parent = static_cast<pointer>(this);
+                return left;
+            }
+            return left->insert(n);
+        }
+        else if(key_compare()(key, n->key))
+        {
+            if( ! have_right())
+            {
+                right = n;
+                n->parent = static_cast<pointer>(this);
+                return right;
+            }
+            return right->insert(n);
+        }
+
+        val = n->val;
+
+        return static_cast<pointer>(this);
+    }
+
+    inline void link(pointer p)                                         noexcept
+    {
+        if(key_compare()(p->key, key))
+        {
+            left = p;
+        }
+        else if(key_compare()(key, p->key))
+        {
+            right = p;
+        }
+        p->parent = static_cast<pointer>(this);
+    }
+
+    inline pointer erase(const key_type& k, pointer& old)               noexcept
+    {
+        if(key_compare()(k, key))
+        {
+            if( ! have_left() )
+            {
+                return nullptr;
+            }
+            return left->erase(k, old);
+        }
+        else if(key_compare()(key, k))
+        {
+            if( ! have_right() )
+            {
+                return nullptr;
+            }
+            return right->erase(k, old);
+        }
+
+        old = static_cast<pointer>(this);
+
+        if(have_no_child())
+        {
+            if(have_parent())
+            {
+                if(is_left())
+                {
+                    parent->left = nullptr;
+                }
+                else
+                {
+                    parent->right = nullptr;
+                }
+
+                return parent;
+            }
+
+            return nullptr;
+        }
+
+        if(have_only_one_child())
+        {
+            if(have_parent())
+            {
+                if(have_left())
+                {
+                    parent->link(left);
+                    return left;
+                }
+                else
+                {
+                    parent->link(right);
+                    return right;
+                }
+            }
+
+            if(have_left())
+            {
+                left->parent = nullptr;
+                return left;
+            }
+            else
+            {
+                right->parent = nullptr;
+                return right;
+            }
+        }
+
+        pointer m_r = right->most_left();
+
+        if(have_parent())
+        {
+            parent->link(m_r);
+        }
+
+        m_r->link(left);
+
+        if(m_r->have_right())
+        {
+            right->link(m_r->right);
+        }
+        else
+        {
+            right->left = nullptr;
+        }
+
+        if(m_r != right)
+        {
+            m_r->link(right);
+        }
+
+        return m_r;
+    }
+
+    inline pointer find(const key_type& k)                              noexcept
+    {
+        if(key_compare()(k, key))
+        {
+            if( ! have_left())
+            {
+                return nullptr;
+            }
+            return left->find(k);
+        }
+        else if(key_compare()(key, k))
+        {
+            if( ! have_right())
+            {
+                return nullptr;
+            }
+            return right->find(k);
+        }
+
+        return static_cast<pointer>(this);
+    }
+
+    inline const_pointer find(const key_type& k)                  const noexcept
+    {
+        if(key_compare()(k, key))
+        {
+            if( ! have_left())
+            {
+                return nullptr;
+            }
+            return left->find(k);
+        }
+        else if(key_compare()(key, k))
+        {
+            if( ! have_right())
+            {
+                return nullptr;
+            }
+            return right->find(k);
+        }
+
+        return static_cast<const_pointer>(this);
     }
 
     pointer    left   {};
@@ -179,40 +417,38 @@ template
 <
       typename K
     , typename V
+    , template <typename> class Compare = std::less
 >
-struct node : public node_base<K, V, ecl::tree::node>
+struct node : public node_base<K, V, Compare, ecl::tree::node>
 {
     // Full namespace is workaround for clang bug
     // about template-template parameters
     //
     // http://stackoverflow.com/questions/17687459/clang-not-accepting-use-of-template-template-parameter-when-using-crtp
-    using base = node_base<K, V, ecl::tree::node>;
+    using base = node_base<K, V, Compare, ecl::tree::node>;
 
-    using node_base<K, V, ecl::tree::node>::node_base;
-    using typename base::pointer;
+    using node_base<K, V, Compare, ecl::tree::node>::node_base;
 };
 
 template
 <
-    typename K,
-    typename V,
-    typename Compare = std::less<const K>,
-    template <typename, typename> class N = node
+      typename K
+    , typename V
+    , template <typename> class Compare = std::less
+    , template <typename, typename, template <typename> class> class N = node
 >
-class binary_tree
+class binary_tree_base
 {
 public:
-    using node_t      = N<K, V>;
-    using pointer     = typename node_t::pointer;
+    using node_t        = typename N<K, V, Compare>::node_t;
 
-    using key_type    = typename node_t::key_type;
-    using value_type  = typename node_t::value_type;
-    using key_compare = Compare;
+    using pointer       = typename node_t::pointer;
+    using const_pointer = typename node_t::const_pointer;
 
-    ~binary_tree()
-    {
+    using key_type      = typename node_t::key_type;
+    using value_type    = typename node_t::value_type;
 
-    }
+    using key_compare   = typename node_t::key_compare;
 
 // Iterators start
 protected:
@@ -236,14 +472,16 @@ protected:
             if(m_n->have_right())
             {
                 m_n = m_n->right;
-                while(m_n->have_left())
-                {
-                    m_n = m_n->left;
-                }
+                m_n = m_n->most_left();
             }
             else
             {
                 pointer y = m_n->parent;
+                if(nullptr == y)
+                {
+                    m_n = m_e;
+                    return;
+                }
                 while(m_n == y->right)
                 {
                     m_n = y;
@@ -273,10 +511,7 @@ protected:
             if(m_n->have_left())
             {
                 m_n = m_n->left;
-                while(m_n->have_right())
-                {
-                    m_n = m_n->right;
-                }
+                m_n = m_n->most_right();
             }
             else
             {
@@ -313,7 +548,7 @@ public:
         using reference  = V&;
         using pointer    = V*;
 
-        iterator(binary_tree::pointer n, binary_tree::pointer e)
+        iterator(binary_tree_base::pointer n, binary_tree_base::pointer e)
             : base_iterator(n, e)
         {}
 
@@ -358,12 +593,12 @@ public:
             return !operator==(rhs);
         }
 
-        bool operator==(const binary_tree::pointer& rhs)                   const
+        bool operator==(const binary_tree_base::pointer& rhs)              const
         {
             return m_n == rhs;
         }
 
-        bool operator!=(const binary_tree::pointer& rhs)                   const
+        bool operator!=(const binary_tree_base::pointer& rhs)              const
         {
             return !operator==(rhs);
         }
@@ -383,7 +618,7 @@ public:
         using reference  = const V&;
         using pointer    = const V*;
 
-        const_iterator(binary_tree::pointer n, binary_tree::pointer e)
+        const_iterator(binary_tree_base::pointer n, binary_tree_base::pointer e)
             : base_iterator(n, e)
         {}
 
@@ -428,12 +663,12 @@ public:
             return !operator==(rhs);
         }
 
-        bool operator==(const binary_tree::pointer& rhs)                   const
+        bool operator==(const binary_tree_base::pointer& rhs)              const
         {
             return m_n == rhs;
         }
 
-        bool operator!=(const binary_tree::pointer& rhs)                   const
+        bool operator!=(const binary_tree_base::pointer& rhs)              const
         {
             return !operator==(rhs);
         }
@@ -444,22 +679,22 @@ public:
 
     iterator begin()                                                    noexcept
     {
-        return iterator(m_header_ptr->left, m_header_ptr);
+        return iterator(m_header.left, pointer(&m_header));
     }
 
     iterator end()                                                      noexcept
     {
-        return iterator(m_header_ptr, m_header_ptr);
+        return iterator(pointer(&m_header), pointer(&m_header));
     }
 
     const_iterator begin()                                        const noexcept
     {
-        return const_iterator(m_header_ptr->left, m_header_ptr);
+        return const_iterator(m_header.left, pointer(&m_header));
     }
 
     const_iterator end()                                          const noexcept
     {
-        return const_iterator(m_header_ptr, m_header_ptr);
+        return const_iterator(pointer(&m_header), pointer(&m_header));
     }
 
     reverse_iterator rbegin()                                           noexcept
@@ -486,7 +721,38 @@ public:
 
     iterator insert(pointer n)
     {
-        return insert_from_root(n, true, true);
+        n->parent            = nullptr;
+        n->left              = nullptr;
+        n->right             = nullptr;
+
+        if( ! m_header.have_parent())
+        {
+            m_header.parent = n;
+            m_header.left   = n;
+            m_header.right  = n;
+
+            ++m_size;
+
+            return iterator(m_header.parent, pointer(&m_header));
+        }
+
+        pointer inserted_n = m_header.parent->insert(n);
+        // new node
+        if(inserted_n == n)
+        {
+            if(key_compare()(n->key, m_header.left->key))
+            {
+                m_header.left = n;
+            }
+            else if(key_compare()(m_header.right->key, n->key))
+            {
+                m_header.right = n;
+            }
+
+            ++m_size;
+        }
+
+        return iterator(inserted_n, pointer(&m_header));
     }
 
     std::size_t count()                                           const noexcept
@@ -494,185 +760,93 @@ public:
         return m_size;
     }
 
-    pointer root()                                                      noexcept
+    pointer root()                                                const noexcept
     {
-        return m_root;
+        if(m_size == 0)
+        {
+            return nullptr;
+        }
+
+        return m_header.parent;
     }
 
-    iterator find(const key_type& k)                              const noexcept
+    pointer min()                                                 const noexcept
     {
-        return iterator(find_node(k), m_header_ptr);
+        if(m_size == 0)
+        {
+            return nullptr;
+        }
+
+        return m_header.left;
+    }
+
+    pointer max()                                                 const noexcept
+    {
+        if(m_size == 0)
+        {
+            return nullptr;
+        }
+
+        return m_header.right;
+    }
+
+    const_iterator find(const key_type& k)                        const noexcept
+    {
+        pointer p = m_header.parent->find(k);
+        if(nullptr == p)
+        {
+            return end();
+        }
+        return const_iterator(p, pointer(&m_header));
     }
 
     pointer erase(const key_type& k)                                    noexcept
     {
-        pointer p = find_node(k);
-        if(nullptr == p)
+        if(m_header.parent == pointer(&m_header))
         {
-            return p;
+            return nullptr;
         }
 
-        pointer replacer = nullptr;
+        pointer  tmp      = nullptr;
+        pointer& old      = tmp;
+        pointer  new_root = m_header.parent->erase(k, old);
 
-        if(p->have_no_child()) // No childrens
+        if(nullptr == new_root)
         {
-            if(p->parent != nullptr)
+            if(old == pointer(m_header.parent))
             {
-                if(p->is_left())
-                {
-                    p->parent->left = nullptr;
-                }
-                else
-                {
-                    p->parent->right = nullptr;
-                }
+                m_size = 0;
+                m_header.parent = pointer(&m_header);
+                m_header.left   = pointer(&m_header);
+                m_header.right  = pointer(&m_header);
+
+                return old;
             }
-        }
-        else if(p->have_right() && !p->have_left()) // One right child
-        {
-            p->right->parent = p->parent;
-            if(p->parent != nullptr)
-            {
-                if(p->is_left())
-                {
-                    p->parent->left = p->right;
-                }
-                else
-                {
-                    p->parent->right = p->right;
-                }
-            }
-        }
-        else if(p->have_left() && !p->have_right()) // One left child
-        {
-            p->left->parent = p->parent;
-            if(p->parent != nullptr)
-            {
-                if(p->is_left())
-                {
-                    p->parent->left = p->left;
-                }
-                else
-                {
-                    p->parent->left = p->right;
-                }
-            }
-        }
-        else // Both childrens
-        {
-            if(nullptr != p->parent)
-            {
-                if(p->is_left())
-                {
-                    p->parent->left = nullptr;
-                }
-                else
-                {
-                    p->parent->right = nullptr;
-                }
-            }
+
+            return nullptr;
         }
 
-        if(p->have_parent())
-        {
+        --m_size;
 
+        if(m_header.parent == old)
+        {
+            m_header.parent = new_root;
         }
 
-        return p;
+        if(m_header.left == old)
+        {
+            m_header.left = new_root->most_left();
+        }
+
+        if(m_header.right == old)
+        {
+            m_header.right = new_root->most_right();
+        }
+
+        return old;
     }
 
 protected:
-    pointer find_node(const key_type& k)                          const noexcept
-    {
-        pointer current = m_root;
-
-        while(nullptr != current)
-        {
-            if(key_compare()(current->key, k))
-            {
-                current  = current->right;
-            }
-            else if(key_compare()(k, current->key))
-            {
-                current  = current->left;
-            }
-            else
-            {
-                return current;
-            }
-        }
-
-        return current;
-    }
-
-    iterator insert_from_root(pointer n, bool most_left, bool most_right)
-    {
-        if(nullptr == m_root)
-        {
-            m_root               = n;
-            m_root->parent       = nullptr;
-            m_header_ptr->left   = m_root;
-            m_header_ptr->right  = m_root;
-            m_header_ptr->parent = m_root;
-
-            ++m_size;
-
-            return iterator(m_root, m_header_ptr);
-        }
-
-        return insert_from_node(n, m_root, most_left, most_right);
-    }
-
-    iterator insert_from_node(pointer n,
-                              pointer node_to,
-                              bool    most_left,
-                              bool    most_right)
-    {
-        if(key_compare()(n->key, node_to->key))
-        {
-            if(nullptr == node_to->left)
-            {
-                node_to->left = n;
-                n->parent = node_to;
-
-                if(most_left)
-                {
-                    m_header_ptr->left = n;
-                }
-
-                ++m_size;
-
-                return iterator(n, m_header_ptr);
-            }
-
-            return insert_from_node(n, node_to->left, most_left & true, false);
-        }
-        else if(key_compare()(node_to->key, n->key))
-        {
-            if(nullptr == node_to->right)
-            {
-                node_to->right = n;
-                n->parent = node_to;
-
-                if(most_right)
-                {
-                    m_header_ptr->right = n;
-                }
-
-                ++m_size;
-
-                return iterator(n, m_header_ptr);
-            }
-
-            return insert_from_node(n, node_to->right, false, most_right & true);
-        }
-        else // equality
-        {
-            node_to->val = n->val;
-            return iterator(node_to, m_header_ptr);
-        }
-    }
-
     void link_as_left(pointer c, pointer f)                             noexcept
     {
         if((nullptr == c) && (nullptr == f))
@@ -756,16 +930,12 @@ protected:
     }
 
 protected:
-    pointer     m_header_ptr { &m_header };
-    pointer     m_root       {};
-    std::size_t m_size       { 0 };
-
-private:
     node_t      m_header;
+    std::size_t m_size   { 0    };
 };
 
 } // namespace tree
 
 } // namespace ecl
 
-#endif //ECL_BINARY_TREE
+#endif //ECL_BINARY_TREE_BASE

@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include <ecl/tree/balanced_binary_tree.hpp>
+#include <ecl/tree/simple_binary_tree.hpp>
 #include <ecl/tree/red_black_tree.hpp>
 
 #include <string>
@@ -15,7 +15,7 @@
 using key_type       = int;
 using value_type     = std::string;
 
-using tree_t         = ecl::tree::balanced_binary_tree<key_type, value_type>;
+using tree_t         = ecl::tree::simple_binary_tree<key_type, value_type>;
 using tree_node_t    = typename tree_t::node_t;
 
 using rb_tree_t      = ecl::tree::red_black_tree<key_type, value_type>;
@@ -187,10 +187,13 @@ void fill_tree_static(const char* prefix, T& tree, typename T::node_t (&nodes)[N
 }
 
 template<typename T>
-void dump_tree(const char* prefix, T& tree)
+void dump_tree(const char* prefix, const T& tree)
 {
     std::cout << prefix << "printing tree." << std::endl;
-    print(tree.root());
+    if(nullptr != tree.root())
+    {
+        print(tree.root());
+    }
     std::cout << prefix << "done." << std::endl << std::endl;
 
     std::cout << prefix << "iterating over tree." << std::endl;
@@ -211,7 +214,7 @@ void dump_tree(const char* prefix, T& tree)
 }
 
 template<typename T>
-void erase(const char* prefix, T& tree, key_type from, key_type to)
+void erase_tree_static(const char* prefix, T& tree, key_type from, key_type to)
 {
     std::size_t count = 0;
 
@@ -237,6 +240,67 @@ void erase(const char* prefix, T& tree, key_type from, key_type to)
     std::cout << prefix << "done. erased: " << count << std::endl;
 }
 
+template<typename T>
+void erase_tree_dynamic(const char* prefix, T& tree, key_type from, key_type to)
+{
+    std::size_t count = 0;
+
+    std::cout << prefix << "erasing nodes."   << std::endl;
+    std::cout << prefix << "nodes key from: " << from  << std::endl;
+    std::cout << prefix << "nodes key to:   " << to    << std::endl;
+
+    for(key_type i = from; i < to; ++i)
+    {
+        std::cout << prefix << "erasing node " << i << ": ";
+        typename T::node_t::pointer p = tree.erase(i);
+        if(nullptr != p)
+        {
+            ++count;
+            delete p;
+            std::cout << "done." << std::endl;
+        }
+        else
+        {
+            std::cout << "no such node." << std::endl;
+        }
+        dump_tree(prefix, tree);
+    }
+
+    std::cout << prefix << "done. erased: " << count << std::endl;
+}
+
+template<typename T>
+void find_in_tree(const char* prefix, const T& tree, key_type from, key_type to)
+{
+    std::size_t count = 0;
+
+    std::cout << prefix << "find nodes."      << std::endl;
+    std::cout << prefix << "nodes key from: " << from  << std::endl;
+    std::cout << prefix << "nodes key to:   " << to    << std::endl;
+
+    for(key_type i = from; i < to; ++i)
+    {
+        std::cout << prefix << "search for node " << i << ": ";
+        if(tree.end() != tree.find(i))
+        {
+            ++count;
+            std::cout << "found." << std::endl;
+        }
+        else
+        {
+            std::cout << "no such node." << std::endl;
+        }
+    }
+
+    std::cout << prefix << "done. found: " << count << std::endl;
+}
+
+template<typename T, std::size_t N>
+constexpr static std::size_t array_size(T (&)[N])
+{
+    return N;
+}
+
 int main(int, char**, char**)
 {
     tree_t t1;
@@ -247,15 +311,19 @@ int main(int, char**, char**)
 
     fill_tree_static(TREE_PREFIX, t1, nodes);
     dump_tree(TREE_PREFIX, t1);
+    find_in_tree(TREE_PREFIX, t1, 0, static_cast<key_type>(array_size(nodes)) + 1);
+    erase_tree_static(TREE_PREFIX, t1, 0, static_cast<key_type>(array_size(nodes)) + 1);
 
     fill_tree_static(RB_TREE_PREFIX, rb_t1, rb_nodes);
     dump_tree(RB_TREE_PREFIX, rb_t1);
+    find_in_tree(RB_TREE_PREFIX, rb_t1, 0, static_cast<key_type>(array_size(rb_nodes)) + 1);
 
     fill_tree_dynamic(TREE_PREFIX, t2, 0, NODES_COUNT, NODES_COUNT);
     dump_tree(TREE_PREFIX, t2);
+    find_in_tree(TREE_PREFIX, t2, 0, NODES_COUNT + 1);
+    erase_tree_dynamic(TREE_PREFIX, t2, 0, NODES_COUNT + 1);
 
     fill_tree_dynamic(RB_TREE_PREFIX, rb_t2, 0, NODES_COUNT, NODES_COUNT);
     dump_tree(RB_TREE_PREFIX, rb_t2);
-
-    erase(TREE_PREFIX, t1, 0, NODES_COUNT);
+    find_in_tree(RB_TREE_PREFIX, rb_t2, 0, NODES_COUNT + 1);
 }
