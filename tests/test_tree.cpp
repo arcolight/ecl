@@ -21,7 +21,7 @@ using tree_node_t    = typename tree_t::node_t;
 using rb_tree_t      = ecl::tree::red_black_tree<key_type, value_type>;
 using rb_tree_node_t = typename rb_tree_t::node_t;
 
-static tree_node_t nodes [] =
+static tree_node_t simple_nodes [] =
 {
     { 6,  "6"  },
     { 17, "17" },
@@ -77,12 +77,25 @@ static rb_tree_node_t rb_nodes [] =
     { 19, "19" }
 };
 
+template<typename T, std::size_t N>
+constexpr static std::size_t array_size(T (&)[N])
+{
+    return N;
+}
+
 void print_indent(std::size_t indent)
 {
-    for(std::size_t i = 0; i < indent; ++i)
+    if(indent == 0)
     {
-        std::cout << "      ";
+        return;
     }
+
+    for(std::size_t i = 0; i < indent - 1; ++i)
+    {
+        std::cout << "         ";
+    }
+    std::cout << "         ";
+    // std::cout << "+-------";
 }
 
 template<typename N>
@@ -98,6 +111,7 @@ void print(N n, std::size_t indent = 0)
 
     if(n->have_left())
     {
+        // std::cout << "+-------";
         print(n->left, indent + 1);
     }
 }
@@ -127,7 +141,7 @@ void print<rb_tree_node_t*>(rb_tree_node_t* n, std::size_t indent)
 }
 
 template<typename T>
-void fill_tree_dynamic(const char* prefix, T& tree, key_type from, key_type to, std::size_t count)
+void fill_tree_dynamic(const std::string prefix, T& tree, key_type from, key_type to, std::size_t count)
 {
     std::size_t ins_count = 0;
 
@@ -162,7 +176,7 @@ void fill_tree_dynamic(const char* prefix, T& tree, key_type from, key_type to, 
 }
 
 template<typename T, std::size_t N>
-void fill_tree_static(const char* prefix, T& tree, typename T::node_t (&nodes)[N])
+void fill_tree_static(const std::string prefix, T& tree, typename T::node_t (& nodes)[N])
 {
     std::size_t count = 0;
 
@@ -187,7 +201,7 @@ void fill_tree_static(const char* prefix, T& tree, typename T::node_t (&nodes)[N
 }
 
 template<typename T>
-void dump_tree(const char* prefix, const T& tree)
+void dump_tree(const std::string prefix, const T& tree)
 {
     std::cout << prefix << "printing tree." << std::endl;
     if(nullptr != tree.root())
@@ -214,7 +228,7 @@ void dump_tree(const char* prefix, const T& tree)
 }
 
 template<typename T>
-void erase_tree_static(const char* prefix, T& tree, key_type from, key_type to)
+void erase_tree_static(const std::string prefix, T& tree, key_type from, key_type to)
 {
     std::size_t count = 0;
 
@@ -241,7 +255,7 @@ void erase_tree_static(const char* prefix, T& tree, key_type from, key_type to)
 }
 
 template<typename T>
-void erase_tree_dynamic(const char* prefix, T& tree, key_type from, key_type to)
+void erase_tree_dynamic(const std::string prefix, T& tree, key_type from, key_type to)
 {
     std::size_t count = 0;
 
@@ -270,7 +284,7 @@ void erase_tree_dynamic(const char* prefix, T& tree, key_type from, key_type to)
 }
 
 template<typename T>
-void find_in_tree(const char* prefix, const T& tree, key_type from, key_type to)
+void find_in_tree(const std::string prefix, const T& tree, key_type from, key_type to)
 {
     std::size_t count = 0;
 
@@ -296,34 +310,23 @@ void find_in_tree(const char* prefix, const T& tree, key_type from, key_type to)
 }
 
 template<typename T, std::size_t N>
-constexpr static std::size_t array_size(T (&)[N])
+void test_tree(const std::string prefix, typename T::node_t (& nodes)[N])
 {
-    return N;
+    T static_tree;
+    fill_tree_static(prefix, static_tree, nodes);
+    dump_tree(prefix, static_tree);
+    find_in_tree(prefix, static_tree, 0, static_cast<key_type>(N) + 1);
+    erase_tree_static(prefix, static_tree, 0, static_cast<key_type>(N) + 1);
+
+    T dynamic_tree;
+    fill_tree_dynamic(prefix, dynamic_tree, 0, NODES_COUNT, NODES_COUNT);
+    dump_tree(prefix, dynamic_tree);
+    find_in_tree(prefix, dynamic_tree, 0, NODES_COUNT + 1);
+    erase_tree_dynamic(prefix, dynamic_tree, 0, NODES_COUNT + 1);
 }
 
 int main(int, char**, char**)
 {
-    tree_t t1;
-    tree_t t2;
-
-    rb_tree_t rb_t1;
-    rb_tree_t rb_t2;
-
-    fill_tree_static(TREE_PREFIX, t1, nodes);
-    dump_tree(TREE_PREFIX, t1);
-    find_in_tree(TREE_PREFIX, t1, 0, static_cast<key_type>(array_size(nodes)) + 1);
-    erase_tree_static(TREE_PREFIX, t1, 0, static_cast<key_type>(array_size(nodes)) + 1);
-
-    fill_tree_static(RB_TREE_PREFIX, rb_t1, rb_nodes);
-    dump_tree(RB_TREE_PREFIX, rb_t1);
-    find_in_tree(RB_TREE_PREFIX, rb_t1, 0, static_cast<key_type>(array_size(rb_nodes)) + 1);
-
-    fill_tree_dynamic(TREE_PREFIX, t2, 0, NODES_COUNT, NODES_COUNT);
-    dump_tree(TREE_PREFIX, t2);
-    find_in_tree(TREE_PREFIX, t2, 0, NODES_COUNT + 1);
-    erase_tree_dynamic(TREE_PREFIX, t2, 0, NODES_COUNT + 1);
-
-    fill_tree_dynamic(RB_TREE_PREFIX, rb_t2, 0, NODES_COUNT, NODES_COUNT);
-    dump_tree(RB_TREE_PREFIX, rb_t2);
-    find_in_tree(RB_TREE_PREFIX, rb_t2, 0, NODES_COUNT + 1);
+    test_tree<tree_t>(TREE_PREFIX, simple_nodes);
+    // test_tree<rb_tree_t>(RB_TREE_PREFIX, rb_nodes);
 }

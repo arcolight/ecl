@@ -46,8 +46,15 @@ class red_black_tree : public binary_tree_base<K, V, Compare, red_black_node>
 
     using base::m_header;
 public:
+    using typename base::node_t;
+
     using typename base::pointer;
     using typename base::const_pointer;
+
+    using typename base::key_type;
+    using typename base::value_type;
+
+    using typename base::key_compare;
 
     using typename base::iterator;
     using typename base::const_iterator;
@@ -67,6 +74,52 @@ public:
         return result;
     }
 
+    pointer erase(const key_type& k)
+    {
+        pointer p = this->base::erase(k);
+
+        if(nullptr == p)
+        {
+            return p;
+        }
+
+        pointer s = p->sibling();
+        pointer par = p->parent;
+
+        if(p->color == node_color::BLACK)
+        {
+            if(s != nullptr)
+            {
+                if(s->color == node_color::RED)
+                {
+                    if(p->is_left())
+                    {
+                        this->rotate_left(par);
+                    }
+                    else
+                    {
+                        this->rotate_right(par);
+                    }
+
+                    par->color = node_color::RED;
+                    s->color = node_color::BLACK;
+                }
+                else
+                {
+                    if(s->left->color  == node_color::BLACK &&
+                       s->right->color == node_color::BLACK )
+                    {
+                        s->color   = node_color::RED;
+                        par->color = node_color::BLACK;
+                    }
+
+                }
+            }
+        }
+
+        return p;
+    }
+
 private:
 
     /**
@@ -80,7 +133,7 @@ private:
      */
     void insert_case1(pointer n)
     {
-        if(nullptr == n->parent)
+        if( ! n->have_parent())
         {
             n->color = node_color::BLACK;
             return;
@@ -213,6 +266,8 @@ private:
             m_header.parent->parent = nullptr;
         }
     }
+
+
 };
 
 } // namespace tree

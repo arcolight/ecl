@@ -129,6 +129,36 @@ struct node_base
         return result;
     }
 
+    inline pointer sibling()                                            noexcept
+    {
+        if( ! have_parent())
+        {
+            return nullptr;
+        }
+
+        if(is_left())
+        {
+            return parent->right;
+        }
+
+        return parent->left;
+    }
+
+    inline const_pointer sibling()                                const noexcept
+    {
+        if( ! have_parent())
+        {
+            return nullptr;
+        }
+
+        if(is_left())
+        {
+            return parent->right;
+        }
+
+        return parent->left;
+    }
+
     inline pointer grandparent()                                        noexcept
     {
         if( ! have_parent())
