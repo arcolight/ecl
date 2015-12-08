@@ -193,7 +193,7 @@ private:
     {
         pointer u = n->uncle();
 
-        if(nullptr != u)
+        if(nullptr == u)
         {
             insert_case4(n);
             return;
