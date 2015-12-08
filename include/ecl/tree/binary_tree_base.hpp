@@ -31,10 +31,13 @@ struct node_base
                                        typename std::add_const<node_t>::type
                                    >::type;
 
-    using key_type      = typename std::add_const<K>::type;
+    // using key_type      = typename std::add_const<K>::type;
+    using key_type      = K;
     using value_type    = V;
 
     using key_compare   = Compare<key_type>;
+
+    using erase_return  = std::pair<pointer, pointer>;
 
     node_base()
     {
@@ -297,26 +300,19 @@ struct node_base
         p->parent = static_cast<pointer>(this);
     }
 
-    inline pointer erase(const key_type& k, pointer& old)               noexcept
+    inline erase_return erase()                                         noexcept
     {
-        if(key_compare()(k, key))
+        if(have_both())
         {
-            if( ! have_left() )
-            {
-                return nullptr;
-            }
-            return left->erase(k, old);
-        }
-        else if(key_compare()(key, k))
-        {
-            if( ! have_right() )
-            {
-                return nullptr;
-            }
-            return right->erase(k, old);
+            pointer successor = right->most_left();
+
+            key = successor->key;
+            val = successor->val;
+
+            return successor->erase();
         }
 
-        old = static_cast<pointer>(this);
+        pointer this_p = static_cast<pointer>(this);
 
         if(have_no_child())
         {
@@ -331,64 +327,36 @@ struct node_base
                     parent->right = nullptr;
                 }
 
-                return parent;
+                return { this_p, parent };
             }
 
-            return nullptr;
+            return { this_p, nullptr };
         }
-
-        if(have_only_one_child())
-        {
-            if(have_parent())
-            {
-                if(have_left())
-                {
-                    parent->link(left);
-                    return left;
-                }
-                else
-                {
-                    parent->link(right);
-                    return right;
-                }
-            }
-
-            if(have_left())
-            {
-                left->parent = nullptr;
-                return left;
-            }
-            else
-            {
-                right->parent = nullptr;
-                return right;
-            }
-        }
-
-        pointer m_r = right->most_left();
 
         if(have_parent())
         {
-            parent->link(m_r);
+            if(have_left())
+            {
+                parent->link(left);
+                return { this_p, left };
+            }
+            else
+            {
+                parent->link(right);
+                return { this_p, right };
+            }
         }
 
-        m_r->link(left);
-
-        if(m_r->have_right())
+        if(have_left())
         {
-            right->link(m_r->right);
+            left->parent = nullptr;
+            return { this_p, left };
         }
         else
         {
-            right->left = nullptr;
+            right->parent = nullptr;
+            return { this_p, right };
         }
-
-        if(m_r != right)
-        {
-            m_r->link(right);
-        }
-
-        return m_r;
     }
 
     inline pointer find(const key_type& k)                              noexcept
@@ -479,6 +447,8 @@ public:
     using value_type    = typename node_t::value_type;
 
     using key_compare   = typename node_t::key_compare;
+
+    using erase_return  = typename node_t::erase_return;
 
 // Iterators start
 protected:
@@ -832,51 +802,62 @@ public:
 
     pointer erase(const key_type& k)                                    noexcept
     {
+        erase_return ret = erase_internal(k);
+
+        return ret.first;
+    }
+
+protected:
+    erase_return erase_internal(const key_type& k)                      noexcept
+    {
         if(m_header.parent == pointer(&m_header))
         {
-            return nullptr;
+            return { nullptr, nullptr };
         }
 
-        pointer  tmp      = nullptr;
-        pointer& old      = tmp;
-        pointer  new_root = m_header.parent->erase(k, old);
-
-        if(nullptr == new_root)
+        pointer to_erase = m_header.parent->find(k);
+        if(nullptr == to_erase)
         {
-            if(old == pointer(m_header.parent))
+            return { nullptr, nullptr };
+        }
+
+        erase_return ret = to_erase->erase();
+        pointer removed  = ret.first;
+        pointer successor = ret.second;
+
+        if(nullptr == successor)
+        {
+            if(removed == pointer(m_header.parent))
             {
                 m_size = 0;
                 m_header.parent = pointer(&m_header);
                 m_header.left   = pointer(&m_header);
                 m_header.right  = pointer(&m_header);
-
-                return old;
             }
 
-            return nullptr;
+            return ret;
         }
 
         --m_size;
 
-        if(m_header.parent == old)
+        if(m_header.parent == removed)
         {
-            m_header.parent = new_root;
+            m_header.parent = successor;
         }
 
-        if(m_header.left == old)
+        if(m_header.left == removed)
         {
-            m_header.left = new_root->most_left();
+            m_header.left = successor->most_left();
         }
 
-        if(m_header.right == old)
+        if(m_header.right == removed)
         {
-            m_header.right = new_root->most_right();
+            m_header.right = successor->most_right();
         }
 
-        return old;
+        return ret;
     }
 
-protected:
     void link_as_left(pointer c, pointer f)                             noexcept
     {
         if((nullptr == c) && (nullptr == f))
@@ -960,8 +941,8 @@ protected:
     }
 
 protected:
-    node_t      m_header;
-    std::size_t m_size   { 0    };
+    node_t      m_header {   };
+    std::size_t m_size   { 0 };
 };
 
 } // namespace tree

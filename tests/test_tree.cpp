@@ -85,17 +85,10 @@ constexpr static std::size_t array_size(T (&)[N])
 
 void print_indent(std::size_t indent)
 {
-    if(indent == 0)
-    {
-        return;
-    }
-
-    for(std::size_t i = 0; i < indent - 1; ++i)
+    for(std::size_t i = 0; i < indent; ++i)
     {
         std::cout << "         ";
     }
-    std::cout << "         ";
-    // std::cout << "+-------";
 }
 
 template<typename N>
@@ -111,7 +104,6 @@ void print(N n, std::size_t indent = 0)
 
     if(n->have_left())
     {
-        // std::cout << "+-------";
         print(n->left, indent + 1);
     }
 }
@@ -328,5 +320,5 @@ void test_tree(const std::string prefix, typename T::node_t (& nodes)[N])
 int main(int, char**, char**)
 {
     test_tree<tree_t>(TREE_PREFIX, simple_nodes);
-    // test_tree<rb_tree_t>(RB_TREE_PREFIX, rb_nodes);
+    test_tree<rb_tree_t>(RB_TREE_PREFIX, rb_nodes);
 }
