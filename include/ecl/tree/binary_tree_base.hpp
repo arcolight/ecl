@@ -415,25 +415,8 @@ template
 <
       typename K
     , typename V
-    , template <typename> class Compare = std::less
->
-struct node : public node_base<K, V, Compare, ecl::tree::node>
-{
-    // Full namespace is workaround for clang bug
-    // about template-template parameters
-    //
-    // http://stackoverflow.com/questions/17687459/clang-not-accepting-use-of-template-template-parameter-when-using-crtp
-    using base = node_base<K, V, Compare, ecl::tree::node>;
-
-    using node_base<K, V, Compare, ecl::tree::node>::node_base;
-};
-
-template
-<
-      typename K
-    , typename V
-    , template <typename> class Compare = std::less
-    , template <typename, typename, template <typename> class> class N = node
+    , template <typename> class Compare
+    , template <typename, typename, template <typename> class> class N
 >
 class binary_tree_base
 {
