@@ -9,6 +9,17 @@
 
 #define NODES_COUNT    100
 
+#define TREE_DUMP_SPACE "  "
+#define TREE_DUMP_RIGHT " ┌"
+#define TREE_DUMP_LEFT  " └"
+#define TREE_DUMP_CON   " │"
+#define TREE_DUMP_NODE  "─┤"
+
+#define TREE_DUMP_NODE_HAVE_NO    "─╼"
+#define TREE_DUMP_NODE_HAVE_LEFT  "─┮"
+#define TREE_DUMP_NODE_HAVE_RIGHT "─┶"
+#define TREE_DUMP_NODE_HAVE_BOTH  "─┾"
+
 #define TREE_PREFIX    "[BT] | "
 #define RB_TREE_PREFIX "[RB] | "
 
@@ -83,53 +94,142 @@ constexpr static std::size_t array_size(T (&)[N])
     return N;
 }
 
-void print_indent(std::size_t indent)
+void print_node_symbol(bool have_left, bool have_right)
 {
-    for(std::size_t i = 0; i < indent; ++i)
+    if(!have_left && !have_right)
     {
-        std::cout << "         ";
+        std::cout << TREE_DUMP_NODE_HAVE_NO;
+    }
+    else if(have_left && !have_right)
+    {
+        std::cout << TREE_DUMP_NODE_HAVE_LEFT;
+    }
+    else if(!have_left && have_right)
+    {
+        std::cout << TREE_DUMP_NODE_HAVE_RIGHT;
+    }
+    else
+    {
+        std::cout << TREE_DUMP_NODE_HAVE_BOTH;
     }
 }
 
 template<typename N>
-void print(N n, std::size_t indent = 0)
+void print_node(N n)
 {
-    if(n->have_right())
-    {
-        print(n->right, indent + 1);
-    }
-
-    print_indent(indent);
-    std::cout << "[N] " << n->key << std::endl;
-
-    if(n->have_left())
-    {
-        print(n->left, indent + 1);
-    }
+    print_node_symbol(n->have_left(), n->have_right());
+    std::cout << " " << n->key << std::endl;
 }
 
 template<>
-void print<rb_tree_node_t*>(rb_tree_node_t* n, std::size_t indent)
+void print_node<rb_tree_node_t*>(rb_tree_node_t* n)
 {
-    if(n->have_right())
+    if(n->is_black())
     {
-        print(n->right, indent + 1);
-    }
-
-    print_indent(indent);
-    if(n->color == ecl::tree::node_color::BLACK)
-    {
-        std::cout << "[B] " << n->key << std::endl;
+        print_node_symbol(n->have_left(), n->have_right());
+        std::cout << " B:" << n->key << std::endl;
     }
     else
     {
-        std::cout << "[R] " << n->key << std::endl;
+        print_node_symbol(n->have_left(), n->have_right());
+        std::cout << " R:" << n->key << std::endl;
     }
+}
+
+void print_indent(std::size_t indent)
+{
+    for(std::size_t i = 0; i < indent; ++i)
+    {
+        std::cout << TREE_DUMP_SPACE;
+    }
+}
+
+template<typename N>
+void print(N n, std::vector<std::size_t> connectors = std::vector<std::size_t>(), std::size_t indent = 0)
+{
+    if(n->have_right())
+    {
+        if(n->is_left())
+        {
+            connectors.push_back(indent);
+        }
+        print(n->right, connectors, indent + 1);
+        if(n->is_left())
+        {
+            connectors.pop_back();
+        }
+    }
+
+    // for(auto c : connectors)
+    // {
+    //     std::cout << c << "|";
+    // }
+    // std::cout << indent << std::endl;
+
+    std::size_t sum_con = 0;
+    for(auto& c : connectors)
+    {
+        print_indent(c - sum_con - 1);
+        std::cout << TREE_DUMP_CON;
+        sum_con = c;
+    }
+
+    if(indent >= sum_con + 1)
+    {
+        print_indent(indent - sum_con - 1);
+    }
+
+    if(n->is_right())
+    {
+        std::cout << TREE_DUMP_RIGHT;
+    }
+    else if(n->is_left())
+    {
+        std::cout << TREE_DUMP_LEFT;
+    }
+
+    // ─
+    print_node(n);
 
     if(n->have_left())
     {
-        print(n->left, indent + 1);
+        if(n->is_right())
+        {
+            connectors.push_back(indent);
+        }
+        print(n->left, connectors, indent + 1);
+        if(n->is_right())
+        {
+            connectors.pop_back();
+        }
     }
+}
+
+template<typename T>
+void dump_tree(const std::string prefix, const T& tree)
+{
+    std::cout << prefix << "printing tree." << std::endl;
+    if(nullptr != tree.root())
+    {
+        print(tree.root());
+    }
+    std::cout << prefix << "done." << std::endl << std::endl;
+
+    std::cout << prefix << "iterating over tree." << std::endl;
+
+    for(auto& v : tree)
+    {
+        std::cout << prefix << "iterator : " << v << std::endl;
+    }
+
+    auto it_end = tree.rend();
+
+    for(auto it = tree.rbegin(); it != it_end; ++it)
+    {
+        std::cout << prefix << "reverse iterator : " << *it << std::endl;
+    }
+
+    std::cout << prefix << "done." << std::endl << std::endl;
 }
 
 template<typename T>
@@ -162,6 +262,7 @@ void fill_tree_dynamic(const std::string prefix, T& tree, key_type from, key_typ
             std::cout << "done." << std::endl;
             ++ins_count;
         }
+        dump_tree(prefix, tree);
     }
 
     std::cout << prefix << "done. inserted: " << ins_count << std::endl << std::endl;
@@ -187,36 +288,10 @@ void fill_tree_static(const std::string prefix, T& tree, typename T::node_t (& n
             std::cout << "done." << std::endl;
             ++count;
         }
+        dump_tree(prefix, tree);
     }
 
     std::cout << prefix << "done. inserted: " << count << std::endl << std::endl;
-}
-
-template<typename T>
-void dump_tree(const std::string prefix, const T& tree)
-{
-    std::cout << prefix << "printing tree." << std::endl;
-    if(nullptr != tree.root())
-    {
-        print(tree.root());
-    }
-    std::cout << prefix << "done." << std::endl << std::endl;
-
-    std::cout << prefix << "iterating over tree." << std::endl;
-
-    for(auto& v : tree)
-    {
-        std::cout << prefix << "iterator : " << v << std::endl;
-    }
-
-    auto it_end = tree.rend();
-
-    for(auto it = tree.rbegin(); it != it_end; ++it)
-    {
-        std::cout << prefix << "reverse iterator : " << *it << std::endl;
-    }
-
-    std::cout << prefix << "done." << std::endl << std::endl;
 }
 
 template<typename T>
