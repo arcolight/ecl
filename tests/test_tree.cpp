@@ -210,17 +210,21 @@ void dump_tree(const std::string prefix, const T& tree)
 
     std::cout << prefix << "iterating over tree." << std::endl;
 
+    std::cout << prefix << "iterator :         ";
     for(auto& v : tree)
     {
-        std::cout << prefix << "iterator : " << v << std::endl;
+        std::cout << v << " ";
     }
+    std::cout << std::endl;
 
     auto it_end = tree.rend();
 
+    std::cout << prefix << "reverse iterator : ";
     for(auto it = tree.rbegin(); it != it_end; ++it)
     {
-        std::cout << prefix << "reverse iterator : " << *it << std::endl;
+        std::cout << *it << " ";
     }
+    std::cout << std::endl;
 
     std::cout << prefix << "done." << std::endl << std::endl;
 }
