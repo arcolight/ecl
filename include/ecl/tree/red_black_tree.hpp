@@ -32,27 +32,27 @@ struct red_black_node : public node_base<K, V, Compare, ecl::tree::red_black_nod
     using node_base<K, V, Compare, ecl::tree::red_black_node>::node_base;
     using typename base::pointer;
 
-    bool is_black()                                               const noexcept
+    inline bool is_black()                                        const noexcept
     {
         return color == node_color::BLACK;
     }
 
-    bool is_red()                                                 const noexcept
+    inline bool is_red()                                          const noexcept
     {
         return color == node_color::RED;
     }
 
-    void mark_black()                                                   noexcept
+    inline void mark_black()                                            noexcept
     {
         color = node_color::BLACK;
     }
 
-    void mark_red()                                                     noexcept
+    inline void mark_red()                                              noexcept
     {
         color = node_color::RED;
     }
 
-    void mark_as(pointer p)                                             noexcept
+    inline void mark_as(pointer p)                                      noexcept
     {
         color = p->color;
     }
