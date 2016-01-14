@@ -124,16 +124,16 @@ void print_node(N n)
 template<>
 void print_node<rb_tree_node_t*>(rb_tree_node_t* n)
 {
+    print_node_symbol(n->have_left(), n->have_right());
     if(n->is_black())
     {
-        print_node_symbol(n->have_left(), n->have_right());
-        std::cout << " B:" << n->key << std::endl;
+        std::cout << " B:";
     }
-    else
+    else if(n->is_red())
     {
-        print_node_symbol(n->have_left(), n->have_right());
-        std::cout << " R:" << n->key << std::endl;
+        std::cout << " R:";
     }
+    std::cout << n->key << std::endl;
 }
 
 void print_indent(std::size_t indent)
@@ -160,12 +160,6 @@ void print(N n, std::vector<std::size_t> connectors = std::vector<std::size_t>()
         }
     }
 
-    // for(auto c : connectors)
-    // {
-    //     std::cout << c << "|";
-    // }
-    // std::cout << indent << std::endl;
-
     std::size_t sum_con = 0;
     for(auto& c : connectors)
     {
@@ -188,7 +182,6 @@ void print(N n, std::vector<std::size_t> connectors = std::vector<std::size_t>()
         std::cout << TREE_DUMP_LEFT;
     }
 
-    // ─
     print_node(n);
 
     if(n->have_left())
