@@ -353,8 +353,8 @@ void find_in_tree(const std::string prefix, const T& tree, key_type from, key_ty
     std::size_t count = 0;
 
     std::cout << prefix << "find nodes."      << std::endl;
-    std::cout << prefix << "nodes key from: " << from  << std::endl;
-    std::cout << prefix << "nodes key to:   " << to    << std::endl;
+    std::cout << prefix << "nodes key from: " << from << std::endl;
+    std::cout << prefix << "nodes key to:   " << to   << std::endl;
 
     for(key_type i = from; i < to; ++i)
     {
