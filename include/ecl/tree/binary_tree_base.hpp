@@ -218,12 +218,22 @@ struct node_base
     {
         const_pointer t = static_cast<const_pointer>(this);
 
+        if(nullptr == t->parent)
+        {
+            return false;
+        }
+
         return t == t->parent->left;
     }
 
     inline bool is_right()                                        const noexcept
     {
         const_pointer t = static_cast<const_pointer>(this);
+
+        if(nullptr == t->parent)
+        {
+            return false;
+        }
 
         return t == t->parent->right;
     }
