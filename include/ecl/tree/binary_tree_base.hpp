@@ -337,7 +337,7 @@ struct node_base
                     parent->right = nullptr;
                 }
 
-                return { this_p, parent };
+                return { this_p, nullptr };
             }
 
             return { this_p, nullptr };
@@ -831,19 +831,38 @@ protected:
             return { nullptr, nullptr };
         }
 
-        erase_return ret = to_erase->erase();
-        pointer removed  = ret.first;
+        erase_return ret  = to_erase->erase();
+        pointer removed   = ret.first;
         pointer successor = ret.second;
 
-        if(nullptr == successor)
+        std::cout << "removed:   ";
+        if(nullptr != removed)
         {
-            if(removed == pointer(m_header.parent))
-            {
-                m_size = 0;
-                m_header.parent = pointer(&m_header);
-                m_header.left   = pointer(&m_header);
-                m_header.right  = pointer(&m_header);
-            }
+            std::cout << removed->key;
+        }
+        else
+        {
+            std::cout << "nullptr";
+        }
+        std::cout << std::endl;
+
+        std::cout << "successor: ";
+        if(nullptr != successor)
+        {
+            std::cout << successor->key;
+        }
+        else
+        {
+            std::cout << "nullptr";
+        }
+        std::cout << std::endl;
+
+        if(removed == pointer(m_header.parent) && (nullptr == successor))
+        {
+            m_size = 0;
+            m_header.parent = pointer(&m_header);
+            m_header.left   = pointer(&m_header);
+            m_header.right  = pointer(&m_header);
 
             return ret;
         }
@@ -857,12 +876,26 @@ protected:
 
         if(m_header.left == removed)
         {
-            m_header.left = successor->most_left();
+            if(nullptr != successor)
+            {
+                m_header.left = successor->most_left();
+            }
+            else
+            {
+                m_header.left = removed->parent->most_left();
+            }
         }
 
         if(m_header.right == removed)
         {
-            m_header.right = successor->most_right();
+            if(nullptr != successor)
+            {
+                m_header.right = successor->most_right();
+            }
+            else
+            {
+                m_header.right = removed->parent->most_right();
+            }
         }
 
         return ret;

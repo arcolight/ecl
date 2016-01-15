@@ -32,33 +32,96 @@ struct red_black_node : public node_base<K, V, Compare, ecl::tree::red_black_nod
     using node_base<K, V, Compare, ecl::tree::red_black_node>::node_base;
     using typename base::pointer;
 
-    inline bool is_black()                                        const noexcept
-    {
-        return color == node_color::BLACK;
-    }
-
-    inline bool is_red()                                          const noexcept
-    {
-        return color == node_color::RED;
-    }
-
-    inline void mark_black()                                            noexcept
-    {
-        color = node_color::BLACK;
-    }
-
-    inline void mark_red()                                              noexcept
-    {
-        color = node_color::RED;
-    }
-
-    inline void mark_as(pointer p)                                      noexcept
-    {
-        color = p->color;
-    }
-
     node_color color { node_color::RED };
 };
+
+template
+<
+      typename K
+    , typename V
+    , template <typename> class Compare
+>
+bool is_black(red_black_node<K, V, Compare>* n)                         noexcept
+{
+    if(nullptr == n)
+    {
+        return true;
+    }
+
+    return n->color == node_color::BLACK;
+}
+
+template
+<
+      typename K
+    , typename V
+    , template <typename> class Compare
+>
+bool is_red(red_black_node<K, V, Compare>* n)                           noexcept
+{
+    if(nullptr == n)
+    {
+        return false;
+    }
+
+    return n->color == node_color::RED;
+}
+
+template
+<
+      typename K
+    , typename V
+    , template <typename> class Compare
+>
+void mark_black(red_black_node<K, V, Compare>* n)                       noexcept
+{
+    if(nullptr == n)
+    {
+        return;
+    }
+
+    n->color = node_color::BLACK;
+}
+
+template
+<
+      typename K
+    , typename V
+    , template <typename> class Compare
+>
+void mark_red(red_black_node<K, V, Compare>* n)                         noexcept
+{
+    if(nullptr == n)
+    {
+        return;
+    }
+
+    n->color = node_color::RED;
+}
+
+template
+<
+      typename K
+    , typename V
+    , template <typename> class Compare
+>
+void mark_as(red_black_node<K, V, Compare>* n,
+             red_black_node<K, V, Compare>* other)                      noexcept
+{
+    if(nullptr == n)
+    {
+        return;
+    }
+
+    if(nullptr == other)
+    {
+        n->color = node_color::BLACK;
+    }
+    else
+    {
+        n->color = other->color;
+    }
+}
 
 template
 <
@@ -95,7 +158,7 @@ public:
     iterator insert(pointer n)                                          noexcept
     {
         iterator result = this->base::insert(n);
-        n->mark_red();
+        mark_red(n);
 
         insert_case1(n);
 
@@ -113,20 +176,24 @@ public:
             return nullptr;
         }
 
-        if(nullptr == u)
+        if(is_black(v))
         {
-            return v;
-        }
-
-        if(v->is_black())
-        {
-            if(u->is_red())
+            if(is_red(u))
             {
-                u->mark_black();
+                mark_black(u);
             }
             else
             {
-                delete_case1(u);
+                if(nullptr == u)
+                {
+                    pointer s = (v->parent->left == nullptr) ? v->parent->right : v->parent->left;
+                    delete_case1(v, s);
+                }
+                else
+                {
+                    pointer s = u->sibling();
+                    delete_case1(u, s);
+                }
             }
         }
 
@@ -148,7 +215,7 @@ private:
     {
         if( ! n->have_parent())
         {
-            n->mark_black();
+            mark_black(n);
             return;
         }
 
@@ -168,7 +235,7 @@ private:
      */
     void insert_case2(pointer n)                                        noexcept
     {
-        if(n->parent->is_black())
+        if(is_black(n->parent))
         {
             return;
         }
@@ -199,13 +266,13 @@ private:
             return;
         }
 
-        if(u->is_red() && n->parent->is_red())
+        if(is_red(u) && is_red(n->parent))
         {
-            n->parent->mark_black();
-            u->mark_black();
+            mark_black(n->parent);
+            mark_black(u);
 
             pointer g = n->grandparent();
-            g->mark_red();
+            mark_red(g);
 
             insert_case1(g);
 
@@ -234,13 +301,13 @@ private:
         if(n->is_right() && n->parent->is_left())
         {
             this->rotate_left(n->parent);
-            n->mark_black();
+            mark_black(n);
             n = n->left;
         }
         else if(n->is_left() && n->parent->is_right())
         {
             this->rotate_right(n->parent);
-            n->mark_black();
+            mark_black(n);
             n = n->right;
         }
 
@@ -265,8 +332,8 @@ private:
     {
         pointer g = n->grandparent();
 
-        n->parent->mark_black();
-        g->mark_red();
+        mark_black(n->parent);
+        mark_red(g);
 
         if(n->is_left() && n->parent->is_left())
         {
@@ -284,11 +351,11 @@ private:
         }
     }
 
-    void delete_case1(pointer n)                                        noexcept
+    void delete_case1(pointer n, pointer s)                             noexcept
     {
         if(n->have_parent())
         {
-            delete_case2(n);
+            delete_case2(n, s);
         }
     }
 
@@ -306,20 +373,12 @@ private:
      *               3         4   5        6      1        2    3        4
      *
      */
-    void delete_case2(pointer n)                                        noexcept
+    void delete_case2(pointer n, pointer s)                             noexcept
     {
-        pointer s = n->sibling();
-
-        // nullptr equals 'black' node, so we can safely return from this point
-        if(nullptr == s)
+        if(is_red(s))
         {
-            return;
-        }
-
-        if(s->is_red())
-        {
-            n->parent->mark_red();
-            s->mark_black();
+            mark_red(n->parent);
+            mark_black(s);
             if(n->is_left())
             {
                 this->rotate_left(n->parent);
@@ -328,8 +387,10 @@ private:
             {
                 this->rotate_right(n->parent);
             }
-
-            delete_case3(n);
+        }
+        else
+        {
+            delete_case3(n, s);
         }
     }
 
@@ -347,21 +408,19 @@ private:
      *               3         4   5        6                    3         4   5        6
      *
      */
-    void delete_case3(pointer n)                                        noexcept
+    void delete_case3(pointer n, pointer s)                             noexcept
     {
-        pointer s = n->sibling();
-
-        if(n->parent->is_black() &&
-           s->is_black()         &&
-           s->left->is_black()   &&
-           s->right->is_black() )
+        if(is_black(n->parent) &&
+           is_black(s)         &&
+           is_black(s->left)   &&
+           is_black(s->right))
         {
-            s->mark_red();
-            delete_case1(n->parent);
+            mark_red(s);
+            delete_case1(n->parent, n->parent->sibling());
         }
         else
         {
-            delete_case4(n);
+            delete_case4(n, s);
         }
     }
 
@@ -379,21 +438,19 @@ private:
      *               3         4   5        6                    3         4   5        6
      *
      */
-    void delete_case4(pointer n)                                        noexcept
+    void delete_case4(pointer n, pointer s)                             noexcept
     {
-        pointer s = n->sibling();
-
-        if(n->parent->is_red() &&
-           s->is_black()       &&
-           s->left->is_black() &&
-           s->right->is_black() )
+        if(is_red(n->parent) &&
+           is_black(s)       &&
+           is_black(s->left) &&
+           is_black(s->right))
         {
-            s->mark_red();
-            n->parent->mark_black();
+            mark_red(s);
+            mark_black(n->parent);
         }
         else
         {
-            delete_case5(n);
+            delete_case5(n, s);
         }
     }
 
@@ -411,31 +468,29 @@ private:
      *                                                      3        4
      *
      */
-    void delete_case5(pointer n)                                        noexcept
+    void delete_case5(pointer n, pointer s)                             noexcept
     {
-        pointer s = n->sibling();
-
-        if(s->is_black())
+        if(is_black(s))
         {
-            if(n->is_left()         &&
-               s->right->is_black() &&
-               s->left->is_right())
+            if(n->is_left()       &&
+               is_black(s->right) &&
+               is_red(s->left))
             {
-                s->mark_red();
-                s->left->mark_black();
+                mark_red(s);
+                mark_black(s->left);
                 this->rotate_right(s);
             }
-            else if(n->is_right()       &&
-                    s->left->is_black() &&
-                    s->right->is_red())
+            else if(n->is_right()     &&
+                    is_black(s->left) &&
+                    is_red(s->right))
             {
-                s->mark_red();
-                s->right->mark_black();
+                mark_red(s);
+                mark_black(s->right);
                 this->rotate_left(s);
             }
         }
 
-        delete_case6(n);
+        delete_case6(n, n->sibling());
     }
 
     /**
@@ -452,21 +507,25 @@ private:
      *                    4        5           1       2
      *
      */
-    void delete_case6(pointer n)                                        noexcept
+    void delete_case6(pointer n, pointer s)                             noexcept
     {
-        pointer s = n->sibling();
-
-        s->mark_as(n->parent);
-        n->parent->mark_black();
+        mark_as(s, n->parent);
+        mark_black(n->parent);
 
         if(n->is_left())
         {
-            s->right->mark_black();
+            if(nullptr != s)
+            {
+                mark_black(s->right);
+            }
             this->rotate_left(n->parent);
         }
         else
         {
-            s->left->mark_black();
+            if(nullptr != s)
+            {
+                mark_black(s->left);
+            }
             this->rotate_right(n->parent);
         }
     }

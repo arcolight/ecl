@@ -125,11 +125,11 @@ template<>
 void print_node<rb_tree_node_t*>(rb_tree_node_t* n)
 {
     print_node_symbol(n->have_left(), n->have_right());
-    if(n->is_black())
+    if(is_black(n))
     {
         std::cout << " B:";
     }
-    else if(n->is_red())
+    else if(is_red(n))
     {
         std::cout << " R:";
     }
@@ -391,6 +391,6 @@ void test_tree(const std::string prefix, typename T::node_t (& nodes)[N])
 
 int main(int, char**, char**)
 {
-    test_tree<tree_t>(TREE_PREFIX, simple_nodes);
+    // test_tree<tree_t>(TREE_PREFIX, simple_nodes);
     test_tree<rb_tree_t>(RB_TREE_PREFIX, rb_nodes);
 }
