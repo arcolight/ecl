@@ -445,12 +445,13 @@ public:
 
 // Iterators start
 protected:
+    template <typename Pointer>
     struct base_iterator
     {
         using iterator_category = std::bidirectional_iterator_tag;
         using difference_type   = ptrdiff_t;
 
-        base_iterator(pointer n, pointer e)                             noexcept
+        base_iterator(Pointer n, Pointer e)                             noexcept
             : m_n(n)
             , m_e(e)
         {}
@@ -469,7 +470,7 @@ protected:
             }
             else
             {
-                pointer y = m_n->parent;
+                Pointer y = m_n->parent;
                 if(nullptr == y)
                 {
                     m_n = m_e;
@@ -508,7 +509,7 @@ protected:
             }
             else
             {
-                pointer y = m_n->parent;
+                Pointer y = m_n->parent;
                 while(m_n == y->left)
                 {
                     m_n = y;
@@ -522,18 +523,20 @@ protected:
             }
         }
 
-        pointer m_n { nullptr };
-        pointer m_e { nullptr };
+        Pointer m_n { nullptr };
+        Pointer m_e { nullptr };
     };
 
 public:
-    struct iterator : public base_iterator
+    struct iterator :
+        public base_iterator<binary_tree_base::pointer>
     {
     private:
-        using base_iterator::increment;
-        using base_iterator::decrement;
-        using base_iterator::m_n;
-        using base_iterator::m_e;
+        using base = base_iterator<binary_tree_base::pointer>;
+        using base::increment;
+        using base::decrement;
+        using base::m_n;
+        using base::m_e;
 
     public:
         using self_type  = iterator;
@@ -541,8 +544,9 @@ public:
         using reference  = V&;
         using pointer    = V*;
 
-        iterator(binary_tree_base::pointer n, binary_tree_base::pointer e)
-            : base_iterator(n, e)
+        iterator(binary_tree_base::pointer n,
+                 binary_tree_base::pointer e)
+            : base_iterator<binary_tree_base::pointer>(n, e)
         {}
 
         self_type& operator++()                                         noexcept
@@ -597,13 +601,15 @@ public:
         }
     };
 
-    struct const_iterator : public base_iterator
+    struct const_iterator :
+        public base_iterator<binary_tree_base::const_pointer>
     {
     private:
-        using base_iterator::increment;
-        using base_iterator::decrement;
-        using base_iterator::m_n;
-        using base_iterator::m_e;
+        using base = base_iterator<binary_tree_base::const_pointer>;
+        using base::increment;
+        using base::decrement;
+        using base::m_n;
+        using base::m_e;
 
     public:
         using self_type  = const_iterator;
@@ -611,8 +617,9 @@ public:
         using reference  = const V&;
         using pointer    = const V*;
 
-        const_iterator(binary_tree_base::pointer n, binary_tree_base::pointer e)
-            : base_iterator(n, e)
+        const_iterator(binary_tree_base::const_pointer n,
+                       binary_tree_base::const_pointer e)
+            : base_iterator<binary_tree_base::const_pointer>(n, e)
         {}
 
         self_type& operator++()                                         noexcept
@@ -656,12 +663,12 @@ public:
             return !operator==(rhs);
         }
 
-        bool operator==(const binary_tree_base::pointer& rhs)              const
+        bool operator==(const binary_tree_base::const_pointer& rhs)        const
         {
             return m_n == rhs;
         }
 
-        bool operator!=(const binary_tree_base::pointer& rhs)              const
+        bool operator!=(const binary_tree_base::const_pointer& rhs)        const
         {
             return !operator==(rhs);
         }
@@ -783,14 +790,24 @@ public:
         return m_header.right;
     }
 
-    const_iterator find(const key_type& k)                        const noexcept
+    iterator find(const key_type& k)                                    noexcept
     {
         pointer p = m_header.parent->find(k);
         if(nullptr == p)
         {
             return end();
         }
-        return const_iterator(p, pointer(&m_header));
+        return iterator(p, pointer(&m_header));
+    }
+
+    const_iterator find(const key_type& k)                        const noexcept
+    {
+        const_pointer p = m_header.parent->find(k);
+        if(nullptr == p)
+        {
+            return end();
+        }
+        return const_iterator(p, const_pointer(&m_header));
     }
 
     pointer erase(const key_type& k)                                    noexcept
