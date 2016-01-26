@@ -80,6 +80,8 @@ void mark_black(red_black_node<K, V, Compare>* n)                       noexcept
         return;
     }
 
+    std::cout << n->key << " : black" << std::endl;
+
     n->color = node_color::BLACK;
 }
 
@@ -95,6 +97,8 @@ void mark_red(red_black_node<K, V, Compare>* n)                         noexcept
     {
         return;
     }
+
+    std::cout << n->key << " : red" << std::endl;
 
     n->color = node_color::RED;
 }
@@ -115,10 +119,19 @@ void mark_as(red_black_node<K, V, Compare>* n,
 
     if(nullptr == other)
     {
+        std::cout << n->key << " : as nullptr = black" << std::endl;
+
         n->color = node_color::BLACK;
     }
     else
     {
+        std::string clr = "black";
+        if(other->color == node_color::RED)
+        {
+            clr = "red";
+        }
+        std::cout << n->key << " : as " << other->key << " = " << clr << std::endl;
+
         n->color = other->color;
     }
 }
@@ -154,6 +167,7 @@ public:
 
     using base::root;
     using base::count;
+    using base::empty;
 
     iterator insert(pointer n)                                          noexcept
     {
@@ -167,37 +181,43 @@ public:
 
     pointer erase(const key_type& k)                                    noexcept
     {
-        erase_return ret = this->base::erase_internal(k);
-        pointer v = ret.first;  // removed
-        pointer u = ret.second; // successor
-
-        if(nullptr == v) // not found
+        if(empty())
         {
             return nullptr;
         }
 
-        if(is_black(v))
+        pointer to_erase = root()->find(k);
+        if(nullptr == to_erase) // not found
         {
-            if(is_red(u))
+            return nullptr;
+        }
+
+        pointer suc   = to_erase->successor();
+        pointer child = suc->have_left() ? suc->left : suc->right;
+
+        if(is_black(suc))
+        {
+            // delete_fixup(suc);
+            if(is_red(child))
             {
-                mark_black(u);
+                mark_black(child);
             }
             else
             {
-                if(nullptr == u)
+                if(suc->have_no_child())
                 {
-                    pointer s = (v->parent->left == nullptr) ? v->parent->right : v->parent->left;
-                    delete_case1(v, s);
+                    delete_case1(suc);
                 }
                 else
                 {
-                    pointer s = u->sibling();
-                    delete_case1(u, s);
+                    delete_case1(child);
                 }
             }
         }
 
-        return v;
+        erase_return ret = this->erase_internal(to_erase);
+
+        return ret.first;
     }
 
 private:
@@ -343,19 +363,14 @@ private:
         {
             this->rotate_left(g);
         }
-
-        if(m_header.parent == g)
-        {
-            m_header.parent = g->parent;
-            m_header.parent->parent = nullptr;
-        }
     }
 
-    void delete_case1(pointer n, pointer s)                             noexcept
+    void delete_case1(pointer n)                                        noexcept
     {
+        std::cout << "case 1. n: " << n->key << std::endl;
         if(n->have_parent())
         {
-            delete_case2(n, s);
+            delete_case2(n);
         }
     }
 
@@ -373,8 +388,10 @@ private:
      *               3         4   5        6      1        2    3        4
      *
      */
-    void delete_case2(pointer n, pointer s)                             noexcept
+    void delete_case2(pointer n)                                        noexcept
     {
+        std::cout << "case 2. n: " << n->key << std::endl;
+        pointer s = n->sibling();
         if(is_red(s))
         {
             mark_red(n->parent);
@@ -390,7 +407,7 @@ private:
         }
         else
         {
-            delete_case3(n, s);
+            delete_case3(n);
         }
     }
 
@@ -408,19 +425,21 @@ private:
      *               3         4   5        6                    3         4   5        6
      *
      */
-    void delete_case3(pointer n, pointer s)                             noexcept
+    void delete_case3(pointer n)                                        noexcept
     {
+        std::cout << "case 3. n: " << n->key << std::endl;
+        pointer s = n->sibling();
         if(is_black(n->parent) &&
            is_black(s)         &&
-           is_black(s->left)   &&
-           is_black(s->right))
+           ((s != nullptr) && is_black(s->left) ) &&
+           ((s != nullptr) && is_black(s->right)))
         {
             mark_red(s);
-            delete_case1(n->parent, n->parent->sibling());
+            delete_case1(n->parent);
         }
         else
         {
-            delete_case4(n, s);
+            delete_case4(n);
         }
     }
 
@@ -438,19 +457,21 @@ private:
      *               3         4   5        6                    3         4   5        6
      *
      */
-    void delete_case4(pointer n, pointer s)                             noexcept
+    void delete_case4(pointer n)                                        noexcept
     {
+        std::cout << "case 4. n: " << n->key << std::endl;
+        pointer s = n->sibling();
         if(is_red(n->parent) &&
            is_black(s)       &&
-           is_black(s->left) &&
-           is_black(s->right))
+           ((s == nullptr) || is_black(s->left) ) &&
+           ((s == nullptr) || is_black(s->right)))
         {
             mark_red(s);
             mark_black(n->parent);
         }
         else
         {
-            delete_case5(n, s);
+            delete_case5(n);
         }
     }
 
@@ -468,21 +489,23 @@ private:
      *                                                      3        4
      *
      */
-    void delete_case5(pointer n, pointer s)                             noexcept
+    void delete_case5(pointer n)                                        noexcept
     {
+        std::cout << "case 5. n: " << n->key << std::endl;
+        pointer s = n->sibling();
         if(is_black(s))
         {
             if(n->is_left()       &&
-               is_black(s->right) &&
-               is_red(s->left))
+               ((s == nullptr) || is_black(s->right)) &&
+               ((s != nullptr) && is_red(s->left)))
             {
                 mark_red(s);
                 mark_black(s->left);
                 this->rotate_right(s);
             }
             else if(n->is_right()     &&
-                    is_black(s->left) &&
-                    is_red(s->right))
+                    ((s == nullptr) || is_black(s->left)) &&
+                    ((s != nullptr) && is_red(s->right)))
             {
                 mark_red(s);
                 mark_black(s->right);
@@ -490,7 +513,7 @@ private:
             }
         }
 
-        delete_case6(n, n->sibling());
+        delete_case6(n);
     }
 
     /**
@@ -507,8 +530,10 @@ private:
      *                    4        5           1       2
      *
      */
-    void delete_case6(pointer n, pointer s)                             noexcept
+    void delete_case6(pointer n)                                        noexcept
     {
+        std::cout << "case 6. n: " << n->key << "parent: " << n->parent->key << std::endl;
+        pointer s = n->sibling();
         mark_as(s, n->parent);
         mark_black(n->parent);
 
@@ -520,7 +545,7 @@ private:
             }
             this->rotate_left(n->parent);
         }
-        else
+        else if(n->is_right())
         {
             if(nullptr != s)
             {
@@ -528,7 +553,95 @@ private:
             }
             this->rotate_right(n->parent);
         }
+        else
+        {
+            std::cout << "FAIL!!!" << std::endl;
+        }
     }
+
+    // void delete_fixup(pointer n)                                        noexcept
+    // {
+    //     pointer s = nullptr;
+
+    //     while(n != root() && is_black(n))
+    //     {
+    //         std::cout << "=begin=" << std::endl;
+    //         std::cout << "n =    " << n->key << std::endl;
+    //         std::cout << "root = " << root()->key << std::endl;
+    //         std::cout << "=======" << std::endl;
+
+    //         if(n->is_left())
+    //         {
+    //             s = n->sibling();
+    //             if(is_red(s))
+    //             {
+    //                 mark_black(s);
+    //                 mark_red(n->parent);
+    //                 this->rotate_left(n->parent);
+    //                 s = n->parent->right;
+    //             }
+
+    //             if(is_black(s->right) && is_black(s->left))
+    //             {
+    //                 mark_red(s);
+    //                 n = n->parent;
+    //             }
+    //             else
+    //             {
+    //                 if(is_black(s->right))
+    //                 {
+    //                     mark_black(s->left);
+    //                     mark_red(s);
+    //                     this->rotate_right(s);
+    //                     s = n->parent->right;
+    //                 }
+    //                 mark_as(s, n->parent);
+    //                 mark_black(n->parent);
+    //                 mark_black(s->right);
+    //                 this->rotate_left(n->parent);
+    //                 n = root();
+    //             }
+    //         }
+    //         else
+    //         {
+    //             s = n->sibling();
+    //             if(is_red(s))
+    //             {
+    //                 mark_black(s);
+    //                 mark_red(n->parent);
+    //                 this->rotate_right(n->parent);
+    //                 s = n->parent->right;
+    //             }
+
+    //             if(is_black(s->left) && is_black(s->right))
+    //             {
+    //                 mark_red(s);
+    //                 n = n->parent;
+    //             }
+    //             else
+    //             {
+    //                 if(is_black(s->left))
+    //                 {
+    //                     mark_black(s->right);
+    //                     mark_red(s);
+    //                     this->rotate_left(s);
+    //                     s = n->parent->left;
+    //                 }
+    //                 mark_as(s, n->parent);
+    //                 mark_black(n->parent);
+    //                 mark_black(s->left);
+    //                 this->rotate_right(n->parent);
+    //                 n = root();
+    //             }
+    //         }
+    //         mark_black(n);
+    //         mark_black(root());
+    //         std::cout << "=======" << std::endl;
+    //         std::cout << "n =    " << n->key << std::endl;
+    //         std::cout << "root = " << root()->key << std::endl;
+    //         std::cout << "==end==" << std::endl;
+    //     }
+    // }
 };
 
 } // namespace tree

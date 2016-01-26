@@ -264,6 +264,11 @@ struct node_base
                (!have_left() &&  have_right());
     }
 
+    inline bool is_leaf()                                         const noexcept
+    {
+        return have_no_child();
+    }
+
     inline bool have_parent()                                     const noexcept
     {
         return nullptr != parent;
@@ -310,18 +315,26 @@ struct node_base
         p->parent = static_cast<pointer>(this);
     }
 
-    inline erase_return erase()                                         noexcept
+    inline void replace_from(pointer successor)                         noexcept
     {
-        if(have_both())
+        key = successor->key;
+        val = successor->val;
+    }
+
+    inline pointer successor()                                          noexcept
+    {
+        pointer suc = static_cast<pointer>(this);
+
+        if(have_right())
         {
-            pointer successor = right->most_left();
-
-            key = successor->key;
-            val = successor->val;
-
-            return successor->erase();
+            suc = right->most_left();
         }
 
+        return suc;
+    }
+
+    inline erase_return erase_internal()                                noexcept
+    {
         pointer this_p = static_cast<pointer>(this);
 
         if(have_no_child())
@@ -367,6 +380,13 @@ struct node_base
             right->parent = nullptr;
             return { this_p, right };
         }
+    }
+
+    inline erase_return erase()                                         noexcept
+    {
+        pointer s = successor();
+        replace_from(s);
+        return s->erase_internal();
     }
 
     inline pointer find(const key_type& k)                              noexcept
@@ -760,9 +780,14 @@ public:
         return m_size;
     }
 
+    bool empty()                                                  const noexcept
+    {
+        return m_size == 0; // m_header.parent == pointer(&m_header); ?
+    }
+
     pointer root()                                                const noexcept
     {
-        if(m_size == 0)
+        if(empty())
         {
             return nullptr;
         }
@@ -818,44 +843,12 @@ public:
     }
 
 protected:
-    erase_return erase_internal(const key_type& k)                      noexcept
+
+    erase_return erase_internal(pointer p)                              noexcept
     {
-        if(m_header.parent == pointer(&m_header))
-        {
-            return { nullptr, nullptr };
-        }
-
-        pointer to_erase = m_header.parent->find(k);
-        if(nullptr == to_erase)
-        {
-            return { nullptr, nullptr };
-        }
-
-        erase_return ret  = to_erase->erase();
+        erase_return ret  = p->erase();
         pointer removed   = ret.first;
         pointer successor = ret.second;
-
-        std::cout << "removed:   ";
-        if(nullptr != removed)
-        {
-            std::cout << removed->key;
-        }
-        else
-        {
-            std::cout << "nullptr";
-        }
-        std::cout << std::endl;
-
-        std::cout << "successor: ";
-        if(nullptr != successor)
-        {
-            std::cout << successor->key;
-        }
-        else
-        {
-            std::cout << "nullptr";
-        }
-        std::cout << std::endl;
 
         if(removed == pointer(m_header.parent) && (nullptr == successor))
         {
@@ -901,6 +894,22 @@ protected:
         return ret;
     }
 
+    erase_return erase_internal(const key_type& k)                      noexcept
+    {
+        if(empty())
+        {
+            return { nullptr, nullptr };
+        }
+
+        pointer to_erase = m_header.parent->find(k);
+        if(nullptr == to_erase)
+        {
+            return { nullptr, nullptr };
+        }
+
+        return erase_internal(to_erase);
+    }
+
     void link_as_left(pointer c, pointer f)                             noexcept
     {
         if((nullptr == c) && (nullptr == f))
@@ -937,11 +946,22 @@ protected:
         }
     }
 
-    pointer rotate_left(pointer n)                                      noexcept
+    void rotate_left(pointer n)                                         noexcept
     {
+        std::cout << "rotate left around " << n->key << std::endl;
+
         pointer p = n->parent;
         pointer r = n->right;
         pointer rl = (nullptr == r) ? nullptr : r->left;
+
+        if(m_header.parent == n)
+        {
+            m_header.parent = n->right;
+        }
+
+        std::cout << "root is " << m_header.parent->key << std::endl;
+        std::cout << "root parent is " << m_header.parent->parent << std::endl;
+
         if(nullptr != p)
         {
             if(p->left == n)
@@ -957,14 +977,25 @@ protected:
         link_as_left(n, r);
         link_as_right(rl, n);
 
-        return n;
+        root()->parent = nullptr;
     }
 
-    pointer rotate_right(pointer n)                                     noexcept
+    void rotate_right(pointer n)                                        noexcept
     {
+        std::cout << "rotate right around " << n->key << std::endl;
+
         pointer p = n->parent;
         pointer l = n->left;
         pointer lr = (nullptr == l) ? nullptr : l->right;
+
+        if(m_header.parent == n)
+        {
+            m_header.parent = n->left;
+        }
+
+        std::cout << "root is " << m_header.parent->key << std::endl;
+        std::cout << "root parent is " << m_header.parent->parent << std::endl;
+
         if(nullptr != p)
         {
             if(p->left == n)
@@ -980,7 +1011,7 @@ protected:
         link_as_right(n, l);
         link_as_left(lr, n);
 
-        return n;
+        root()->parent = nullptr;
     }
 
 protected:
