@@ -80,8 +80,6 @@ void mark_black(red_black_node<K, V, Compare>* n)                       noexcept
         return;
     }
 
-    std::cout << n->key << " : black" << std::endl;
-
     n->color = node_color::BLACK;
 }
 
@@ -97,8 +95,6 @@ void mark_red(red_black_node<K, V, Compare>* n)                         noexcept
     {
         return;
     }
-
-    std::cout << n->key << " : red" << std::endl;
 
     n->color = node_color::RED;
 }
@@ -119,19 +115,10 @@ void mark_as(red_black_node<K, V, Compare>* n,
 
     if(nullptr == other)
     {
-        std::cout << n->key << " : as nullptr = black" << std::endl;
-
         n->color = node_color::BLACK;
     }
     else
     {
-        std::string clr = "black";
-        if(other->color == node_color::RED)
-        {
-            clr = "red";
-        }
-        std::cout << n->key << " : as " << other->key << " = " << clr << std::endl;
-
         n->color = other->color;
     }
 }
@@ -367,7 +354,6 @@ private:
 
     void delete_case1(pointer n)                                        noexcept
     {
-        std::cout << "case 1. n: " << n->key << std::endl;
         if(n->have_parent())
         {
             delete_case2(n);
@@ -390,7 +376,6 @@ private:
      */
     void delete_case2(pointer n)                                        noexcept
     {
-        std::cout << "case 2. n: " << n->key << std::endl;
         pointer s = n->sibling();
         if(is_red(s))
         {
@@ -427,12 +412,11 @@ private:
      */
     void delete_case3(pointer n)                                        noexcept
     {
-        std::cout << "case 3. n: " << n->key << std::endl;
         pointer s = n->sibling();
         if(is_black(n->parent) &&
            is_black(s)         &&
-           ((s != nullptr) && is_black(s->left) ) &&
-           ((s != nullptr) && is_black(s->right)))
+           ((s == nullptr) || is_black(s->left) ) &&
+           ((s == nullptr) || is_black(s->right)))
         {
             mark_red(s);
             delete_case1(n->parent);
@@ -459,7 +443,6 @@ private:
      */
     void delete_case4(pointer n)                                        noexcept
     {
-        std::cout << "case 4. n: " << n->key << std::endl;
         pointer s = n->sibling();
         if(is_red(n->parent) &&
            is_black(s)       &&
@@ -491,7 +474,6 @@ private:
      */
     void delete_case5(pointer n)                                        noexcept
     {
-        std::cout << "case 5. n: " << n->key << std::endl;
         pointer s = n->sibling();
         if(is_black(s))
         {
@@ -532,7 +514,6 @@ private:
      */
     void delete_case6(pointer n)                                        noexcept
     {
-        std::cout << "case 6. n: " << n->key << "parent: " << n->parent->key << std::endl;
         pointer s = n->sibling();
         mark_as(s, n->parent);
         mark_black(n->parent);
@@ -545,7 +526,7 @@ private:
             }
             this->rotate_left(n->parent);
         }
-        else if(n->is_right())
+        else
         {
             if(nullptr != s)
             {
@@ -553,95 +534,7 @@ private:
             }
             this->rotate_right(n->parent);
         }
-        else
-        {
-            std::cout << "FAIL!!!" << std::endl;
-        }
     }
-
-    // void delete_fixup(pointer n)                                        noexcept
-    // {
-    //     pointer s = nullptr;
-
-    //     while(n != root() && is_black(n))
-    //     {
-    //         std::cout << "=begin=" << std::endl;
-    //         std::cout << "n =    " << n->key << std::endl;
-    //         std::cout << "root = " << root()->key << std::endl;
-    //         std::cout << "=======" << std::endl;
-
-    //         if(n->is_left())
-    //         {
-    //             s = n->sibling();
-    //             if(is_red(s))
-    //             {
-    //                 mark_black(s);
-    //                 mark_red(n->parent);
-    //                 this->rotate_left(n->parent);
-    //                 s = n->parent->right;
-    //             }
-
-    //             if(is_black(s->right) && is_black(s->left))
-    //             {
-    //                 mark_red(s);
-    //                 n = n->parent;
-    //             }
-    //             else
-    //             {
-    //                 if(is_black(s->right))
-    //                 {
-    //                     mark_black(s->left);
-    //                     mark_red(s);
-    //                     this->rotate_right(s);
-    //                     s = n->parent->right;
-    //                 }
-    //                 mark_as(s, n->parent);
-    //                 mark_black(n->parent);
-    //                 mark_black(s->right);
-    //                 this->rotate_left(n->parent);
-    //                 n = root();
-    //             }
-    //         }
-    //         else
-    //         {
-    //             s = n->sibling();
-    //             if(is_red(s))
-    //             {
-    //                 mark_black(s);
-    //                 mark_red(n->parent);
-    //                 this->rotate_right(n->parent);
-    //                 s = n->parent->right;
-    //             }
-
-    //             if(is_black(s->left) && is_black(s->right))
-    //             {
-    //                 mark_red(s);
-    //                 n = n->parent;
-    //             }
-    //             else
-    //             {
-    //                 if(is_black(s->left))
-    //                 {
-    //                     mark_black(s->right);
-    //                     mark_red(s);
-    //                     this->rotate_left(s);
-    //                     s = n->parent->left;
-    //                 }
-    //                 mark_as(s, n->parent);
-    //                 mark_black(n->parent);
-    //                 mark_black(s->left);
-    //                 this->rotate_right(n->parent);
-    //                 n = root();
-    //             }
-    //         }
-    //         mark_black(n);
-    //         mark_black(root());
-    //         std::cout << "=======" << std::endl;
-    //         std::cout << "n =    " << n->key << std::endl;
-    //         std::cout << "root = " << root()->key << std::endl;
-    //         std::cout << "==end==" << std::endl;
-    //     }
-    // }
 };
 
 } // namespace tree

@@ -948,8 +948,6 @@ protected:
 
     void rotate_left(pointer n)                                         noexcept
     {
-        std::cout << "rotate left around " << n->key << std::endl;
-
         pointer p = n->parent;
         pointer r = n->right;
         pointer rl = (nullptr == r) ? nullptr : r->left;
@@ -958,9 +956,6 @@ protected:
         {
             m_header.parent = n->right;
         }
-
-        std::cout << "root is " << m_header.parent->key << std::endl;
-        std::cout << "root parent is " << m_header.parent->parent << std::endl;
 
         if(nullptr != p)
         {
@@ -982,8 +977,6 @@ protected:
 
     void rotate_right(pointer n)                                        noexcept
     {
-        std::cout << "rotate right around " << n->key << std::endl;
-
         pointer p = n->parent;
         pointer l = n->left;
         pointer lr = (nullptr == l) ? nullptr : l->right;
@@ -992,9 +985,6 @@ protected:
         {
             m_header.parent = n->left;
         }
-
-        std::cout << "root is " << m_header.parent->key << std::endl;
-        std::cout << "root parent is " << m_header.parent->parent << std::endl;
 
         if(nullptr != p)
         {
