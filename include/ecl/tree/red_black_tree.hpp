@@ -41,7 +41,7 @@ template
     , typename V
     , template <typename> class Compare
 >
-bool is_black(red_black_node<K, V, Compare>* n)                         noexcept
+bool is_black(const red_black_node<K, V, Compare>* n)                   noexcept
 {
     if(nullptr == n)
     {
@@ -57,7 +57,7 @@ template
     , typename V
     , template <typename> class Compare
 >
-bool is_red(red_black_node<K, V, Compare>* n)                           noexcept
+bool is_red(const red_black_node<K, V, Compare>* n)                     noexcept
 {
     if(nullptr == n)
     {
@@ -390,10 +390,7 @@ private:
                 this->rotate_right(n->parent);
             }
         }
-        else
-        {
-            delete_case3(n);
-        }
+        delete_case3(n);
     }
 
     /**

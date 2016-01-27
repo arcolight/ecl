@@ -17,10 +17,10 @@ using request_raw_t = const char*;
 
 template
 <
-    std::size_t MAX_URI_LENGTH     = 128 ,
-    std::size_t MAX_URI_PARAMETERS = 32  ,
-    std::size_t MAX_HEADER_LENGTH  = 128 ,
-    std::size_t MAX_HEADERS_COUNT  = 32
+      std::size_t MAX_URI_LENGTH     = 128
+    , std::size_t MAX_URI_PARAMETERS = 32
+    , std::size_t MAX_HEADER_LENGTH  = 128
+    , std::size_t MAX_HEADERS_COUNT  = 32
 >
 struct request
 {

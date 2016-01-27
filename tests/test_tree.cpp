@@ -1,13 +1,14 @@
-#include <iostream>
-
 #include <ecl/tree/simple_binary_tree.hpp>
 #include <ecl/tree/red_black_tree.hpp>
 
+#include <iostream>
 #include <string>
+#include <algorithm>
 
 #include <random>
+#include <ctime>
 
-#define NODES_COUNT    100
+#define NODES_COUNT 500
 
 #define TREE_DUMP_SPACE "  "
 #define TREE_DUMP_RIGHT " ┌"
@@ -92,6 +93,56 @@ template<typename T, std::size_t N>
 constexpr static std::size_t array_size(T (&)[N])
 {
     return N;
+}
+
+template<typename T>
+std::size_t node_height(const T* n)
+{
+    std::size_t height = 0;
+    while(nullptr != n)
+    {
+        ++height;
+        n = n->parent;
+    }
+
+    return height;
+}
+
+template<>
+std::size_t node_height<rb_tree_node_t>(const rb_tree_node_t* n)
+{
+    std::size_t height = 0;
+    while(nullptr != n)
+    {
+        if(is_black(n))
+        {
+            ++height;
+        }
+        n = n->parent;
+    }
+
+    return height;
+}
+
+template<typename T>
+void check_tree_properties(const std::string prefix,
+                           std::vector<std::size_t>& heights,
+                           const T* n)
+{
+    if(nullptr == n)
+    {
+        return;
+    }
+
+    if(n->is_leaf())
+    {
+        std::size_t h = node_height(n);
+        heights.push_back(h);
+        std::cout << prefix << n->key << " : " << h << std::endl;
+    }
+
+    check_tree_properties(prefix, heights, n->left);
+    check_tree_properties(prefix, heights, n->right);
 }
 
 void print_node_symbol(bool have_left, bool have_right)
@@ -199,6 +250,26 @@ void print(N n, std::vector<std::size_t> connectors = std::vector<std::size_t>()
 }
 
 template<typename T>
+bool validate_heights(const std::string,
+                      const std::vector<std::size_t>&)
+{
+    return true;
+}
+
+template<>
+bool validate_heights<rb_tree_t>(const std::string,
+                                 const std::vector<std::size_t>& heights)
+{
+    if(heights.empty())
+    {
+        return true;
+    }
+
+    auto result = std::minmax_element(heights.begin(), heights.end());
+    return *result.first == *result.second;
+}
+
+template<typename T>
 void dump_tree(const std::string prefix, const T& tree)
 {
     std::cout << prefix << "printing tree." << std::endl;
@@ -227,6 +298,16 @@ void dump_tree(const std::string prefix, const T& tree)
     std::cout << std::endl;
 
     std::cout << prefix << "done." << std::endl << std::endl;
+
+    std::vector<std::size_t> heights;
+    check_tree_properties(prefix, heights, tree.root());
+
+    bool v_res = validate_heights<rb_tree_t>(prefix, heights);
+
+    if(!v_res)
+    {
+        exit(1);
+    }
 }
 
 template<typename T>
@@ -327,22 +408,41 @@ void erase_tree_dynamic(const std::string prefix, T& tree, key_type from, key_ty
     std::cout << prefix << "nodes key from: " << from  << std::endl;
     std::cout << prefix << "nodes key to:   " << to    << std::endl;
 
-    for(key_type i = from; i < to; ++i)
+    std::srand(std::time(0));
+    while(!tree.empty())
     {
-        std::cout << prefix << "erasing node " << i << ": ";
+        key_type i = std::rand() % (to - from) + from;
         typename T::node_t::pointer p = tree.erase(i);
         if(nullptr != p)
         {
+            std::cout << prefix << "erasing node " << i << ": ";
             ++count;
             delete p;
             std::cout << "done." << std::endl;
+            dump_tree(prefix, tree);
         }
         else
         {
-            std::cout << "no such node." << std::endl;
+            // std::cout << "no such node." << std::endl;
         }
-        dump_tree(prefix, tree);
     }
+
+    // for(key_type i = from; i < to; ++i)
+    // {
+    //     std::cout << prefix << "erasing node " << i << ": ";
+    //     typename T::node_t::pointer p = tree.erase(i);
+    //     if(nullptr != p)
+    //     {
+    //         ++count;
+    //         delete p;
+    //         std::cout << "done." << std::endl;
+    //     }
+    //     else
+    //     {
+    //         std::cout << "no such node." << std::endl;
+    //     }
+    //     dump_tree(prefix, tree);
+    // }
 
     std::cout << prefix << "done. erased: " << count << std::endl;
 }
@@ -391,6 +491,6 @@ void test_tree(const std::string prefix, typename T::node_t (& nodes)[N])
 
 int main(int, char**, char**)
 {
-    test_tree<tree_t>(TREE_PREFIX, simple_nodes);
+    // test_tree<tree_t>(TREE_PREFIX, simple_nodes);
     test_tree<rb_tree_t>(RB_TREE_PREFIX, rb_nodes);
 }

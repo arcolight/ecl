@@ -797,7 +797,7 @@ public:
 
     pointer min()                                                 const noexcept
     {
-        if(m_size == 0)
+        if(empty())
         {
             return nullptr;
         }
@@ -807,7 +807,7 @@ public:
 
     pointer max()                                                 const noexcept
     {
-        if(m_size == 0)
+        if(empty())
         {
             return nullptr;
         }
