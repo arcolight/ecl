@@ -12,9 +12,8 @@
 
 #define TREE_DUMP_SPACE "  "
 #define TREE_DUMP_RIGHT " ┌"
-#define TREE_DUMP_LEFT  " └"
 #define TREE_DUMP_CON   " │"
-#define TREE_DUMP_NODE  "─┤"
+#define TREE_DUMP_LEFT  " └"
 
 #define TREE_DUMP_NODE_HAVE_NO    "─╼"
 #define TREE_DUMP_NODE_HAVE_LEFT  "─┮"
