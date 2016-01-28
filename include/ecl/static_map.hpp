@@ -5,7 +5,7 @@
 #include <type_traits>
 #include <array>
 
-#include <ecl/rb_tree.hpp>
+#include <ecl/tree/red_black_tree.hpp>
 
 namespace ecl
 {
@@ -13,28 +13,28 @@ namespace ecl
 template<typename K, typename V, std::size_t N, typename Compare = std::less<K>>
 class static_map
 {
-    using tree_t                 = rb_tree<const K, V>;
+    using tree_t                 = tree::red_black_tree<K, V>;
     using tree_node_t            = typename tree_t::node_t;
 
 public:
     using key_type               = typename tree_t::key_type;
     using mapped_type            = typename tree_t::value_type;
-    using value_type             = std::pair<const K, V>;
+    using value_type             = std::pair<K, V>;
     using key_compare            = Compare;
 
     using const_iterator         = typename tree_t::const_iterator;
     using const_reverse_iterator = typename tree_t::const_reverse_iterator;
 
     template<typename... Args>
-    constexpr explicit static_map (Args&&... args) :
-        // m_pairs { { std::forward<Args>(args)... } }
-        m_nodes { { std::forward<Args>(args)... } }
+    constexpr explicit static_map (mapped_type&& def, Args&&... args) :
+        m_nodes     { { std::forward<Args>(args)... } },
+        m_not_found { std::forward<mapped_type>(def) }
     {
         static_assert(std::is_nothrow_default_constructible<mapped_type>::value,
             "Value type should be nothrow default constructible.");
     }
 
-    void inline build_tree()
+    inline void build_tree()                                      const noexcept
     {
         if(m_tree_init)
         {
@@ -54,15 +54,13 @@ public:
         build_tree();
 
         const_iterator i = search(k);
-        // for(auto& p : m_nodes)
-        // {
-        //     if(p.first == k)
-        //     {
-        //         return p.second;
-        //     }
-        // }
 
-        return not_found();
+        if(i == static_cast<const tree_t>(m_tree).end())
+        {
+            return not_found();
+        }
+
+        return *i;
     }
 
     const mapped_type& operator[](key_type&& k)                   const noexcept
@@ -70,15 +68,13 @@ public:
         build_tree();
 
         const_iterator i = search(k);
-        // for(auto& p : m_nodes)
-        // {
-        //     if(p.first == k)
-        //     {
-        //         return p.second;
-        //     }
-        // }
 
-        return not_found();
+        if(i == static_cast<const tree_t>(m_tree).end())
+        {
+            return not_found();
+        }
+
+        return *i;
     }
 
     constexpr static std::size_t size()                                 noexcept
@@ -88,66 +84,81 @@ public:
 
     const V& not_found()                                          const noexcept
     {
+        build_tree();
+
         return m_not_found;
     }
 
-    const const_iterator begin()                                  const noexcept
+    const_iterator begin()                                        const noexcept
     {
-        return m_nodes.begin();
+        build_tree();
+
+        return static_cast<const tree_t>(m_tree).begin();
     }
 
-    const const_iterator end()                                    const noexcept
+    const_iterator end()                                          const noexcept
     {
-        return m_nodes.end();
+        build_tree();
+
+        return static_cast<const tree_t>(m_tree).end();
     }
 
-    const const_reverse_iterator rbegin()                         const noexcept
+    const_reverse_iterator rbegin()                               const noexcept
     {
-        return m_nodes.rbegin();
+        build_tree();
+
+        return static_cast<const tree_t>(m_tree).rbegin();
     }
 
-    const const_reverse_iterator rend()                           const noexcept
+    const_reverse_iterator rend()                                 const noexcept
     {
-        return m_nodes.rend();
+        build_tree();
+
+        return static_cast<const tree_t>(m_tree).rend();
     }
 
 private:
-    const_iterator search(const key_type& k)
+    const_iterator search(key_type&& k)                           const noexcept
     {
-
+        return static_cast<const tree_t>(m_tree).find(
+            std::forward<key_type>(k)
+        );
     }
 
-    bool                            m_tree_init { false };
-    const mapped_type               m_not_found {};
+    const_iterator search(const key_type& k)                      const noexcept
+    {
+        return static_cast<const tree_t>(m_tree).find(k);
+    }
 
-    tree_t                          m_tree      {};
-    std::array<tree_node_t, N>      m_nodes;
+    mutable bool                       m_tree_init { false };
+    mutable tree_t                     m_tree      {};
 
-    // const std::array<value_type, N> m_pairs;
+    mutable std::array<tree_node_t, N> m_nodes;
+    const mapped_type                  m_not_found {};
 };
 
 template
 <
-    typename K,
-    typename V,
-    typename... Args,
-    typename Compare = std::less<K>
+      typename K
+    , typename V
+    , typename... Args
+    , typename Compare = std::less<K>
 >
 constexpr inline static_map
                  <
-                     K,
-                     V,
-                     sizeof...(Args),
-                     Compare
-                 > create_map(Args&&... args)
+                       K
+                     , V
+                     , sizeof...(Args)
+                     , Compare
+                 > create_map(V&& def, Args&&... args)
 {
     return static_map
            <
-               K,
-               V,
-               sizeof...(Args),
-               Compare
-           >(std::forward<Args>(args)...);
+                 K
+               , V
+               , sizeof...(Args)
+               , Compare
+           >(std::forward<V>(def), std::forward<Args>(args)...);
 }
 
 } // namespace ecl
