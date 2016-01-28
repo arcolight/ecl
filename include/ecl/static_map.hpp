@@ -55,7 +55,7 @@ public:
 
         const_iterator i = search(k);
 
-        if(i == static_cast<const tree_t>(m_tree).end())
+        if(i == static_cast<const tree_t*>(&m_tree)->end())
         {
             return not_found();
         }
@@ -69,7 +69,7 @@ public:
 
         const_iterator i = search(k);
 
-        if(i == static_cast<const tree_t>(m_tree).end())
+        if(i == static_cast<const tree_t*>(&m_tree)->end())
         {
             return not_found();
         }
@@ -93,41 +93,41 @@ public:
     {
         build_tree();
 
-        return static_cast<const tree_t>(m_tree).begin();
+        return static_cast<const tree_t*>(&m_tree)->begin();
     }
 
     const_iterator end()                                          const noexcept
     {
         build_tree();
 
-        return static_cast<const tree_t>(m_tree).end();
+        return static_cast<const tree_t*>(&m_tree)->end();
     }
 
     const_reverse_iterator rbegin()                               const noexcept
     {
         build_tree();
 
-        return static_cast<const tree_t>(m_tree).rbegin();
+        return static_cast<const tree_t*>(&m_tree)->rbegin();
     }
 
     const_reverse_iterator rend()                                 const noexcept
     {
         build_tree();
 
-        return static_cast<const tree_t>(m_tree).rend();
+        return static_cast<const tree_t*>(&m_tree)->rend();
     }
 
 private:
     const_iterator search(key_type&& k)                           const noexcept
     {
-        return static_cast<const tree_t>(m_tree).find(
+        return static_cast<const tree_t*>(&m_tree)->find(
             std::forward<key_type>(k)
         );
     }
 
     const_iterator search(const key_type& k)                      const noexcept
     {
-        return static_cast<const tree_t>(m_tree).find(k);
+        return static_cast<const tree_t*>(&m_tree)->find(k);
     }
 
     mutable bool                       m_tree_init { false };
