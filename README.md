@@ -38,6 +38,15 @@ Scott Schurr's str_const class.
 ### circular_buffer
 Circular buffer class.
 
+### tree
+Binary tree implementation. Can be used with statically allocated nodes, so no memory allocation needed.
+
+### red_black_tree
+Red-black tree implementation. Can be used with statically allocated nodes, so no memory allocation needed.
+
+### static_map
+Simple map class with constant fields. Uses RB-tree for element access.
+
 ### web server (under development)
 Simple web server with staticaly linked resources.
 Simple CGI support.
@@ -58,6 +67,8 @@ Targets:
     * test_stream
     * test_json
     * test_str_const
+    * test_tree
+    * test_static_map
     * test_command_processor
     * test_web
 
