@@ -302,7 +302,7 @@ void dump_tree(const std::string prefix, const T& tree)
     std::vector<std::size_t> heights;
     check_tree_properties(prefix, heights, tree.root());
 
-    bool v_res = validate_heights<rb_tree_t>(prefix, heights);
+    bool v_res = validate_heights<T>(prefix, heights);
 
     if(!v_res)
     {
@@ -493,6 +493,6 @@ void test_tree(const std::string prefix, typename T::node_t (& nodes)[N])
 
 int main(int, char**, char**)
 {
-    // test_tree<tree_t>(TREE_PREFIX, simple_nodes);
+    test_tree<tree_t>(TREE_PREFIX, simple_nodes);
     test_tree<rb_tree_t>(RB_TREE_PREFIX, rb_nodes);
 }
