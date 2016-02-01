@@ -2,7 +2,7 @@ ecl
 ===
 
 Very small C++ class set suitable for embedded devices.
-C++11-compatible compiler needed. (Tested: gcc-4.7, gcc-4.8, clang-3.5)
+C++11-compatible compiler needed. (Tested: gcc>=4.7, clang>=3.5)
 
 ### fsm
 Generic class for Finite State Machine creating.
