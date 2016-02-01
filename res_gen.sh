@@ -4,7 +4,7 @@ if [ $# -lt 2 ] ; then
     echo "Usage: ./res_gen.sh RES_FILE OUT_DIR [-c]";
     echo "RES_FILE : Resource file to encode."
     echo "OUT_DIR  : Output directory, where encoded file will be saved."
-    echo "-c     : true Compress with gzip resource file."
+    echo "-c       : true Compress with gzip resource file."
     exit 1
 fi
 
