@@ -2,6 +2,7 @@
 #include <ecl/tree/red_black_tree.hpp>
 
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <algorithm>
 
@@ -325,9 +326,11 @@ void fill_tree_dynamic(const std::string prefix, T& tree, key_type from, key_typ
     for(std::size_t i = 0; i < count; ++i)
     {
         int v = uniform_dist(e);
-        typename T::node_t::pointer p = new typename T::node_t(v, std::to_string(v));
+        std::stringstream ss;
+        ss << v;
+        typename T::node_t::pointer p = new typename T::node_t(v, ss.str());
 
-        std::cout << prefix << "insert (" << v << "; " << std::to_string(v) << ") : ";
+        std::cout << prefix << "insert (" << v << "; " << ss.str() << ") : ";
 
         if(tree.insert(p) != p)
         {
