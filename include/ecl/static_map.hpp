@@ -38,17 +38,10 @@ public:
 
     inline void build_tree()                                      const noexcept
     {
-        if(m_tree_init)
-        {
-            return;
-        }
-
         for(std::size_t i = 0; i < N; ++i)
         {
             m_tree.insert(&m_nodes[i]);
         }
-
-        m_tree_init = true;
     }
 
     const mapped_type& operator[](const key_type& k)              const noexcept
@@ -118,10 +111,9 @@ private:
         return static_cast<const tree_t*>(&m_tree)->find(k);
     }
 
-    mutable bool                       m_tree_init { false };
     mutable tree_t                     m_tree      {};
+    mutable std::array<tree_node_t, N> m_nodes     {};
 
-    mutable std::array<tree_node_t, N> m_nodes;
     const mapped_type                  m_not_found {};
 };
 
