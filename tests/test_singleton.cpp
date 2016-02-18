@@ -36,7 +36,7 @@ class test_class_ns
 public:
     virtual ~test_class_ns() {}
 
-    void hello()                                                       const
+    void hello()                                                           const
     {
         std::cout << "test_class_ns at " << this << std::endl;
     }
@@ -46,9 +46,10 @@ protected:
 };
 
 }
-typedef ecl::singleton<test_class_1>  test_class_1_singleton;
-typedef ecl::singleton<test_class_2>  test_class_2_singleton;
-typedef ecl::singleton<test_class_ns> test_class_ns_singleton;
+
+using test_class_1_singleton  = ecl::singleton<test_class_1>;
+using test_class_2_singleton  = ecl::singleton<test_class_2>;
+using test_class_ns_singleton = ecl::singleton<test_class_ns>;
 
 int main(int argc, char** argv)
 {
