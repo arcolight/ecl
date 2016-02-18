@@ -35,7 +35,7 @@ private:
 };
 
 template<typename T>
-T& singleton<T>::instance()
+T& singleton<T>::instance()                                             noexcept
 {
     static singleton<T> object;
 
