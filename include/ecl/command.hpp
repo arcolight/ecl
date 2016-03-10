@@ -6,6 +6,7 @@
 #include <cstring>
 
 #include <array>
+#include <type_traits>
 
 #include <ecl/singleton.hpp>
 
@@ -49,9 +50,10 @@ template<typename cmd>
 class cmd_core
 {
 private:
-    using receiver_t = detail::i_receiver<cmd>;
-    using receiver_ptr_t = receiver_t*;
-    using array_singleton_t = ecl::singleton<
+    using receiver_t        = detail::i_receiver<cmd>;
+    using receiver_ptr_t    = typename std::add_pointer<receiver_t>::type;
+    using array_singleton_t = ecl::singleton
+    <
         std::array<receiver_ptr_t, RECEIVER_CAPACITY>
     >;
 
@@ -145,7 +147,7 @@ protected:
         this->detail::cmd_core<cmd>::reg(this);
     }
 
-    virtual ~receiver()
+    virtual ~receiver()                                                 override
     {}
 };
 
