@@ -11,8 +11,6 @@
 #include <cstddef>
 #include <functional>
 
-#include <ecl/singleton.hpp>
-
 namespace ecl
 {
 
@@ -24,7 +22,12 @@ namespace ecl
  * @tparam state_t FSM states enum type.
  * @tparam init Init state from state_t enum.
  */
-template<typename derived, typename state_t, state_t init>
+template
+<
+      typename derived
+    , typename state_t
+    , state_t  init
+>
 class state_machine
 {
 protected:
@@ -130,9 +133,14 @@ protected:
      * Returns true if transition can be completed, false if not.
      *
      */
-    template<state_t start, typename event_t, state_t next,
-             void (derived::*action)(const event_t&) = nullptr,
-             bool (derived::*guard)(const event_t&) = nullptr>
+    template
+    <
+          state_t  start
+        , typename event_t
+        , state_t  next
+        , void (derived::*action)(const event_t&) = nullptr
+        , bool (derived::*guard )(const event_t&) = nullptr
+    >
     class row : public virtual transition_layer<event_t>
     {
     protected:
@@ -282,9 +290,12 @@ public:
      * @param e Reference to event object.
      * @return FSM state after event processing.
      */
-    template<typename event_t,
-             typename transition_table_t,
-             typename callback_table_t>
+    template
+    <
+          typename event_t
+        , typename transition_table_t
+        , typename callback_table_t
+    >
     state_t transition(const event_t& e);
 
     /**
@@ -315,13 +326,16 @@ private:
     constexpr static state_t m_s_init_state { init };
 };
 
-template<typename derived, typename state_t, state_t init>
-template<typename event_t,
-         typename transition_table_t,
-         typename callback_table_t>
+template<typename derived, typename state_t, state_t  init>
+template
+<
+      typename event_t
+    , typename transition_table_t
+    , typename callback_table_t
+>
 state_t state_machine<derived, state_t, init>::transition(const event_t& e)
 {
-    transition_table_t& tt = singleton<transition_table_t>::instance();
+    static transition_table_t tt;
 
     const state_t current = m_state;
     const state_t next = tt.template transition<event_t>(*m_fsm_ptr, e);
@@ -335,7 +349,12 @@ state_t state_machine<derived, state_t, init>::transition(const event_t& e)
     return m_state;
 }
 
-template<typename derived, typename state_t, state_t init>
+template
+<
+      typename derived
+    , typename state_t
+    , state_t  init
+>
 template<typename... rows>
 state_machine<derived, state_t, init>::transition_table<rows...>::transition_table()
 {
