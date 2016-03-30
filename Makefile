@@ -36,7 +36,9 @@ TESTS_DIR = ./tests
 BIN_DIR = ./bin
 DOC_DIR = ./doc
 
-GCOV = gcov
+ifndef GCOV
+	GCOV=gcov
+endif
 
 all: tests
 

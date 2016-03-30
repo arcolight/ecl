@@ -9,8 +9,10 @@ before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq libyajl-dev libxml2-dev libxqilla-dev
   - if [ "$CXX" = "clang++" ]; then sudo apt-get install -qq libstdc++-4.8-dev; fi
+  - if [ "$CXX" = "clang++" ]; then export GCOV="gcov-4.8"; fi
   - if [ "$CXX" = "g++" ]; then sudo apt-get install -qq g++-4.8; fi
   - if [ "$CXX" = "g++" ]; then export CXX="g++-4.8" CC="gcc-4.8"; fi
+  - if [ "$CXX" = "g++" ]; then export GCOV="gcov-4.8"; fi
 
 script:
   - make
