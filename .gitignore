@@ -32,3 +32,5 @@ ecl.files
 ecl.includes
 
 *.gcno
+*.gcda
+*.gcov

@@ -36,6 +36,8 @@ TESTS_DIR = ./tests
 BIN_DIR = ./bin
 DOC_DIR = ./doc
 
+GCOV = gcov
+
 all: tests
 
 out_dir:
@@ -76,11 +78,98 @@ test_$(TREE): out_dir
 test_$(CMD): out_dir
 	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(CMD)_$(CXX).map $(TESTS_DIR)/test_$(CMD).cpp -o $(BIN_DIR)/$(CMD)_$(CXX)
 
+gcov_$(FSM): test_$(FSM)
+	$(BIN_DIR)/$(FSM)_$(CXX)
+	cp test_$(FSM).gcno $(TESTS_DIR)/
+	cp test_$(FSM).gcda $(TESTS_DIR)/
+	$(GCOV) $(TESTS_DIR)/test_$(FSM).cpp
+	rm $(TESTS_DIR)/test_$(FSM).gcno
+	rm $(TESTS_DIR)/test_$(FSM).gcda
+
+gcov_$(SG): test_$(SG)
+	$(BIN_DIR)/$(SG)_$(CXX)
+	cp test_$(SG).gcno $(TESTS_DIR)/
+	cp test_$(SG).gcda $(TESTS_DIR)/
+	$(GCOV) $(TESTS_DIR)/test_$(SG).cpp
+	rm $(TESTS_DIR)/test_$(SG).gcno
+	rm $(TESTS_DIR)/test_$(SG).gcda
+
+gcov_$(CB): test_$(CB)
+	$(BIN_DIR)/$(CB)_$(CXX)
+	cp test_$(CB).gcno $(TESTS_DIR)/
+	cp test_$(CB).gcda $(TESTS_DIR)/
+	$(GCOV) $(TESTS_DIR)/test_$(CB).cpp
+	rm $(TESTS_DIR)/test_$(CB).gcno
+	rm $(TESTS_DIR)/test_$(CB).gcda
+
+gcov_$(BF): test_$(BF)
+	$(BIN_DIR)/$(BF)_$(CXX)
+	cp test_$(BF).gcno $(TESTS_DIR)/
+	cp test_$(BF).gcda $(TESTS_DIR)/
+	$(GCOV) $(TESTS_DIR)/test_$(BF).cpp
+	rm $(TESTS_DIR)/test_$(BF).gcno
+	rm $(TESTS_DIR)/test_$(BF).gcda
+
+gcov_$(SINGLETON): test_$(SINGLETON)
+	$(BIN_DIR)/$(SINGLETON)_$(CXX)
+	cp test_$(SINGLETON).gcno $(TESTS_DIR)/
+	cp test_$(SINGLETON).gcda $(TESTS_DIR)/
+	$(GCOV) $(TESTS_DIR)/test_$(SINGLETON).cpp
+	rm $(TESTS_DIR)/test_$(SINGLETON).gcno
+	rm $(TESTS_DIR)/test_$(SINGLETON).gcda
+
+gcov_$(STREAM): test_$(STREAM)
+	$(BIN_DIR)/$(STREAM)_$(CXX)
+	cp test_$(STREAM).gcno $(TESTS_DIR)/
+	cp test_$(STREAM).gcda $(TESTS_DIR)/
+	$(GCOV) $(TESTS_DIR)/test_$(STREAM).cpp
+	rm $(TESTS_DIR)/test_$(STREAM).gcno
+	rm $(TESTS_DIR)/test_$(STREAM).gcda
+
+gcov_$(JSON): test_$(JSON)
+	$(BIN_DIR)/$(JSON)_$(CXX)
+	cp test_$(JSON).gcno $(TESTS_DIR)/
+	cp test_$(JSON).gcda $(TESTS_DIR)/
+	$(GCOV) $(TESTS_DIR)/test_$(JSON).cpp
+	rm $(TESTS_DIR)/test_$(JSON).gcno
+	rm $(TESTS_DIR)/test_$(JSON).gcda
+
+gcov_$(STR_CONST): test_$(STR_CONST)
+	$(BIN_DIR)/$(STR_CONST)_$(CXX)
+	cp test_$(STR_CONST).gcno $(TESTS_DIR)/
+	cp test_$(STR_CONST).gcda $(TESTS_DIR)/
+	$(GCOV) $(TESTS_DIR)/test_$(STR_CONST).cpp
+	rm $(TESTS_DIR)/test_$(STR_CONST).gcno
+	rm $(TESTS_DIR)/test_$(STR_CONST).gcda
+
+gcov_$(STATIC_MAP): test_$(STATIC_MAP)
+	$(BIN_DIR)/$(STATIC_MAP)_$(CXX)
+	cp test_$(STATIC_MAP).gcno $(TESTS_DIR)/
+	cp test_$(STATIC_MAP).gcda $(TESTS_DIR)/
+	$(GCOV) $(TESTS_DIR)/test_$(STATIC_MAP).cpp
+	rm $(TESTS_DIR)/test_$(STATIC_MAP).gcno
+	rm $(TESTS_DIR)/test_$(STATIC_MAP).gcda
+
+gcov_$(TREE): test_$(TREE)
+	$(BIN_DIR)/$(TREE)_$(CXX)
+	cp test_$(TREE).gcno $(TESTS_DIR)/
+	cp test_$(TREE).gcda $(TESTS_DIR)/
+	$(GCOV) $(TESTS_DIR)/test_$(TREE).cpp
+	rm $(TESTS_DIR)/test_$(TREE).gcno
+	rm $(TESTS_DIR)/test_$(TREE).gcda
+
+gcov_all: gcov_$(FSM) gcov_$(SG) gcov_$(CB) gcov_$(BF) gcov_$(SINGLETON) gcov_$(STREAM) gcov_$(JSON) gcov_$(STR_CONST) gcov_$(STATIC_MAP) gcov_$(TREE)
+
 doxygen:
 	doxygen $(DOXYGEN_CONFIG)
+
+clean_gcov:
+	$(RM) *.gcno
+	$(RM) *.gcda
+	$(RM) *.gcov
 
 clean_doc:
 	$(RM) -r $(DOC_DIR)
 
-clean: clean_doc
+clean: clean_doc clean_gcov
 	$(RM) -r $(BIN_DIR)
