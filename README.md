@@ -2,6 +2,7 @@ ecl
 ===
 
 [![Build Status](https://scan.coverity.com/projects/8398/badge.svg)](https://scan.coverity.com/projects/8398)
+[![Build Status](https://travis-ci.org/simkimsia/UtilityBehaviors.png)](https://travis-ci.org/arcolight/ecl)
 
 Very small C++ class set suitable for embedded devices.
 C++11-compatible compiler needed. (Tested: gcc>=4.7, clang>=3.5)
