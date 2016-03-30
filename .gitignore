@@ -30,3 +30,5 @@ ecl.creator
 ecl.creator.user
 ecl.files
 ecl.includes
+
+*.gcno

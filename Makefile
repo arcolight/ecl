@@ -14,7 +14,7 @@ CXXFLAGS = -std=c++11 -fPIC -fno-rtti -fno-exceptions -fvisibility=hidden $(SECU
 GCC_FLAGS = $(CXXFLAGS) $(GCC_WARNINGS) -fstack-protector -fstack-check -fbounds-check -ggdb
 CLANG_FLAGS = $(CXXFLAGS) $(CLANG_WARNINGS)
 
-FLAGS = $(CXXFLAGS) $(WARNINGS) $(ADD_FLAGS) $(ADD_WARN)
+FLAGS = $(CXXFLAGS) $(WARNINGS) -coverage $(ADD_FLAGS) $(ADD_WARN)
 
 DOXYGEN_CONFIG = doxygen.config
 
