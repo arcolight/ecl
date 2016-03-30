@@ -19,3 +19,19 @@ branches:
   only:
     - master
     - dev
+
+env:
+  global:
+   # The next declaration is the encrypted COVERITY_SCAN_TOKEN, created
+   #   via the "travis encrypt" command using the project repo's public key
+   - secure: "QBHqhPX5SyHB3s0tVStrlZqLxGJi7OSa0KOi6X295ZMpdfh8lekbZ8Zo39y1Nho5NBV55rQ4/c0JTX6qNHhCH+Feqv58nts6XT/TI9DP+xpDxXErWIblY7ef2uhgYrdVObHQ3p/KQ94bCJTt8LihKhSOVazuPKH6C0tDayzTw1Xd30Ch/qjf+sPD6nAlpJZaZTTB3SfVhWLDOtCdJiqKoZVhYaJTD60ZWHfNhtNL1ZgKImcNziKwZksrRYof0xPIYk9QGj6R4gHrmBNlgu3fGCMWNfbYXYGO9aOCpBQ6t/rLlgj04gJpXL3qTm/zSx5ImlTywdg2ycwjpAZgxNvHyJEseBYwLrpgSyhMRlaM8PRXKP+dVimwuU+8s1l8714BVrvsVlzh2tUpFptyWMLm2cwXna/lrGF1a8yqGJFGtKZ6XN14eVu8qCaPefVmEr35ivcBQ6eFTiHrH+Ab2XMaiQyr5dENArh3uJT2S1lpp3Y88pp3R7XzROlOfvSSWHRLllU7vPPNmKxuxkRje+EZ0dNdKwK34jKdgd4TbW6VH2dOfserU8KybdYUTQjpWb1yxLPQh0x6LnrmdAEIdqNO9xNt5atGzCfedFYZ/mv3AoXADXot+2SqR/BsbLDBLIFi8ZUFiLuc17JT08xxz8MsJH+29rsICHV8t86ZHQ+vHXA="
+
+addons:
+  coverity_scan:
+    project:
+      name: "arcolight/ecl"
+      description: "Build submitted via Travis CI"
+    notification_email: arcolight@gmail.com
+    build_command_prepend: "make clean"
+    build_command:   "make -j 4"
+    branch_pattern: coverity_scan
