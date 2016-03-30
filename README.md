@@ -4,6 +4,7 @@ ecl
 [![Build Status](https://scan.coverity.com/projects/8398/badge.svg)](https://scan.coverity.com/projects/8398)
 [![Build Status](https://travis-ci.org/simkimsia/UtilityBehaviors.png)](https://travis-ci.org/arcolight/ecl)
 [![codecov.io](https://codecov.io/github/arcolight/ecl/coverage.svg?branch=master)](https://codecov.io/github/arcolight/ecl?branch=master)
+[![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/hyperium/hyper/master/LICENSE)
 
 Very small C++ class set suitable for embedded devices.
 C++11-compatible compiler needed. (Tested: gcc>=4.7, clang>=3.5)
