@@ -1,6 +1,13 @@
 ecl
 ===
 
+[![Build Status](https://scan.coverity.com/projects/8398/badge.svg)](https://scan.coverity.com/projects/8398) |
+
+<a href="https://scan.coverity.com/projects/arcolight-ecl">
+  <img alt="Coverity Scan Build Status"
+       src="https://scan.coverity.com/projects/8398/badge.svg"/>
+</a>
+
 Very small C++ class set suitable for embedded devices.
 C++11-compatible compiler needed. (Tested: gcc>=4.7, clang>=3.5)
 
