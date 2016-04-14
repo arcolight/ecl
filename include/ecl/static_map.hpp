@@ -19,7 +19,7 @@ class static_map
 public:
     using key_type               = typename tree_t::key_type;
     using mapped_type            = typename tree_t::value_type;
-    using value_type             = std::pair<K, V>;
+    using value_type             = std::pair<key_type, mapped_type>;
     using key_compare            = Compare;
 
     using const_iterator         = typename tree_t::const_iterator;
@@ -30,10 +30,10 @@ public:
         m_nodes     { { std::forward<Args>(args)... } },
         m_not_found { std::forward<mapped_type>(def) }
     {
-        build_tree();
-
         static_assert(std::is_nothrow_default_constructible<mapped_type>::value,
             "Value type should be nothrow default constructible.");
+
+        build_tree();
     }
 
     inline void build_tree()                                      const noexcept
@@ -132,6 +132,9 @@ constexpr inline const static_map
                            , Compare
                        > create_map(V&& def, Args&&... args)
 {
+    static_assert(std::is_nothrow_default_constructible<V>::value,
+        "Value type should be nothrow default constructible.");
+
     return static_map
            <
                  K
