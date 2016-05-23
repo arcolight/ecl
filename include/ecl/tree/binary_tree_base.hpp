@@ -41,10 +41,10 @@ struct node_base
 
     constexpr node_base()                                               noexcept
     {
-        static_assert(std::is_nothrow_default_constructible<key_type>::value,
-                      "Key should be nothrow default constructible!");
-        static_assert(std::is_nothrow_default_constructible<value_type>::value,
-                      "Value should be nothrow default constructible!");
+        static_assert(std::is_default_constructible<key_type>::value,
+                      "Key should be default constructible!");
+        static_assert(std::is_default_constructible<value_type>::value,
+                      "Value should be default constructible!");
     }
 
     constexpr node_base(const key_type& k)                              noexcept
