@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include <string>
+#include <sstream>
 #include <limits>
 
 #define ECL_WITH_STD_STRING
@@ -61,6 +62,12 @@ typedef object<
     >,
     node<name5, bool>
 > document_std_t;
+
+typedef object<
+    node<name1, float       >,
+    node<name2, double      >,
+    node<name3, long double >
+> floating_point_doc_t;
 
 template<typename T>
 static void fill_document(T& doc)
@@ -150,6 +157,18 @@ int main(int argc, char* argv[])
     deser_result = doc_std_2.deserialize(st_std.data());
     std::cout << std_prefix << "deserialization result: " << (deser_result ? "true" : "false") << std::endl;
     dump_document(doc_std_2, std_prefix);
+
+    floating_point_doc_t fp;
+    fp.f<name1>() = 123.456;
+    fp.f<name2>() = -789.012;
+    fp.f<name3>() = 345.678;
+
+    std::stringstream ss;
+
+    fp.serialize(std::cout, true);
+    fp.serialize(ss);
+
+    std::cout << ss.str() << std::endl;
 
     return 0;
 }

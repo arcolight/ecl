@@ -43,6 +43,9 @@ namespace json
  * uint32_t
  * int64_t
  * uint64_t
+ * float
+ * double
+ * long double
  * ecl::json::string<SIZE>
  * std::string (if ECL_WITH_STD_STRING defined)
  * ecl::json::object

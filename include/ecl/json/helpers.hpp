@@ -219,6 +219,34 @@ struct val_size<uint64_t>
     }
 };
 
+// TODO: size calc for FP!
+template<>
+struct val_size<float>
+{
+    constexpr static std::size_t size()
+    {
+        return 20;
+    }
+};
+
+template<>
+struct val_size<double>
+{
+    constexpr static std::size_t size()
+    {
+        return 20;
+    }
+};
+
+template<>
+struct val_size<long double>
+{
+    constexpr static std::size_t size()
+    {
+        return 20;
+    }
+};
+
 template<typename T>
 struct val_initializer
 {
@@ -287,6 +315,25 @@ struct val_initializer<uint64_t>
     constexpr static uint64_t value() { return 0; }
 };
 
+template<>
+struct val_initializer<float>
+{
+    constexpr static float value() { return 0.0f; }
+};
+
+template<>
+struct val_initializer<double>
+{
+    constexpr static double value() { return 0.0; }
+};
+
+template<>
+struct val_initializer<long double>
+{
+    constexpr static long double value() { return 0.0; }
+};
+
+
 template<typename T>
 struct val_deserializer_numeric_signed
 {
@@ -307,6 +354,19 @@ struct val_deserializer_numeric_unsigned
     {
         char* end = nullptr;
         val = static_cast<T>(strtoull(s, &end, 10));
+        length -= static_cast<std::size_t>(end - s);
+        s = end;
+        return true;
+    }
+};
+
+template<typename T>
+struct val_deserializer_numeric_fp
+{
+    static bool parse(const char*& s, std::size_t& length, T& val)
+    {
+        char* end = nullptr;
+        val = static_cast<T>(strtof(s, &end));
         length -= static_cast<std::size_t>(end - s);
         s = end;
         return true;
@@ -457,13 +517,40 @@ struct val_deserializer<uint64_t>
     }
 };
 
+template<>
+struct val_deserializer<float>
+{
+    static bool parse(const char*& s, std::size_t& length, float& val)
+    {
+        return val_deserializer_numeric_fp<float>::parse(s, length, val);
+    }
+};
+
+template<>
+struct val_deserializer<double>
+{
+    static bool parse(const char*& s, std::size_t& length, double& val)
+    {
+        return val_deserializer_numeric_fp<double>::parse(s, length, val);
+    }
+};
+
+template<>
+struct val_deserializer<long double>
+{
+    static bool parse(const char*& s, std::size_t& length, long double& val)
+    {
+        return val_deserializer_numeric_fp<long double>::parse(s, length, val);
+    }
+};
+
 template<typename T>
 struct val_serializer
 {
     template<typename STREAM>
-    static void stringify(STREAM& st,
-                          const T& val,
-                          bool beautify,
+    static void stringify(STREAM&     st,
+                          const T&    val,
+                          bool        beautify,
                           std::size_t indent,
                           std::size_t indent_increment)
     {
@@ -475,7 +562,7 @@ template<>
 struct val_serializer<const char*>
 {
     template<typename STREAM>
-    static void stringify(STREAM& st,
+    static void stringify(STREAM&     st,
                           const char* val,
                           bool /* beautify */,
                           std::size_t /* indent */,
@@ -640,6 +727,48 @@ struct val_serializer<uint64_t>
     template<typename STREAM>
     static void stringify(STREAM&         st,
                           const uint64_t& val,
+                          bool         /* beautify */,
+                          std::size_t  /* indent */,
+                          std::size_t  /* indent_increment */)
+    {
+        st << val;
+    }
+};
+
+template<>
+struct val_serializer<float>
+{
+    template<typename STREAM>
+    static void stringify(STREAM&      st,
+                          const float& val,
+                          bool         /* beautify */,
+                          std::size_t  /* indent */,
+                          std::size_t  /* indent_increment */)
+    {
+        st << val;
+    }
+};
+
+template<>
+struct val_serializer<double>
+{
+    template<typename STREAM>
+    static void stringify(STREAM&       st,
+                          const double& val,
+                          bool         /* beautify */,
+                          std::size_t  /* indent */,
+                          std::size_t  /* indent_increment */)
+    {
+        st << val;
+    }
+};
+
+template<>
+struct val_serializer<long double>
+{
+    template<typename STREAM>
+    static void stringify(STREAM&            st,
+                          const long double& val,
                           bool         /* beautify */,
                           std::size_t  /* indent */,
                           std::size_t  /* indent_increment */)
