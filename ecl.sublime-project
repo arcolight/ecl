@@ -1,0 +1,31 @@
+{
+    "folders":
+    [
+        {
+            "path": ".",
+            "file_exclude_patterns":
+            [
+                "*.gcda",
+                "*.gcno"
+            ]
+        }
+    ],
+    "settings":
+    {
+        "tab_size": 4,
+        "clang_flags":
+        [
+            "-std=c++11",
+            "-Iinclude",
+            "-Isrc",
+            "-I/usr/include"
+        ]
+    },
+    "build_systems":
+    [
+        {
+            "name": "Makefile",
+            "cmd": ["make"]
+        }
+    ]
+}
