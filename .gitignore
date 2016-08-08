@@ -30,6 +30,7 @@ ecl.creator
 ecl.creator.user
 ecl.files
 ecl.includes
+ecl.sublime-workspace
 
 *.gcno
 *.gcda
