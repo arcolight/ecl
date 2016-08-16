@@ -356,7 +356,7 @@ template
     , state_t  init
 >
 template<typename... rows>
-state_machine<derived, state_t, init>::transition_table<rows...>::transition_table()
+state_machine<derived, state_t, init>::transition_table<rows...>::transition_table() noexcept
 {
 }
 
