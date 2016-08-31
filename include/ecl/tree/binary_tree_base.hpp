@@ -92,6 +92,28 @@ struct node_base
         std::swap(key,    other.key   );
     }
 
+    node_base& operator=(const node_base& other)
+    {
+        left   = other.left;
+        right  = other.right;
+        parent = other.parent;
+        key    = other.key;
+        val    = other.val;
+
+        return *this;
+    }
+
+    node_base& operator=(const node_base&& other)
+    {
+        std::swap(left,   other.left  );
+        std::swap(right,  other.right );
+        std::swap(parent, other.parent);
+        std::swap(val,    other.val   );
+        std::swap(key,    other.key   );
+
+        return *this;
+    }
+
     inline pointer most_left()                                          noexcept
     {
         pointer result = static_cast<pointer>(this);
