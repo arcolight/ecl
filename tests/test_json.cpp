@@ -169,6 +169,7 @@ int main(int argc, char* argv[])
     fp.serialize(ss);
 
     std::cout << ss.str() << std::endl;
+    std::cout << std::noboolalpha;
 
     return 0;
 }

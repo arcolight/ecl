@@ -32,7 +32,7 @@ template<typename S, typename T, T S::*P, std::size_t SIZE>
 class field : public virtual S
 {
 public:
-    constexpr field()                                                   noexcept
+    field()                                                             noexcept
     {
         static_assert((sizeof(T) * 8 >= SIZE), "field size > sizeof(var)");
     }
