@@ -315,10 +315,10 @@ struct node_base
         p->parent = static_cast<pointer>(this);
     }
 
-    inline void replace_from(pointer successor)                         noexcept
+    inline void replace_from(pointer suc)                               noexcept
     {
-        key = successor->key;
-        val = successor->val;
+        key = suc->key;
+        val = suc->val;
     }
 
     inline pointer successor()                                          noexcept
