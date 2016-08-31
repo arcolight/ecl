@@ -92,7 +92,7 @@ struct node_base
         std::swap(key,    other.key   );
     }
 
-    node_base& operator=(const node_base& other)
+    node_base& operator=(const node_base& other)                        noexcept
     {
         left   = other.left;
         right  = other.right;
