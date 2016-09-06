@@ -1,5 +1,6 @@
 #include <ecl/tree/simple_binary_tree.hpp>
 #include <ecl/tree/red_black_tree.hpp>
+#include <ecl/tree/avl_tree.hpp>
 
 #include <iostream>
 #include <sstream>
@@ -18,11 +19,12 @@
 
 #define TREE_DUMP_NODE_HAVE_NO    "─╼"
 #define TREE_DUMP_NODE_HAVE_LEFT  "─┮"
-#define TREE_DUMP_NODE_HAVE_RIGHT "─┶"
 #define TREE_DUMP_NODE_HAVE_BOTH  "─┾"
+#define TREE_DUMP_NODE_HAVE_RIGHT "─┶"
 
-#define TREE_PREFIX    "[BT] | "
-#define RB_TREE_PREFIX "[RB] | "
+#define TREE_PREFIX     "[BT ] | "
+#define RB_TREE_PREFIX  "[RB ] | "
+#define AVL_TREE_PREFIX "[AVL] | "
 
 using key_type       = int;
 using value_type     = std::string;
@@ -32,6 +34,9 @@ using tree_node_t    = typename tree_t::node_t;
 
 using rb_tree_t      = ecl::tree::red_black_tree<key_type, value_type>;
 using rb_tree_node_t = typename rb_tree_t::node_t;
+
+using avl_tree_t      = ecl::tree::avl_tree<key_type, value_type>;
+using avl_tree_node_t = typename avl_tree_t::node_t;
 
 static tree_node_t simple_nodes [] =
 {
@@ -62,6 +67,34 @@ static tree_node_t simple_nodes [] =
 };
 
 static rb_tree_node_t rb_nodes [] =
+{
+    { 6,  "6"  },
+    { 17, "17" },
+    { 1,  "1"  },
+    { 5,  "5"  },
+    { 4,  "4"  },
+    { 21, "21" },
+    { 18, "18" },
+    { 16, "16" },
+    { 11, "11" },
+    { 14, "14" },
+    { 15, "15" },
+    { 2,  "2"  },
+    { 20, "20" },
+    { 10, "10" },
+    { 23, "23" },
+    { 24, "24" },
+    { 9,  "9"  },
+    { 8,  "8"  },
+    { 3,  "3"  },
+    { 12, "12" },
+    { 13, "13" },
+    { 22, "22" },
+    { 7,  "7"  },
+    { 19, "19" }
+};
+
+static avl_tree_node_t avl_nodes [] =
 {
     { 6,  "6"  },
     { 17, "17" },
@@ -184,6 +217,14 @@ void print_node<rb_tree_node_t*>(rb_tree_node_t* n)
     {
         std::cout << " R:";
     }
+    std::cout << n->key << std::endl;
+}
+
+template<>
+void print_node<avl_tree_node_t*>(avl_tree_node_t* n)
+{
+    print_node_symbol(n->have_left(), n->have_right());
+    std::cout << " " << +ecl::tree::balance_factor(n) << ":";
     std::cout << n->key << std::endl;
 }
 
@@ -493,6 +534,7 @@ void test_tree(const std::string prefix, typename T::node_t (& nodes)[N])
 
 int main(int, char**, char**)
 {
-    test_tree<tree_t>(TREE_PREFIX, simple_nodes);
-    test_tree<rb_tree_t>(RB_TREE_PREFIX, rb_nodes);
+    test_tree< tree_t     > ( TREE_PREFIX     , simple_nodes );
+    test_tree< rb_tree_t  > ( RB_TREE_PREFIX  , rb_nodes     );
+    test_tree< avl_tree_t > ( AVL_TREE_PREFIX , avl_nodes    );
 }
