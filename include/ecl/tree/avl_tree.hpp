@@ -27,8 +27,6 @@ struct avl_node : public node_base<K, V, Compare, ecl::tree::avl_node>
 
     using node_base<K, V, Compare, ecl::tree::avl_node>::node_base;
 
-    using typename base::const_pointer;
-
     using height_t = std::int8_t;
 
     height_t height { 1 };
