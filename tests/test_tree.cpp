@@ -306,6 +306,7 @@ void dump_tree(const std::string prefix, const T& tree)
 
     if(!v_res)
     {
+        std::cout << "Validate heights failed!" << std::endl;
         exit(1);
     }
 }

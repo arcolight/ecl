@@ -719,6 +719,8 @@ public:
     using reverse_iterator       = std::reverse_iterator<iterator>;
     using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
+    using insert_return = std::pair<iterator, pointer>;
+
     iterator begin()                                                    noexcept
     {
         return iterator(m_header.left, pointer(&m_header));
@@ -783,38 +785,7 @@ public:
 
     iterator insert(pointer n)
     {
-        n->parent            = nullptr;
-        n->left              = nullptr;
-        n->right             = nullptr;
-
-        if( ! m_header.have_parent())
-        {
-            m_header.parent = n;
-            m_header.left   = n;
-            m_header.right  = n;
-
-            ++m_size;
-
-            return iterator(m_header.parent, pointer(&m_header));
-        }
-
-        pointer inserted_n = m_header.parent->insert(n);
-        // new node
-        if(inserted_n == n)
-        {
-            if(key_compare()(n->key, m_header.left->key))
-            {
-                m_header.left = n;
-            }
-            else if(key_compare()(m_header.right->key, n->key))
-            {
-                m_header.right = n;
-            }
-
-            ++m_size;
-        }
-
-        return iterator(inserted_n, pointer(&m_header));
+        return insert_internal(n).first;
     }
 
     std::size_t count()                                           const noexcept
@@ -885,6 +856,42 @@ public:
     }
 
 protected:
+
+    insert_return insert_internal(pointer n)                            noexcept
+    {
+        n->parent            = nullptr;
+        n->left              = nullptr;
+        n->right             = nullptr;
+
+        if( ! m_header.have_parent())
+        {
+            m_header.parent = n;
+            m_header.left   = n;
+            m_header.right  = n;
+
+            ++m_size;
+
+            return { iterator(m_header.parent, pointer(&m_header)), m_header.parent };
+        }
+
+        pointer inserted_n = m_header.parent->insert(n);
+        // new node
+        if(inserted_n == n)
+        {
+            if(key_compare()(n->key, m_header.left->key))
+            {
+                m_header.left = n;
+            }
+            else if(key_compare()(m_header.right->key, n->key))
+            {
+                m_header.right = n;
+            }
+
+            ++m_size;
+        }
+
+        return { iterator(inserted_n, pointer(&m_header)), inserted_n };
+    }
 
     erase_return erase_internal(pointer p)                              noexcept
     {
