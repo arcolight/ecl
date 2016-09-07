@@ -1,6 +1,7 @@
 #include <ecl/tree/simple_binary_tree.hpp>
 #include <ecl/tree/red_black_tree.hpp>
 #include <ecl/tree/avl_tree.hpp>
+#include <ecl/tree/splay_tree.hpp>
 
 #include <iostream>
 #include <sstream>
@@ -22,21 +23,25 @@
 #define TREE_DUMP_NODE_HAVE_BOTH  "─┾"
 #define TREE_DUMP_NODE_HAVE_RIGHT "─┶"
 
-#define TREE_PREFIX     "[BT ] | "
-#define RB_TREE_PREFIX  "[RB ] | "
-#define AVL_TREE_PREFIX "[AVL] | "
+#define TREE_PREFIX       "[BT   ] | "
+#define RB_TREE_PREFIX    "[RB   ] | "
+#define AVL_TREE_PREFIX   "[AVL  ] | "
+#define SPLAY_TREE_PREFIX "[SPLAY] | "
 
-using key_type       = int;
-using value_type     = std::string;
+using key_type          = int;
+using value_type        = std::string;
 
-using tree_t         = ecl::tree::simple_binary_tree<key_type, value_type>;
-using tree_node_t    = typename tree_t::node_t;
+using tree_t            = ecl::tree::simple_binary_tree<key_type, value_type>;
+using tree_node_t       = typename tree_t::node_t;
 
-using rb_tree_t      = ecl::tree::red_black_tree<key_type, value_type>;
-using rb_tree_node_t = typename rb_tree_t::node_t;
+using rb_tree_t         = ecl::tree::red_black_tree<key_type, value_type>;
+using rb_tree_node_t    = typename rb_tree_t::node_t;
 
-using avl_tree_t      = ecl::tree::avl_tree<key_type, value_type>;
-using avl_tree_node_t = typename avl_tree_t::node_t;
+using avl_tree_t        = ecl::tree::avl_tree<key_type, value_type>;
+using avl_tree_node_t   = typename avl_tree_t::node_t;
+
+using splay_tree_t      = ecl::tree::splay_tree<key_type, value_type>;
+using splay_tree_node_t = typename splay_tree_t::node_t;
 
 static tree_node_t simple_nodes [] =
 {
@@ -95,6 +100,34 @@ static rb_tree_node_t rb_nodes [] =
 };
 
 static avl_tree_node_t avl_nodes [] =
+{
+    { 6,  "6"  },
+    { 17, "17" },
+    { 1,  "1"  },
+    { 5,  "5"  },
+    { 4,  "4"  },
+    { 21, "21" },
+    { 18, "18" },
+    { 16, "16" },
+    { 11, "11" },
+    { 14, "14" },
+    { 15, "15" },
+    { 2,  "2"  },
+    { 20, "20" },
+    { 10, "10" },
+    { 23, "23" },
+    { 24, "24" },
+    { 9,  "9"  },
+    { 8,  "8"  },
+    { 3,  "3"  },
+    { 12, "12" },
+    { 13, "13" },
+    { 22, "22" },
+    { 7,  "7"  },
+    { 19, "19" }
+};
+
+static splay_tree_node_t splay_nodes [] =
 {
     { 6,  "6"  },
     { 17, "17" },
@@ -517,6 +550,32 @@ void find_in_tree(const std::string prefix, const T& tree, key_type from, key_ty
     std::cout << prefix << "done. found: " << count << std::endl;
 }
 
+void find_in_tree(const std::string prefix, splay_tree_t& tree, key_type from, key_type to)
+{
+    std::size_t count = 0;
+
+    std::cout << prefix << "find nodes."      << std::endl;
+    std::cout << prefix << "nodes key from: " << from << std::endl;
+    std::cout << prefix << "nodes key to:   " << to   << std::endl;
+
+    for(key_type i = from; i < to; ++i)
+    {
+        std::cout << prefix << "search for node " << i << ": ";
+        if(tree.end() != tree.find(i))
+        {
+            ++count;
+            std::cout << "found." << std::endl;
+        }
+        else
+        {
+            std::cout << "no such node." << std::endl;
+        }
+        dump_tree(prefix, tree);
+    }
+
+    std::cout << prefix << "done. found: " << count << std::endl;
+}
+
 template<typename T, std::size_t N>
 void test_tree(const std::string prefix, typename T::node_t (& nodes)[N])
 {
@@ -535,7 +594,8 @@ void test_tree(const std::string prefix, typename T::node_t (& nodes)[N])
 
 int main(int, char**, char**)
 {
-    test_tree< tree_t     > ( TREE_PREFIX     , simple_nodes );
-    test_tree< rb_tree_t  > ( RB_TREE_PREFIX  , rb_nodes     );
-    test_tree< avl_tree_t > ( AVL_TREE_PREFIX , avl_nodes    );
+    // test_tree< tree_t       > ( TREE_PREFIX       , simple_nodes );
+    // test_tree< rb_tree_t    > ( RB_TREE_PREFIX    , rb_nodes     );
+    // test_tree< avl_tree_t   > ( AVL_TREE_PREFIX   , avl_nodes    );
+    test_tree< splay_tree_t > ( SPLAY_TREE_PREFIX , splay_nodes  );
 }

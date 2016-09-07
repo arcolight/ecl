@@ -47,37 +47,37 @@ out_dir:
 
 tests: test_$(FSM) test_$(SG) test_$(CB) test_$(BF) test_$(SINGLETON) test_$(STREAM) test_$(JSON) test_$(STR_CONST) test_$(CMD) test_$(TREE) test_$(STATIC_MAP)
 
-test_$(FSM): out_dir
+test_$(FSM): out_dir clean_gcov
 	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(FSM)_$(CXX).map $(TESTS_DIR)/test_$(FSM).cpp -o $(BIN_DIR)/$(FSM)_$(CXX)
 
-test_$(SG): out_dir
+test_$(SG): out_dir clean_gcov
 	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(SG)_$(CXX).map $(TESTS_DIR)/test_$(SG).cpp -o $(BIN_DIR)/$(SG)_$(CXX)
 
-test_$(CB): out_dir
+test_$(CB): out_dir clean_gcov
 	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(CB)_$(CXX).map $(TESTS_DIR)/test_$(CB).cpp -o $(BIN_DIR)/$(CB)_$(CXX)
 
-test_$(BF): out_dir
+test_$(BF): out_dir clean_gcov
 	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(BF)_$(CXX).map $(TESTS_DIR)/test_$(BF).cpp -o $(BIN_DIR)/$(BF)_$(CXX)
 
-test_$(SINGLETON): out_dir
+test_$(SINGLETON): out_dir clean_gcov
 	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(SINGLETON)_$(CXX).map $(TESTS_DIR)/test_$(SINGLETON).cpp -o $(BIN_DIR)/$(SINGLETON)_$(CXX)
 
-test_$(STREAM): out_dir
+test_$(STREAM): out_dir clean_gcov
 	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(STREAM)_$(CXX).map $(TESTS_DIR)/test_$(STREAM).cpp -o $(BIN_DIR)/$(STREAM)_$(CXX)
 
-test_$(JSON): out_dir
+test_$(JSON): out_dir clean_gcov
 	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(JSON)_$(CXX).map $(TESTS_DIR)/test_$(JSON).cpp -o $(BIN_DIR)/$(JSON)_$(CXX)
 
-test_$(STR_CONST): out_dir
+test_$(STR_CONST): out_dir clean_gcov
 	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(STR_CONST)_$(CXX).map $(TESTS_DIR)/test_$(STR_CONST).cpp -o $(BIN_DIR)/$(STR_CONST)_$(CXX)
 
-test_$(STATIC_MAP): out_dir
+test_$(STATIC_MAP): out_dir clean_gcov
 	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(STATIC_MAP)_$(CXX).map $(TESTS_DIR)/test_$(STATIC_MAP).cpp -o $(BIN_DIR)/$(STATIC_MAP)_$(CXX)
 
-test_$(TREE): out_dir
+test_$(TREE): out_dir clean_gcov
 	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(TREE)_$(CXX).map $(TESTS_DIR)/test_$(TREE).cpp -o $(BIN_DIR)/$(TREE)_$(CXX)
 
-test_$(CMD): out_dir
+test_$(CMD): out_dir clean_gcov
 	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(CMD)_$(CXX).map $(TESTS_DIR)/test_$(CMD).cpp -o $(BIN_DIR)/$(CMD)_$(CXX)
 
 gcov_$(FSM): test_$(FSM)
