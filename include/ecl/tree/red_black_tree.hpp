@@ -158,12 +158,21 @@ public:
 
     iterator insert(pointer n)                                          noexcept
     {
-        iterator result = this->base::insert(n);
-        mark_red(n);
+        auto result        = this->base::insert_internal(n);
+        pointer inserted_n = result.second;
+        iterator it        = result.first;
 
-        insert_case1(n);
+        // Node with such key is existing.
+        if(n != inserted_n)
+        {
+            return it;
+        }
 
-        return result;
+        mark_red(inserted_n);
+
+        insert_case1(inserted_n);
+
+        return it;
     }
 
     pointer erase(const key_type& k)                                    noexcept
