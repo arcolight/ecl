@@ -11,7 +11,7 @@
 #include <random>
 #include <ctime>
 
-#define NODES_COUNT 500
+#define NODES_COUNT 100
 
 #define TREE_DUMP_SPACE "  "
 #define TREE_DUMP_RIGHT " ┌"
@@ -577,7 +577,7 @@ void find_in_tree(const std::string prefix, splay_tree_t& tree, key_type from, k
 }
 
 template<typename T, std::size_t N>
-void test_tree(const std::string prefix, typename T::node_t (& nodes)[N])
+void test_tree(const std::string prefix, typename T::node_t (& nodes)[N], std::size_t dynamic_nodes_count)
 {
     T static_tree;
     fill_tree_static(prefix, static_tree, nodes);
@@ -586,16 +586,29 @@ void test_tree(const std::string prefix, typename T::node_t (& nodes)[N])
     erase_tree_static(prefix, static_tree, 0, static_cast<key_type>(N) + 1);
 
     T dynamic_tree;
-    fill_tree_dynamic(prefix, dynamic_tree, 0, NODES_COUNT, NODES_COUNT);
+    fill_tree_dynamic(prefix, dynamic_tree, 0, dynamic_nodes_count, dynamic_nodes_count);
     dump_tree(prefix, dynamic_tree);
-    find_in_tree(prefix, dynamic_tree, 0, NODES_COUNT + 1);
-    erase_tree_dynamic(prefix, dynamic_tree, 0, NODES_COUNT + 1);
+    find_in_tree(prefix, dynamic_tree, 0, dynamic_nodes_count + 1);
+    erase_tree_dynamic(prefix, dynamic_tree, 0, dynamic_nodes_count + 1);
 }
 
-int main(int, char**, char**)
+int main(int argc, char* argv[], char**)
 {
-    // test_tree< tree_t       > ( TREE_PREFIX       , simple_nodes );
-    // test_tree< rb_tree_t    > ( RB_TREE_PREFIX    , rb_nodes     );
-    // test_tree< avl_tree_t   > ( AVL_TREE_PREFIX   , avl_nodes    );
-    test_tree< splay_tree_t > ( SPLAY_TREE_PREFIX , splay_nodes  );
+    if(argc > 2)
+    {
+        std::cout << "Usage: tree_$COMPILER [DYNAMIC_NODES_COUNT]" << std::endl;
+        return 0;
+    }
+
+    std::size_t dynamic_nodes_count = NODES_COUNT;
+
+    if(argc == 2)
+    {
+        dynamic_nodes_count = std::stoi(std::string(argv[1]));
+    }
+
+    test_tree< tree_t       > ( TREE_PREFIX       , simple_nodes , dynamic_nodes_count);
+    test_tree< rb_tree_t    > ( RB_TREE_PREFIX    , rb_nodes     , dynamic_nodes_count);
+    test_tree< avl_tree_t   > ( AVL_TREE_PREFIX   , avl_nodes    , dynamic_nodes_count);
+    test_tree< splay_tree_t > ( SPLAY_TREE_PREFIX , splay_nodes  , dynamic_nodes_count);
 }
