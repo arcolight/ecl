@@ -211,6 +211,33 @@ void check_tree_properties(const std::string prefix,
     check_tree_properties(prefix, heights, n->right);
 }
 
+template<>
+void check_tree_properties<avl_tree_node_t>(const std::string prefix,
+                           std::vector<std::size_t>& heights,
+                           const avl_tree_node_t* n)
+{
+    if(nullptr == n)
+    {
+        return;
+    }
+
+    if(n->is_leaf())
+    {
+        std::size_t h = node_height(n);
+        heights.push_back(h);
+        std::cout << prefix << n->key << " : " << h << std::endl;
+    }
+
+    if((balance_factor(n) > 1) || (balance_factor(n) < -1))
+    {
+        std::cout << prefix << "Balance factor error! n: " << n->val << " BF: " << +balance_factor(n) << std::endl;
+        exit(1);
+    }
+
+    check_tree_properties(prefix, heights, n->left);
+    check_tree_properties(prefix, heights, n->right);
+}
+
 void print_node_symbol(bool have_left, bool have_right)
 {
     if(!have_left && !have_right)
@@ -257,7 +284,7 @@ template<>
 void print_node<avl_tree_node_t*>(avl_tree_node_t* n)
 {
     print_node_symbol(n->have_left(), n->have_right());
-    std::cout << " " << +ecl::tree::balance_factor(n) << ":";
+    std::cout << " (" << +ecl::tree::balance_factor(n) << ":" << +ecl::tree::height(n) << ") ";
     std::cout << n->key << std::endl;
 }
 
@@ -604,7 +631,7 @@ int main(int argc, char* argv[], char**)
 
     if(argc == 2)
     {
-        dynamic_nodes_count = std::stoi(std::string(argv[1]));
+        dynamic_nodes_count = std::max(1, std::stoi(std::string(argv[1])));
     }
 
     test_tree< tree_t       > ( TREE_PREFIX       , simple_nodes , dynamic_nodes_count);

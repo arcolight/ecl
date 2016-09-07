@@ -176,11 +176,18 @@ public:
             return nullptr;
         }
 
-        pointer balance_ptr = to_erase->parent;
+        erase_return ret  = this->base::erase_internal(to_erase);
+        pointer removed   = ret.first;
 
-        erase_return ret = this->base::erase_internal(to_erase);
-
-        balance(balance_ptr);
+        if(to_erase != removed)
+        {
+            balance(to_erase);
+            balance(removed->parent);
+        }
+        else
+        {
+            balance(to_erase->parent);
+        }
 
         return ret.first;
     }
