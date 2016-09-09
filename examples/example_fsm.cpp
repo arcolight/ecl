@@ -198,23 +198,24 @@ public:
 
 void out_state(st s)
 {
-	switch(s) {
-		case st::s_1:
-			std::cout << "s_1" << std::endl;
-		break;
-		case st::s_2:
-			std::cout << "s_2" << std::endl;
-		break;
-		case st::s_3:
-			std::cout << "s_3" << std::endl;
-		break;
-		case st::s_4:
-			std::cout << "s_4" << std::endl;
-		break;
-		case st::s_5:
-			std::cout << "s_5" << std::endl;
-		break;
-	}
+    switch(s)
+    {
+    case st::s_1:
+        std::cout << "s_1" << std::endl;
+    break;
+    case st::s_2:
+        std::cout << "s_2" << std::endl;
+    break;
+    case st::s_3:
+        std::cout << "s_3" << std::endl;
+    break;
+    case st::s_4:
+        std::cout << "s_4" << std::endl;
+    break;
+    case st::s_5:
+        std::cout << "s_5" << std::endl;
+    break;
+    }
 }
 
 int main(int argc, char** argv)

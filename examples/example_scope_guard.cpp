@@ -4,8 +4,8 @@
 
 namespace
 {
-    int testVar = 0;
-    const char *ok = "OK   ";
+    int testVar      = 0;
+    const char *ok   = "OK   ";
     const char *fail = "FAIL ";
 
     const char* test(int step)
