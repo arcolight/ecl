@@ -108,11 +108,8 @@ static void dump_document(T& doc, std::string& prefix)
     std::cout << prefix << "doc<name5>: " << (doc.template f<name5>() ? "true" : "false") << std::endl;
 }
 
-int main(int argc, char* argv[])
+int main(int, char**, char**)
 {
-    (void)argc;
-    (void)argv;
-
     document_ecl_t doc_ecl;
     document_ecl_t doc_ecl_2;
     document_std_t doc_std;

@@ -218,11 +218,8 @@ void out_state(st s)
     }
 }
 
-int main(int argc, char** argv)
+int main(int, char**, char**)
 {
-    (void)(argc);
-    (void)(argv);
-
     test_fsm fsm;
 
     std::cout << std::endl << "Test fsm" << std::endl;

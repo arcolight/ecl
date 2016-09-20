@@ -60,11 +60,8 @@ static void dump(const circular_buffer_t& c)
     std::cout << "]" << std::endl << std::endl;
 }
 
-int main(int argc, char* argv[])
+int main(int, char**, char**)
 {
-    (void)(argc);
-    (void)(argv);
-
     circular_buffer_t cb;
 
     std::srand(static_cast<uint32_t>(std::time(0)));

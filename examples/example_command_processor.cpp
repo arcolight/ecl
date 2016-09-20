@@ -250,11 +250,8 @@ public:
 
 using help_stream_t = ecl::stream<1024>;
 
-int main(int argc, char* argv[])
+int main(int, char**, char**)
 {
-    (void)argc;
-    (void)argv;
-
     receiver_1    r1;
     receiver_2    r2;
     receiver_3    r3;
