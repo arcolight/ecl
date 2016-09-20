@@ -613,13 +613,22 @@ template<>
 struct val_serializer<bool>
 {
     template<typename STREAM>
-    static void stringify(STREAM&        st,
+    static void stringify(STREAM&     st,
                           const bool& val,
                           bool        /* beautify */,
                           std::size_t /* indent */,
                           std::size_t /* indent_increment */)
     {
-        st << val;
+        // We don't want to include <ios>, so we have no std::boolalpha.
+        // We need to do serialization for bool manualy, always alpha.
+        if(val)
+        {
+            st << "true";
+        }
+        else
+        {
+            st << "false";
+        }
     }
 };
 
@@ -627,7 +636,7 @@ template<>
 struct val_serializer<int8_t>
 {
     template<typename STREAM>
-    static void stringify(STREAM&        st,
+    static void stringify(STREAM&       st,
                           const int8_t& val,
                           bool        /* beautify */,
                           std::size_t /* indent */,
@@ -669,7 +678,7 @@ template<>
 struct val_serializer<uint16_t>
 {
     template<typename STREAM>
-    static void stringify(STREAM&        st,
+    static void stringify(STREAM&         st,
                           const uint16_t& val,
                           bool        /* beautify */,
                           std::size_t /* indent */,
@@ -697,7 +706,7 @@ template<>
 struct val_serializer<uint32_t>
 {
     template<typename STREAM>
-    static void stringify(STREAM&        st,
+    static void stringify(STREAM&         st,
                           const uint32_t& val,
                           bool        /* beautify */,
                           std::size_t /* indent */,

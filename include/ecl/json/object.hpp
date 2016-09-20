@@ -90,13 +90,22 @@ private:
             using type = Variadic<Head, Tail...>;
         };
 
-        using type = typename std::conditional<
+        using type = typename std::conditional
+        <
             Pred<Val, T>::value,
-            typename cons<T, typename filter<Pred,
-                                             Val,
-                                             Variadic,
-                                             Ts...>::type>::type,
-            typename filter<Pred, Val, Variadic, Ts...>::type >::type;
+            typename cons
+            <
+                T,
+                typename filter
+                <
+                    Pred,
+                    Val,
+                    Variadic,
+                    Ts...
+                >::type
+            >::type,
+            typename filter<Pred, Val, Variadic, Ts...>::type
+        >::type;
     };
 
 public:
@@ -130,13 +139,15 @@ public:
     }
 
     template<typename NAME>
-    using value_type_t = typename std::tuple_element<
+    using value_type_t = typename std::tuple_element
+    <
         0,
-        typename filter<
-            name_predicate,
-            NAME,
-            std::tuple,
-            NODES...
+        typename filter
+        <
+              name_predicate
+            , NAME
+            , std::tuple
+            , NODES...
         >::type
     >::type;
 
@@ -344,6 +355,13 @@ private:
 
     bool m_enabled { true };
 };
+
+template<typename T, typename... NODES>
+T& operator<< (T& stream, object<NODES...>& obj)
+{
+    obj.serialize(stream);
+    return stream;
+}
 
 } // namespace json
 

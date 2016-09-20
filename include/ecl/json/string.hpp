@@ -48,7 +48,7 @@ public:
         m_val.fill('\0');
     }
 
-    explicit string(const char* const ptr)
+    string(const char* const ptr)
     {
         std::size_t sz = std::min(strlen(ptr), SIZE);
 
@@ -201,6 +201,7 @@ public:
      */
     string<SIZE>& operator= (const char* const ptr)
     {
+        m_val.fill('\0');
         std::size_t sz = std::min(strlen(ptr), SIZE);
         for(std::size_t i = 0; i < sz; ++i)
         {
@@ -208,6 +209,60 @@ public:
         }
 
         return *this;
+    }
+
+    /**
+     * @brief Equals operator for char* type.
+     * @details Compares string with C-style string
+     *
+     * @param ptr pointer to string.
+     *
+     * @return true if equals
+     */
+    bool operator== (const char* const ptr)
+    {
+        return (0 == strncmp(data(), ptr, SIZE + 1));
+    }
+
+    /**
+     * @brief Equals operator for ecl::string type.
+     * @details Compares string with other ecl::string
+     *
+     * @param s reference to ecl::string object
+     *
+     * @return true if equals
+     */
+    template<std::size_t S>
+    bool operator== (const ecl::json::string<S>& str)
+    {
+        return (0 == strncmp(data(), str.data(), std::max((SIZE + 1), S)));
+    }
+
+    /**
+     * @brief Equals operator for char* type.
+     * @details Compares string with C-style string
+     *
+     * @param ptr pointer to string.
+     *
+     * @return true if equals
+     */
+    bool operator!= (const char* const ptr)
+    {
+        return ! (*this == ptr);
+    }
+
+    /**
+     * @brief Equals operator for ecl::string type.
+     * @details Compares string with other ecl::string
+     *
+     * @param s reference to ecl::string object
+     *
+     * @return true if equals
+     */
+    template<std::size_t S>
+    bool operator!= (const ecl::json::string<S>& str)
+    {
+        return ! (*this == str);
     }
 
     /**
