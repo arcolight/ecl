@@ -9,3 +9,4 @@
 #include "test_scope_guard.hpp"
 #include "test_fsm.hpp"
 #include "test_bitfield.hpp"
+#include "test_json.hpp"
