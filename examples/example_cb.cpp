@@ -9,7 +9,7 @@
 
 #define CB_SIZE 16
 
-typedef ecl::circular_buffer<uint8_t, CB_SIZE, true> circular_buffer_t;
+using circular_buffer_t = ecl::circular_buffer<uint8_t, CB_SIZE, true>;
 
 static void dump(const circular_buffer_t& c);
 

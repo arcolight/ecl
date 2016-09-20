@@ -25,49 +25,60 @@ ECL_DECL_NAME_TYPE(ar_item3)
 using namespace ecl;
 using namespace json;
 
-typedef object<
-    node<name1, bool>,
-    node<name2, int32_t>,
-    node<level1,
-        object<
-            node<name1, bool>,
-            node<name3, string<12>>,
-            node<level2, array<
-                object<
-                    node<ar_item1, bool>,
-                    node<ar_item2, int32_t>,
-                    node<ar_item3, string<32>>
-                >, 8>
+using document_ecl_t = object
+<
+    node < name1  , bool    >,
+    node < name2  , int32_t >,
+    node < level1 , object
+        <
+            node < name1  , bool          >,
+            node < name3  , string < 12 > >,
+            node < level2 , array
+                <
+                    object
+                    <
+                          node < ar_item1 , bool          >
+                        , node < ar_item2 , int32_t       >
+                        , node < ar_item3 , string < 32 > >
+                    >
+                    , 8
+                >
             >
         >
     >,
-    node<name5, bool>
-> document_ecl_t;
+    node < name5 , bool >
+>;
 
-typedef object<
-    node<name1, bool>,
-    node<name2, int32_t>,
-    node<level1,
-        object<
-            node<name1, bool>,
-            node<name3, std::string>,
-            node<level2, array<
-                object<
-                    node<ar_item1, bool>,
-                    node<ar_item2, int32_t>,
-                    node<ar_item3, std::string>
-                >, 8>
+using document_std_t = object
+<
+    node < name1  , bool    >,
+    node < name2  , int32_t >,
+    node < level1 , object
+        <
+            node < name1  , bool >,
+            node < name3  , std::string >,
+            node < level2 , array
+                <
+                    object
+                    <
+                          node< ar_item1 , bool        >
+                        , node< ar_item2 , int32_t     >
+                        , node< ar_item3 , std::string >
+                    >
+                    , 8
+                >
             >
         >
     >,
-    node<name5, bool>
-> document_std_t;
+    node < name5 , bool >
+>;
 
-typedef object<
-    node<name1, float       >,
-    node<name2, double      >,
-    node<name3, long double >
-> floating_point_doc_t;
+using floating_point_doc_t = object
+<
+    node < name1 , float       >,
+    node < name2 , double      >,
+    node < name3 , long double >
+>;
 
 template<typename T>
 static void fill_document(T& doc)
