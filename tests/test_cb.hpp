@@ -50,7 +50,7 @@ void circular_range_check(const circular_buffer_t&         b,
 {
     for(std::size_t i = 0; i < b.capacity(); ++i)
     {
-        BOOST_CHECK_MESSAGE(b[i] == v[i], "circular_range_check error! buf[i] = " << +b[i] << " instead of " << +v[i]);
+        BOOST_CHECK_MESSAGE(b[i] == v[i], +b[i] << " = " << +v[i]);
     }
 }
 
@@ -79,7 +79,7 @@ BOOST_FIXTURE_TEST_CASE( pop_case, circular_buffer_fixture  )
     for(value_type_t i = 0; i < buf_size; ++i)
     {
         value_type_t value = buf.pop();
-        BOOST_CHECK_MESSAGE(value == i * 2, "pop error! value = " << +value << " instead of " << i * 2);
+        BOOST_CHECK_MESSAGE(value == i * 2, +value << " = " << i * 2);
     }
 
     buf.clear();
@@ -90,13 +90,13 @@ BOOST_FIXTURE_TEST_CASE( iteration_case, circular_buffer_fixture  )
 {
     for(size_t i = 0; i < buf_size; ++i)
     {
-        BOOST_CHECK_MESSAGE(buf[i] == i * 2, "index error! buf[i] = " << +buf[i] << " instead of " << i * 2);
+        BOOST_CHECK_MESSAGE(buf[i] == i * 2, +buf[i] << " = " << i * 2);
     }
 
     value_type_t j = 0;
     for(auto& c : buf)
     {
-        BOOST_CHECK_MESSAGE(c == j * 2, "range-based for error! value = " << +c << " instead of " << j * 2);
+        BOOST_CHECK_MESSAGE(c == j * 2, +c << " = " << j * 2);
         ++j;
     }
 }
@@ -105,13 +105,13 @@ BOOST_FIXTURE_TEST_CASE( drop_case, circular_buffer_fixture  )
 {
     for(size_t i = 0; i < buf_size; ++i)
     {
-        BOOST_CHECK_MESSAGE(buf[i] == i * 2, "index error! buf[i] = " << +buf[i] << " instead of " << i * 2);
+        BOOST_CHECK_MESSAGE(buf[i] == i * 2, +buf[i] << " = " << i * 2);
     }
 
     value_type_t j = 0;
     for(auto& c : buf)
     {
-        BOOST_CHECK_MESSAGE(c == j * 2, "range-based for error! value = " << +c << " instead of " << j * 2);
+        BOOST_CHECK_MESSAGE(c == j * 2, +c << " = " << j * 2);
         ++j;
     }
 }

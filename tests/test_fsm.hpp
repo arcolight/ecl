@@ -125,7 +125,7 @@ public:
 };
 
 #define ECL_BOOST_CHECK_MESSAGE_PLAYER_FSM(current, expected) \
-    BOOST_CHECK_MESSAGE(current == expected, "state error! state = " << out_state(current) << " instead of " << out_state(expected))
+    BOOST_CHECK_MESSAGE(current == expected, out_state(current) << " = " << out_state(expected))
 
 BOOST_AUTO_TEST_CASE( player_case )
 {

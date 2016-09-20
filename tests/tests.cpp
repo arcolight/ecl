@@ -8,3 +8,4 @@
 #include "test_str_const.hpp"
 #include "test_scope_guard.hpp"
 #include "test_fsm.hpp"
+#include "test_bitfield.hpp"
