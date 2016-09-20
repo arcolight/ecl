@@ -74,7 +74,7 @@ BOOST_FIXTURE_TEST_CASE( push_case, circular_buffer_fixture  )
     circular_range_check(buf, expected2);
 }
 
-BOOST_FIXTURE_TEST_CASE( pop_case, circular_buffer_fixture  )
+BOOST_FIXTURE_TEST_CASE( pop_case, circular_buffer_fixture )
 {
     for(value_type_t i = 0; i < buf_size; ++i)
     {
@@ -86,7 +86,7 @@ BOOST_FIXTURE_TEST_CASE( pop_case, circular_buffer_fixture  )
     BOOST_CHECK_MESSAGE(buf.is_empty(), "buffer not empty!");
 }
 
-BOOST_FIXTURE_TEST_CASE( iteration_case, circular_buffer_fixture  )
+BOOST_FIXTURE_TEST_CASE( iteration_case, circular_buffer_fixture )
 {
     for(size_t i = 0; i < buf_size; ++i)
     {
@@ -101,7 +101,7 @@ BOOST_FIXTURE_TEST_CASE( iteration_case, circular_buffer_fixture  )
     }
 }
 
-BOOST_FIXTURE_TEST_CASE( drop_case, circular_buffer_fixture  )
+BOOST_FIXTURE_TEST_CASE( drop_case, circular_buffer_fixture )
 {
     for(size_t i = 0; i < buf_size; ++i)
     {
