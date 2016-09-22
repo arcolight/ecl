@@ -35,3 +35,6 @@ addons:
     build_command_prepend: "make clean"
     build_command:   "make -j 4"
     branch_pattern: coverity_scan
+  apt:
+    packages:
+    - libboost-test-dev
