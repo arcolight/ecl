@@ -4,7 +4,7 @@ DEBUG = -g0
 
 WARNINGS = -Wall -Wextra -pedantic -Wswitch -Wnon-virtual-dtor -Wshadow -Weffc++
 
-SECURE = -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 -ftrapv -Wformat-security -fPIE -Wl,-z,relro,-z,now -fstack-protector -fstack-check -ggdb
+SECURE = -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 -ftrapv -Wformat-security -fPIE -Wl,-z,relro,-z,now -fstack-protector -ggdb
 
 CXXFLAGS = -std=c++11 -fPIC -fno-rtti -fno-exceptions -fvisibility=hidden $(SECURE) $(OPTIMIZATION) $(DEBUG)
 TEST_CXX_FLAGS = -std=c++11 -fPIC -fvisibility=hidden $(SECURE) $(OPTIMIZATION) $(DEBUG)
