@@ -4,8 +4,8 @@
 
 namespace
 {
-    int testVar = 0;
-    const char *ok = "OK   ";
+    int testVar      = 0;
+    const char *ok   = "OK   ";
     const char *fail = "FAIL ";
 
     const char* test(int step)
@@ -54,11 +54,8 @@ void f(bool condition)
     std::cout << test(1) << "  ::f generic exit" << std::endl;
 }
 
-int main(int argc, char* argv[])
+int main(int, char**, char**)
 {
-    (void) (argc);
-    (void) (argv);
-
     testVar = 0;
     ::f(false);
     std::cout << test(3) << "  ::f exited" << std::endl << std::endl;

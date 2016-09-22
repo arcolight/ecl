@@ -165,11 +165,8 @@ void out_bool_char(bool b, char c)
     l << rst();
 }
 
-int main(int argc, char** argv)
+int main(int, char**, char**)
 {
-    (void)(argc);
-    (void)(argv);
-
 #ifdef __arm__
 
     printf("sizeof(float):       %u\r\n"

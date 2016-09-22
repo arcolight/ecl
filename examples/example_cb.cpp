@@ -9,7 +9,7 @@
 
 #define CB_SIZE 16
 
-typedef ecl::circular_buffer<uint8_t, CB_SIZE, true> circular_buffer_t;
+using circular_buffer_t = ecl::circular_buffer<uint8_t, CB_SIZE, true>;
 
 static void dump(const circular_buffer_t& c);
 
@@ -60,11 +60,8 @@ static void dump(const circular_buffer_t& c)
     std::cout << "]" << std::endl << std::endl;
 }
 
-int main(int argc, char* argv[])
+int main(int, char**, char**)
 {
-    (void)(argc);
-    (void)(argv);
-
     circular_buffer_t cb;
 
     std::srand(static_cast<uint32_t>(std::time(0)));

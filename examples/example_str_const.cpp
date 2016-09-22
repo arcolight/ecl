@@ -4,11 +4,8 @@
 
 using namespace ecl;
 
-int main(int argc, char* argv[])
+int main(int, char**, char**)
 {
-    (void)(argc);
-    (void)(argv);
-
     constexpr str_const test("test!");
     constexpr str_const test2(test);
 

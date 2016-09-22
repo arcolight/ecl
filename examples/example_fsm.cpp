@@ -23,21 +23,21 @@ void out_state(st s);
 
 class test_fsm : public ecl::state_machine<test_fsm, st, st::s_1>
 {
-    void on_ev_1  (const ev_1&)   { std::cout << "event 1 -> ";   }
-    void on_ev_2  (const ev_2&)   { std::cout << "event 2 -> ";   }
-    void on_ev_3  (const ev_3&)   { std::cout << "event 3 -> ";   }
-    void on_ev_4  (const ev_4&)   { std::cout << "event 4 -> ";   }
+    void on_ev_1  (const ev_1&)   { std::cout << "event 1   -> "; }
+    void on_ev_2  (const ev_2&)   { std::cout << "event 2   -> "; }
+    void on_ev_3  (const ev_3&)   { std::cout << "event 3   -> "; }
+    void on_ev_4  (const ev_4&)   { std::cout << "event 4   -> "; }
     void on_ev_5_1(const ev_5&)   { std::cout << "event 5_1 -> "; }
     void on_ev_5_2(const ev_5&)   { std::cout << "event 5_2 -> "; }
-    void on_ev_6  (const ev_6&)   { std::cout << "event 6 -> ";   }
+    void on_ev_6  (const ev_6&)   { std::cout << "event 6   -> "; }
 
-    bool g_ev_1   (const ev_1&)   { std::cout << "guard 1 -> ";   return true;    }
-    bool g_ev_2   (const ev_2&)   { std::cout << "guard 2 -> ";   return true;    }
-    bool g_ev_3   (const ev_3&)   { std::cout << "guard 3 -> ";   return true;    }
-    bool g_ev_4   (const ev_4&)   { std::cout << "guard 4 -> ";   return true;    }
+    bool g_ev_1   (const ev_1&)   { std::cout << "guard 1   -> "; return true;    }
+    bool g_ev_2   (const ev_2&)   { std::cout << "guard 2   -> "; return true;    }
+    bool g_ev_3   (const ev_3&)   { std::cout << "guard 3   -> "; return true;    }
+    bool g_ev_4   (const ev_4&)   { std::cout << "guard 4   -> "; return true;    }
     bool g_ev_5_1 (const ev_5& e) { std::cout << "guard 5_1 -> "; return e.val;   }
     bool g_ev_5_2 (const ev_5& e) { std::cout << "guard 5_2 -> "; return ! e.val; }
-    bool g_ev_6   (const ev_6&)   { std::cout << "guard 6 -> ";   return true;    }
+    bool g_ev_6   (const ev_6&)   { std::cout << "guard 6   -> "; return true;    }
 
     template<typename ev>
     bool g_false (const ev&) { std::cout << "false guard -> "; return false; }
@@ -46,19 +46,20 @@ class test_fsm : public ecl::state_machine<test_fsm, st, st::s_1>
     bool g_true (const ev&)  { std::cout << "true guard -> ";  return true;  }
 
     void on_s_1_enter() { std::cout << "s_1 enter -> "; }
-    void on_s_1_exit()  { std::cout << "s_1 exit -> ";  }
+    void on_s_1_exit()  { std::cout << "s_1 exit  -> "; }
     void on_s_2_enter() { std::cout << "s_2 enter -> "; }
-    void on_s_2_exit()  { std::cout << "s_2 exit -> ";  }
+    void on_s_2_exit()  { std::cout << "s_2 exit  -> "; }
     void on_s_3_enter() { std::cout << "s_3 enter -> "; }
-    void on_s_3_exit()  { std::cout << "s_3 exit -> ";  }
+    void on_s_3_exit()  { std::cout << "s_3 exit  -> "; }
     void on_s_4_enter() { std::cout << "s_4 enter -> "; }
-    void on_s_4_exit()  { std::cout << "s_4 exit -> ";  }
+    void on_s_4_exit()  { std::cout << "s_4 exit  -> "; }
     void on_s_5_enter() { std::cout << "s_5 enter -> "; }
-    void on_s_5_exit()  { std::cout << "s_5 exit -> ";  }
+    void on_s_5_exit()  { std::cout << "s_5 exit  -> "; }
 
-    typedef test_fsm f;
+    using f = test_fsm;
 
-    typedef transition_table<
+    using transition_table_t = transition_table
+    <
         //    Start    Event    Next       Callback        Guard
         //  +---------+------+---------+---------------+---------------+
         row < st::s_1 , ev_1 , st::s_2 , &f::on_ev_1   , &f::g_ev_1    >,
@@ -72,14 +73,15 @@ class test_fsm : public ecl::state_machine<test_fsm, st, st::s_1>
         row < st::s_3 , ev_6 , st::s_5 , &f::on_ev_6                   >,
         row < st::s_5 , ev_6 , st::s_1 , &f::on_ev_6   , &f::g_false   >
         //  +---------+------+---------+---------------+---------------+
-    > transition_table_t;
+    >;
 
-    typedef callback_table<
+    using callback_table_t = callback_table
+    <
         scb< st::s_1, &f::on_s_1_enter, &f::on_s_1_exit >,
         scb< st::s_2, &f::on_s_2_enter                  >,
         scb< st::s_3, nullptr         , &f::on_s_3_exit >,
         scb< st::s_5, &f::on_s_5_enter, &f::on_s_5_exit >
-    > callback_table_t;
+    >;
 
 public:
     template<typename event_t>
@@ -162,31 +164,32 @@ class player : public ecl::state_machine<player, player_state, player_state::emp
         std::cout << "stop and open" << std::endl;
     }
 
-    typedef player_state s;
-    typedef player       p;
+    using s = player_state;
+    using p = player;
 
-    typedef transition_table<
-    //      Start         Event         Next            Action
-    //  +------------+-------------+------------+---------------------+
-    row < s::stopped , play        , s::playing , &p::start_playback  >,
-    row < s::stopped , open_close  , s::open    , &p::open_drawer     >,
-    //  +------------+-------------+------------+---------------------+
-    row < s::open    , open_close  , s::empty   , &p::close_drawer    >,
-    //  +------------+-------------+------------+---------------------+
-    row < s::empty   , open_close  , s::open    , &p::open_drawer     >,
-    row < s::empty   , cd_detected , s::stopped , &p::store_cd_info   >,
-    //  +------------+-------------+------------+---------------------+
-    row < s::playing , stop        , s::stopped , &p::stop_playback   >,
-    row < s::playing , pause       , s::paused  , &p::pause_playback  >,
-    row < s::playing , open_close  , s::open    , &p::stop_and_open   >,
-    //  +------------+-------------+------------+---------------------+
-    row < s::paused  , play        , s::playing , &p::resume_playback >,
-    row < s::paused  , stop        , s::stopped , &p::stop_playback   >,
-    row < s::paused  , open_close  , s::open    , &p::stop_and_open   >
-    //  +------------+-------------+------------+---------------------+
-    > transition_table_t;
+    using transition_table_t = transition_table
+    <
+        //      Start         Event         Next            Action
+        //  +------------+-------------+------------+---------------------+
+        row < s::stopped , play        , s::playing , &p::start_playback  >,
+        row < s::stopped , open_close  , s::open    , &p::open_drawer     >,
+        //  +------------+-------------+------------+---------------------+
+        row < s::open    , open_close  , s::empty   , &p::close_drawer    >,
+        //  +------------+-------------+------------+---------------------+
+        row < s::empty   , open_close  , s::open    , &p::open_drawer     >,
+        row < s::empty   , cd_detected , s::stopped , &p::store_cd_info   >,
+        //  +------------+-------------+------------+---------------------+
+        row < s::playing , stop        , s::stopped , &p::stop_playback   >,
+        row < s::playing , pause       , s::paused  , &p::pause_playback  >,
+        row < s::playing , open_close  , s::open    , &p::stop_and_open   >,
+        //  +------------+-------------+------------+---------------------+
+        row < s::paused  , play        , s::playing , &p::resume_playback >,
+        row < s::paused  , stop        , s::stopped , &p::stop_playback   >,
+        row < s::paused  , open_close  , s::open    , &p::stop_and_open   >
+        //  +------------+-------------+------------+---------------------+
+    >;
 
-    typedef callback_table<> callback_table_t;
+    using callback_table_t = callback_table<>;
 
 public:
     template<typename event_t>
@@ -198,30 +201,28 @@ public:
 
 void out_state(st s)
 {
-	switch(s) {
-		case st::s_1:
-			std::cout << "s_1" << std::endl;
-		break;
-		case st::s_2:
-			std::cout << "s_2" << std::endl;
-		break;
-		case st::s_3:
-			std::cout << "s_3" << std::endl;
-		break;
-		case st::s_4:
-			std::cout << "s_4" << std::endl;
-		break;
-		case st::s_5:
-			std::cout << "s_5" << std::endl;
-		break;
-	}
+    switch(s)
+    {
+    case st::s_1:
+        std::cout << "s_1" << std::endl;
+    break;
+    case st::s_2:
+        std::cout << "s_2" << std::endl;
+    break;
+    case st::s_3:
+        std::cout << "s_3" << std::endl;
+    break;
+    case st::s_4:
+        std::cout << "s_4" << std::endl;
+    break;
+    case st::s_5:
+        std::cout << "s_5" << std::endl;
+    break;
+    }
 }
 
-int main(int argc, char** argv)
+int main(int, char**, char**)
 {
-    (void)(argc);
-    (void)(argv);
-
     test_fsm fsm;
 
     std::cout << std::endl << "Test fsm" << std::endl;

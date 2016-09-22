@@ -47,7 +47,7 @@ struct test_struct_3
 #define F11_SIZE                    31
 #define F12_SIZE                    64
 
-typedef ecl::bit_field
+using test_bit_field_t = ecl::bit_field
 <
     test_struct,
     ECL_FIELD(test_struct, f0,  F0_SIZE),
@@ -63,20 +63,20 @@ typedef ecl::bit_field
     ECL_FIELD(test_struct, f10, F10_SIZE),
     ECL_FIELD(test_struct, f11, F11_SIZE),
     ECL_FIELD(test_struct, f12, F12_SIZE)
-> test_bit_field_t;
+>;
 
-typedef ecl::bit_field
+using test_bit_field_2_t = ecl::bit_field
 <
     test_struct_2,
     ECL_FIELD(test_struct_2, f0, 1),
     ECL_FIELD(test_struct_2, f1, 1)
-> test_bit_field_2_t;
+>;
 
-typedef ecl::bit_field
+using test_bit_field_3_t = ecl::bit_field
 <
     test_struct_3,
     ECL_FIELD(test_struct_3, array, 80)
-> test_bit_field_3_t;
+>;
 
 namespace numerical_chars
 {
@@ -138,11 +138,8 @@ void dump_bit_field(test_bit_field_t const& bf)
     //        bf.f10, bf.f11, bf.f12);
 }
 
-int main(int argc, char** argv)
+int main(int, char**, char**)
 {
-    (void)(argc);
-    (void)(argv);
-
     test_bit_field_t bf;
     test_bit_field_2_t bf_2;
     // test_bit_field_3_t bf_3;

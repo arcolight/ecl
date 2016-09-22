@@ -130,16 +130,20 @@ struct command_5    : public ecl::command<cmd5, command_5>
 
 }
 
-typedef ecl::command_processor< proc,
-    command_quit,
-    command_1,
-    command_2,
-    ecl::command_processor< sub,
-        command_3,
-        command_4,
-        command_5
+using processor_t = ecl::command_processor
+<
+      proc
+    , command_quit
+    , command_1
+    , command_2
+    , ecl::command_processor
+    <
+          sub
+        , command_3
+        , command_4
+        , command_5
     >
-> processor_t;
+>;
 
 namespace
 {
@@ -147,7 +151,7 @@ namespace
 class receiver_quit : public ecl::receiver<command_quit>
 {
 public:
-    virtual void receive(command_quit& q)
+    virtual void receive(command_quit& q)                               override
     {
         std::cout << "Quit command received. code: " << q.m_exit_code << std::endl;
         exit(q.m_exit_code);
@@ -157,7 +161,7 @@ public:
 class receiver_1 : public ecl::receiver<command_1>
 {
 public:
-    virtual void receive(command_1& c)
+    virtual void receive(command_1& c)                                  override
     {
         std::cout << "Receiver 1 <- Command 1 with " << c.m_args.size() << " args:" << std::endl;
         for(auto& s : c.m_args)
@@ -170,7 +174,7 @@ public:
 class receiver_2 : public ecl::receiver<command_2>
 {
 public:
-    virtual void receive(command_2& c)
+    virtual void receive(command_2& c)                                  override
     {
         std::cout << "Receiver 2 <- Command 2 with " << c.m_args.size() << " args:" << std::endl;
         for(auto& s : c.m_args)
@@ -185,7 +189,7 @@ class receiver_3 : public ecl::receiver<command_1>,
                    public ecl::receiver<command_3>
 {
 public:
-    virtual void receive(command_1& c)
+    virtual void receive(command_1& c)                                  override
     {
         std::cout << "Receiver 3 <- Command 1 with " << c.m_args.size() << " args:" << std::endl;
         for(auto& s : c.m_args)
@@ -194,7 +198,7 @@ public:
         }
     }
 
-    virtual void receive(command_2& c)
+    virtual void receive(command_2& c)                                  override
     {
         std::cout << "Receiver 3 <- Command 2 with " << c.m_args.size() << " args:" << std::endl;
         for(auto& s : c.m_args)
@@ -203,7 +207,7 @@ public:
         }
     }
 
-    virtual void receive(command_3& c)
+    virtual void receive(command_3& c)                                  override
     {
         std::cout << "Receiver 3 <- Command 3 with " << c.m_args.size() << " args:" << std::endl;
         for(auto& s : c.m_args)
@@ -218,7 +222,7 @@ class receiver_4 : public ecl::receiver<command_3>,
                    public ecl::receiver<command_5>
 {
 public:
-    virtual void receive(command_3& c)
+    virtual void receive(command_3& c)                                  override
     {
         std::cout << "Receiver 4 <- Command 3 with " << c.m_args.size() << " args:" << std::endl;
         for(auto& s : c.m_args)
@@ -227,7 +231,7 @@ public:
         }
     }
 
-    virtual void receive(command_4& c)
+    virtual void receive(command_4& c)                                  override
     {
         std::cout << "Receiver 4 <- Command 4 with " << c.m_args.size() << " args:" << std::endl;
         for(auto& s : c.m_args)
@@ -236,7 +240,7 @@ public:
         }
     }
 
-    virtual void receive(command_5& c)
+    virtual void receive(command_5& c)                                  override
     {
         std::cout << "Receiver 4 <- Command 5 with " << c.m_args.size() << " args:" << std::endl;
         for(auto& s : c.m_args)
@@ -250,11 +254,8 @@ public:
 
 using help_stream_t = ecl::stream<1024>;
 
-int main(int argc, char* argv[])
+int main(int, char**, char**)
 {
-    (void)argc;
-    (void)argv;
-
     receiver_1    r1;
     receiver_2    r2;
     receiver_3    r3;

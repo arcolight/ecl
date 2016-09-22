@@ -27,13 +27,16 @@ template<typename T, std::size_t CAPACITY, bool ERASE_ELEMENTS = false>
 class circular_buffer
 {
 public:
+    using value_type = T;
+
     circular_buffer()                                                   noexcept
         : m_offset(0),
           m_size(0)
     {
-        static_assert(std::is_nothrow_copy_constructible<T>::value,
-                      "T must be nothrow copy-constructible!");
-        static_assert(std::is_pod<T>::value, "T must be POD!");
+        static_assert(std::is_nothrow_copy_constructible<value_type>::value,
+                      "value_type must be nothrow copy-constructible!");
+        static_assert(std::is_pod<value_type>::value,
+                      "value_type must be POD!");
         static_assert(CAPACITY > 0, "Size must be greater than zero!");
 
         clear();
@@ -49,7 +52,7 @@ public:
         {
             for(auto& c: m_array)
             {
-                c = T();
+                c = value_type();
             }
         }
 
@@ -80,7 +83,7 @@ public:
      *
      * @param v Element to push.
      */
-    void push(const T& v)                                               noexcept
+    void push(const value_type& v)                                      noexcept
     {
         m_array[wrap(m_offset + m_size)] = v;
 
@@ -99,9 +102,9 @@ public:
      *
      * @return Top element.
      */
-    T pop()                                                             noexcept
+    value_type pop()                                                    noexcept
     {
-        T t = m_array[m_offset];
+        value_type t = m_array[m_offset];
         if(ERASE_ELEMENTS)
         {
             m_array[m_offset] = T();
@@ -114,15 +117,15 @@ public:
             return t;
         }
 
-        return T();
+        return value_type();
     }
 
-    T& operator[](std::size_t index)                                    noexcept
+    value_type& operator[](std::size_t index)                           noexcept
     {
         return m_array[wrap(index + m_offset)];
     }
 
-    const T& operator[](std::size_t index)                        const noexcept
+    const value_type& operator[](std::size_t index)               const noexcept
     {
         return m_array[wrap(index + m_offset)];
     }
@@ -132,17 +135,17 @@ public:
         return (m_size == 0);
     }
 
-    T& front()                                                          noexcept
+    value_type& front()                                                 noexcept
     {
         return operator [](0);
     }
 
-    const T& front()                                              const noexcept
+    const value_type& front()                                     const noexcept
     {
         return operator [](0);
     }
 
-    T& back()                                                           noexcept
+    value_type& back()                                                  noexcept
     {
         if(is_empty())
         {
@@ -152,7 +155,7 @@ public:
         return operator [](m_size - 1);
     }
 
-    const T& back()                                               const noexcept
+    const value_type& back()                                      const noexcept
     {
         if(is_empty())
         {
@@ -472,7 +475,7 @@ private:
 
     std::size_t m_offset;
     std::size_t m_size;
-    T           m_array[CAPACITY];
+    value_type  m_array[CAPACITY];
 };
 
 } // namespace ecl
