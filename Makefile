@@ -1,6 +1,6 @@
 ARM_LD_FLAGS = --specs=rdimon.specs
-OPTIMIZATION = -O2
-DEBUG = -g0
+OPTIMIZATION = -O0
+DEBUG = -g2
 
 WARNINGS = -Wall -Wextra -pedantic -Wswitch -Wnon-virtual-dtor -Wshadow -Weffc++
 
@@ -26,6 +26,7 @@ TREE = tree
 CMD = command_processor
 STATIC_MAP = static_map
 JSON = json
+WEB = web
 
 INCLUDE_DIR = ./include
 EXAMPLES_DIR = ./examples
@@ -33,10 +34,26 @@ TESTS_DIR = ./tests
 BIN_DIR = ./bin
 DOC_DIR = ./doc
 
+HTTP_PARSER_DIR = ../http-parser
+
 TESTS_BIN = tests
 
 EXAMPLE_PREFIX = example
 GCOV_PREFIX = gcov
+
+WEB_DEF_PAGES_DIR=./web_def_pages
+WEB_RES_SRC_DIR = ./examples/web_resources_src
+WEB_RES_GEN_DIR = ./examples/web_resources
+WEB_GEN_SOURCES = $(WEB_RES_GEN_DIR)/400_html.cpp              \
+				  $(WEB_RES_GEN_DIR)/403_html.cpp              \
+				  $(WEB_RES_GEN_DIR)/404_html.cpp              \
+				  $(WEB_RES_GEN_DIR)/500_html.cpp              \
+				  $(WEB_RES_GEN_DIR)/favicon_png.cpp           \
+				  $(WEB_RES_GEN_DIR)/icon_png.cpp              \
+				  $(WEB_RES_GEN_DIR)/index_html.cpp            \
+				  $(WEB_RES_GEN_DIR)/authorized_index_html.cpp \
+				  $(WEB_RES_GEN_DIR)/jquery_js.cpp             \
+				  $(WEB_RES_GEN_DIR)/style_css.cpp
 
 ifndef GCOV
 	GCOV=gcov
@@ -48,6 +65,19 @@ out_dir:
 	@mkdir -p $(BIN_DIR)
 
 examples: $(EXAMPLE_PREFIX)_$(FSM) $(EXAMPLE_PREFIX)_$(SG) $(EXAMPLE_PREFIX)_$(CB) $(EXAMPLE_PREFIX)_$(BF) $(EXAMPLE_PREFIX)_$(SINGLETON) $(EXAMPLE_PREFIX)_$(STREAM) $(EXAMPLE_PREFIX)_$(JSON) $(EXAMPLE_PREFIX)_$(STR_CONST) $(EXAMPLE_PREFIX)_$(CMD) $(EXAMPLE_PREFIX)_$(TREE) $(EXAMPLE_PREFIX)_$(STATIC_MAP)
+
+gen_web_res:
+	@mkdir -p $(WEB_RES_GEN_DIR)
+	./res_gen.sh $(WEB_DEF_PAGES_DIR)/400.html            $(WEB_RES_GEN_DIR)/
+	./res_gen.sh $(WEB_DEF_PAGES_DIR)/403.html            $(WEB_RES_GEN_DIR)/
+	./res_gen.sh $(WEB_DEF_PAGES_DIR)/404.html            $(WEB_RES_GEN_DIR)/
+	./res_gen.sh $(WEB_DEF_PAGES_DIR)/500.html            $(WEB_RES_GEN_DIR)/
+	./res_gen.sh $(WEB_RES_SRC_DIR)/index.html            $(WEB_RES_GEN_DIR)/ -c
+	./res_gen.sh $(WEB_RES_SRC_DIR)/authorized_index.html $(WEB_RES_GEN_DIR)/ -c
+	./res_gen.sh $(WEB_RES_SRC_DIR)/style.css             $(WEB_RES_GEN_DIR)/ -c
+	./res_gen.sh $(WEB_RES_SRC_DIR)/icon.png              $(WEB_RES_GEN_DIR)/ -c
+	./res_gen.sh $(WEB_RES_SRC_DIR)/favicon.png           $(WEB_RES_GEN_DIR)/ -c
+	./res_gen.sh $(WEB_RES_SRC_DIR)/jquery.js             $(WEB_RES_GEN_DIR)/ -c
 
 $(EXAMPLE_PREFIX)_$(FSM): out_dir
 	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(FSM)_$(CXX).map $(EXAMPLES_DIR)/$(EXAMPLE_PREFIX)_$(FSM).cpp -o $(BIN_DIR)/$(FSM)_$(CXX)
@@ -82,6 +112,9 @@ $(EXAMPLE_PREFIX)_$(TREE): out_dir
 $(EXAMPLE_PREFIX)_$(CMD): out_dir
 	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(CMD)_$(CXX).map $(EXAMPLES_DIR)/$(EXAMPLE_PREFIX)_$(CMD).cpp -o $(BIN_DIR)/$(CMD)_$(CXX)
 
+$(EXAMPLE_PREFIX)_$(WEB): out_dir gen_web_res
+	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -I$(HTTP_PARSER_DIR) -Wl,-Map=$(BIN_DIR)/$(WEB)_$(CXX).map $(EXAMPLES_DIR)/$(EXAMPLE_PREFIX)_$(WEB).cpp $(WEB_GEN_SOURCES) $(HTTP_PARSER_DIR)/http_parser.c -o $(BIN_DIR)/$(WEB)_$(CXX)
+
 tests: out_dir clean_gcov
 	$(CXX) $(TESTS_FLAGS) -I$(INCLUDE_DIR) $(TESTS_DIR)/$(TESTS_BIN).cpp -lboost_unit_test_framework -o $(BIN_DIR)/$(TESTS_BIN)_$(CXX)
 
@@ -108,3 +141,4 @@ clean_doc:
 
 clean: clean_doc clean_gcov
 	$(RM) -r $(BIN_DIR)
+	$(RM) -r $(WEB_RES_GEN_DIR)

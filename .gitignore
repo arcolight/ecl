@@ -22,7 +22,7 @@
 
 # All in 'bin' folder
 bin/*
-tests/web_resources/*
+examples/web_resources/*
 doc/*
 
 ecl.config
