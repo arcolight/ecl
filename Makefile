@@ -1,6 +1,6 @@
 ARM_LD_FLAGS = --specs=rdimon.specs
-OPTIMIZATION = -O2
-DEBUG = -g0
+OPTIMIZATION = -O0
+DEBUG = -g2
 
 WARNINGS = -Wall -Wextra -pedantic -Wswitch -Wnon-virtual-dtor -Wshadow -Weffc++
 
@@ -25,6 +25,7 @@ STATIC_MAP = static_map
 TREE = tree
 CMD = command_processor
 STATIC_MAP = static_map
+FIXED_SIZE_MAP = fixed_size_map
 JSON = json
 
 INCLUDE_DIR = ./include
@@ -75,6 +76,9 @@ $(EXAMPLE_PREFIX)_$(STR_CONST): out_dir
 
 $(EXAMPLE_PREFIX)_$(STATIC_MAP): out_dir
 	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(STATIC_MAP)_$(CXX).map $(EXAMPLES_DIR)/$(EXAMPLE_PREFIX)_$(STATIC_MAP).cpp -o $(BIN_DIR)/$(STATIC_MAP)_$(CXX)
+
+$(EXAMPLE_PREFIX)_$(FIXED_SIZE_MAP): out_dir
+	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(FIXED_SIZE_MAP)_$(CXX).map $(EXAMPLES_DIR)/$(EXAMPLE_PREFIX)_$(FIXED_SIZE_MAP).cpp -o $(BIN_DIR)/$(FIXED_SIZE_MAP)_$(CXX)
 
 $(EXAMPLE_PREFIX)_$(TREE): out_dir
 	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(TREE)_$(CXX).map $(EXAMPLES_DIR)/$(EXAMPLE_PREFIX)_$(TREE).cpp -o $(BIN_DIR)/$(TREE)_$(CXX)
