@@ -488,7 +488,7 @@ void erase_tree_static(const std::string prefix, T& tree, key_type from, key_typ
     for(key_type i = from; i < to; ++i)
     {
         std::cout << prefix << "erasing node " << i << ": ";
-        if(tree.end() != tree.erase(i))
+        if(nullptr != tree.erase(i).first)
         {
             ++count;
             std::cout << "done." << std::endl;
@@ -516,12 +516,12 @@ void erase_tree_dynamic(const std::string prefix, T& tree, key_type from, key_ty
     while(!tree.empty())
     {
         key_type i = std::rand() % (to - from) + from;
-        typename T::iterator p = tree.erase(i);
-        if(tree.end() != p)
+        typename T::erase_return p = tree.erase(i);
+        if(nullptr != p.first)
         {
             std::cout << prefix << "erasing node " << i << ": ";
             ++count;
-            delete typename T::pointer(p);
+            delete p.first;
             std::cout << "done." << std::endl;
             dump_tree(prefix, tree);
         }

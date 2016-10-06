@@ -14,16 +14,32 @@ namespace ecl
 namespace tree
 {
 
+namespace detail
+{
+    template<typename T>
+    struct conditional_storage
+    {
+        T x {};
+    };
+
+    template<>
+    struct conditional_storage<void>
+    {
+
+    };
+} // namespace detail
+
 template
 <
       typename K
     , typename V
     , template <typename> class Compare
-    , template <typename, typename, template <typename> class> class N
+    , template <typename, typename, template <typename> class, typename> class N
+    , typename Storage = void
 >
 struct node_base
 {
-    using node_t        = N<K, V, Compare>;
+    using node_t        = N<K, V, Compare, Storage>;
 
     using pointer       = typename std::add_pointer<node_t>::type;
     using const_pointer = typename std::add_pointer
@@ -308,6 +324,11 @@ struct node_base
         return nullptr != parent;
     }
 
+    inline bool alone()                                           const noexcept
+    {
+        return !have_parent() && have_no_child();
+    }
+
     inline pointer insert(pointer n)                                    noexcept
     {
         if(key_compare()(n->key, key))
@@ -365,6 +386,13 @@ struct node_base
         }
 
         return suc;
+    }
+
+    inline void detach()                                                noexcept
+    {
+        parent = nullptr;
+        left   = nullptr;
+        right  = nullptr;
     }
 
     inline erase_return erase_internal()                                noexcept
@@ -467,13 +495,15 @@ struct node_base
         return static_cast<const_pointer>(this);
     }
 
-    pointer       left   {};
-    pointer       right  {};
-    pointer       parent {};
+    pointer                              left   { nullptr };
+    pointer                              right  { nullptr };
+    pointer                              parent { nullptr };
 
-    key_type      key    { };
-    value_type    val    { };
-    pair_type_ext pair   { key, val };
+    key_type                             key    { };
+    value_type                           val    { };
+    pair_type_ext                        pair   { key, val };
+
+    detail::conditional_storage<Storage> _s     {};
 };
 
 template
@@ -481,12 +511,13 @@ template
       typename K
     , typename V
     , template <typename> class Compare
-    , template <typename, typename, template <typename> class> class N
+    , template <typename, typename, template <typename> class, typename> class N
+    , typename Storage = void
 >
 class binary_tree_base
 {
 public:
-    using node_t        = typename N<K, V, Compare>::node_t;
+    using node_t        = typename N<K, V, Compare, Storage>::node_t;
 
     using pointer       = typename node_t::pointer;
     using const_pointer = typename node_t::const_pointer;
@@ -638,6 +669,11 @@ public:
             return m_n->pair;
         }
 
+        pointer    operator->()                                         noexcept
+        {
+            return &(m_n->pair);
+        }
+
         bool operator==(const self_type& rhs)                     const noexcept
         {
             return (m_n == rhs.m_n) && (m_e == rhs.m_e);
@@ -724,6 +760,11 @@ public:
         reference  operator*()                                    const noexcept
         {
             return m_n->pair;
+        }
+
+        pointer    operator->()                                   const noexcept
+        {
+            return &(m_n->pair);
         }
 
         bool operator==(const self_type& rhs)                     const noexcept
@@ -828,6 +869,26 @@ public:
         return const_reverse_iterator(begin());
     }
 
+    iterator make_iterator(pointer p)                             const noexcept
+    {
+        if(nullptr == p)
+        {
+            return end();
+        }
+
+        return iterator(p, pointer(&m_header));
+    }
+
+    const_iterator make_iterator(const_pointer p)                 const noexcept
+    {
+        if(nullptr == p)
+        {
+            return end();
+        }
+
+        return const_iterator(p, const_pointer(&m_header));
+    }
+
 // Iterators end
 
     iterator insert(pointer n)
@@ -877,6 +938,11 @@ public:
 
     iterator find(const key_type& k)                                    noexcept
     {
+        if(empty())
+        {
+            return end();
+        }
+
         pointer p = m_header.parent->find(k);
         if(nullptr == p)
         {
@@ -887,6 +953,11 @@ public:
 
     const_iterator find(const key_type& k)                        const noexcept
     {
+        if(empty())
+        {
+            return end();
+        }
+
         const_pointer p = m_header.parent->find(k);
         if(nullptr == p)
         {
@@ -895,25 +966,18 @@ public:
         return const_iterator(p, const_pointer(&m_header));
     }
 
-    iterator erase(const key_type& k)                                   noexcept
+    erase_return erase(const key_type& k)                               noexcept
     {
-        erase_return ret = erase_internal(k);
-
-        if(nullptr == ret.first)
-        {
-            return end();
-        }
-
-        return iterator(ret.first, pointer(&m_header));
+        return erase_internal(k);
     }
 
 protected:
 
     insert_return insert_internal(pointer n)                            noexcept
     {
-        n->parent            = nullptr;
-        n->left              = nullptr;
-        n->right             = nullptr;
+        n->parent = nullptr;
+        n->left   = nullptr;
+        n->right  = nullptr;
 
         if( ! m_header.have_parent())
         {

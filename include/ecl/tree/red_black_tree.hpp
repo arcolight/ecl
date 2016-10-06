@@ -20,16 +20,31 @@ template
       typename K
     , typename V
     , template <typename> class Compare = std::less
+    , typename Storage = void
 >
-struct red_black_node : public node_base<K, V, Compare, ecl::tree::red_black_node>
+struct red_black_node : public node_base
+                               <
+                                     K
+                                   , V
+                                   , Compare
+                                   , ecl::tree::red_black_node
+                                   , Storage
+                               >
 {
     // Full namespace is workaround for clang bug
     // about template-template parameters
     //
     // http://stackoverflow.com/questions/17687459/clang-not-accepting-use-of-template-template-parameter-when-using-crtp
-    using base = node_base<K, V, Compare, ecl::tree::red_black_node>;
+    using base = node_base<K, V, Compare, ecl::tree::red_black_node, Storage>;
 
-    using node_base<K, V, Compare, ecl::tree::red_black_node>::node_base;
+    using node_base
+          <
+                K
+              , V
+              , Compare
+              , ecl::tree::red_black_node
+              , Storage
+          >::node_base;
     using typename base::pointer;
 
     node_color color { node_color::RED };
@@ -40,8 +55,9 @@ template
       typename K
     , typename V
     , template <typename> class Compare
+    , typename Storage
 >
-bool is_black(const red_black_node<K, V, Compare>* n)                   noexcept
+bool is_black(const red_black_node<K, V, Compare, Storage>* n)          noexcept
 {
     if(nullptr == n)
     {
@@ -56,8 +72,9 @@ template
       typename K
     , typename V
     , template <typename> class Compare
+    , typename Storage
 >
-bool is_red(const red_black_node<K, V, Compare>* n)                     noexcept
+bool is_red(const red_black_node<K, V, Compare, Storage>* n)            noexcept
 {
     if(nullptr == n)
     {
@@ -72,8 +89,9 @@ template
       typename K
     , typename V
     , template <typename> class Compare
+    , typename Storage
 >
-void mark_black(red_black_node<K, V, Compare>* n)                       noexcept
+void mark_black(red_black_node<K, V, Compare, Storage>* n)              noexcept
 {
     if(nullptr == n)
     {
@@ -88,8 +106,9 @@ template
       typename K
     , typename V
     , template <typename> class Compare
+    , typename Storage
 >
-void mark_red(red_black_node<K, V, Compare>* n)                         noexcept
+void mark_red(red_black_node<K, V, Compare, Storage>* n)                noexcept
 {
     if(nullptr == n)
     {
@@ -104,9 +123,10 @@ template
       typename K
     , typename V
     , template <typename> class Compare
+    , typename Storage
 >
-void mark_as(red_black_node<K, V, Compare>* n,
-             red_black_node<K, V, Compare>* other)                      noexcept
+void mark_as(red_black_node<K, V, Compare, Storage>* n,
+             red_black_node<K, V, Compare, Storage>* other)             noexcept
 {
     if(nullptr == n)
     {
@@ -128,10 +148,18 @@ template
       typename K
     , typename V
     , template <typename> class Compare = std::less
+    , typename Storage = void
 >
-class red_black_tree : public binary_tree_base<K, V, Compare, red_black_node>
+class red_black_tree : public binary_tree_base
+                              <
+                                    K
+                                  , V
+                                  , Compare
+                                  , red_black_node
+                                  , Storage
+                              >
 {
-    using base = binary_tree_base<K, V, Compare, red_black_node>;
+    using base = binary_tree_base<K, V, Compare, red_black_node, Storage>;
 
     using base::m_header;
 public:
@@ -184,17 +212,17 @@ public:
         return it;
     }
 
-    iterator erase(const key_type& k)                                   noexcept
+    erase_return erase(const key_type& k)                               noexcept
     {
         if(empty())
         {
-            return end();
+            return { nullptr, nullptr };
         }
 
         pointer to_erase = root()->find(k);
         if(nullptr == to_erase) // not found
         {
-            return end();
+            return { nullptr, nullptr };
         }
 
         pointer suc   = to_erase->successor();
@@ -220,9 +248,7 @@ public:
             }
         }
 
-        erase_return ret = this->erase_internal(to_erase);
-
-        return iterator(ret.first, pointer(&m_header));
+        return this->erase_internal(to_erase);
     }
 
 private:
