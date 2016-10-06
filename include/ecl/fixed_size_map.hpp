@@ -113,6 +113,7 @@ public:
 
         ptr->key = value.first;
         ptr->val = value.second;
+
         iterator i = m_tree.insert(ptr);
 
         if(i != ptr)
@@ -137,7 +138,12 @@ public:
 
     iterator erase( const_iterator pos )                                noexcept
     {
-        return m_tree.erase(pos);
+        auto it = m_tree.erase((*pos).first);
+        if(end() != it)
+        {
+            mark_as_free(*(tree_node_pointer_t(it)));
+        }
+        return it;
     }
 
     iterator erase( const_iterator first, const_iterator last )         noexcept
@@ -153,16 +159,17 @@ public:
 
     size_type erase( const key_type& key )                              noexcept
     {
-        pointer ptr = m_tree.erase(key);
+        iterator it = m_tree.erase(key);
 
-        return (nullptr == ptr) ? 0 : 1;
+        return (end() == it) ? 0 : 1;
     }
 
     void swap( map& other )                                             noexcept
     {
-        std::swap(m_tree       , other.m_tree);
-        std::swap(m_nodes_pool , other.m_nodes_pool);
-        std::swap(m_not_found  , other.m_not_found);
+        std::swap(m_tree             , other.m_tree);
+        std::swap(m_nodes_pool       , other.m_nodes_pool);
+        std::swap(m_nodes_used_flags , other.m_nodes_used_flags);
+        std::swap(m_not_found        , other.m_not_found);
     }
 
     size_type count( const key_type& key )                        const noexcept
@@ -204,10 +211,11 @@ public:
 
         if(i == end())
         {
-            return *insert({ k, mapped_type() }).first;
+            iterator it = insert({ k, mapped_type() }).first;
+            return (*it).second;
         }
 
-        return *i;
+        return (*i).second;
     }
 
     const mapped_type& operator[](key_type&& k)                   const noexcept
@@ -224,27 +232,27 @@ public:
 
     iterator begin()                                                    noexcept
     {
-        return static_cast<tree_t*>(&m_tree)->begin();
+        return m_tree.begin();
     }
 
     iterator end()                                                      noexcept
     {
-        return static_cast<tree_t*>(&m_tree)->end();
+        return m_tree.end();
     }
 
     reverse_iterator rbegin()                                           noexcept
     {
-        return static_cast<tree_t*>(&m_tree)->rbegin();
+        return m_tree.rbegin();
     }
 
     reverse_iterator rend()                                             noexcept
     {
-        return static_cast<tree_t*>(&m_tree)->rend();
+        return m_tree.rend();
     }
 
     const_iterator begin()                                        const noexcept
     {
-        return static_cast<const tree_t*>(&m_tree)->begin();
+        return m_tree.begin();
     }
 
     const_iterator cbegin()                                       const noexcept
@@ -254,17 +262,17 @@ public:
 
     const_iterator end()                                          const noexcept
     {
-        return static_cast<const tree_t*>(&m_tree)->end();
+        return m_tree.end();
     }
 
     const_iterator cend()                                         const noexcept
     {
-        return end();
+        return cend();
     }
 
     const_reverse_iterator rbegin()                               const noexcept
     {
-        return static_cast<const tree_t*>(&m_tree)->rbegin();
+        return m_tree.rbegin();
     }
 
     const_reverse_iterator crbegin()                              const noexcept
@@ -274,7 +282,7 @@ public:
 
     const_reverse_iterator rend()                                 const noexcept
     {
-        return static_cast<const tree_t*>(&m_tree)->rend();
+        return m_tree.rend();
     }
 
     const_reverse_iterator crend()                                const noexcept
