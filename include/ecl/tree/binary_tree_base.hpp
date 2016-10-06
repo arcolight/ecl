@@ -114,6 +114,16 @@ struct node_base
         return *this;
     }
 
+    bool operator==(const node_base& rhs)                                  const
+    {
+        return ((key == rhs.key) && (val == rhs.val));
+    }
+
+    bool operator!=(const node_base& rhs)                                  const
+    {
+        return !(*this == rhs);
+    }
+
     inline pointer most_left()                                          noexcept
     {
         pointer result = static_cast<pointer>(this);
@@ -871,7 +881,11 @@ protected:
 
             ++m_size;
 
-            return { iterator(m_header.parent, pointer(&m_header)), m_header.parent };
+            return
+            {
+                  iterator(m_header.parent, pointer(&m_header))
+                , m_header.parent
+            };
         }
 
         pointer inserted_n = m_header.parent->insert(n);
