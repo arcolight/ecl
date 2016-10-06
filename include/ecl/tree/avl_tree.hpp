@@ -123,7 +123,7 @@ class avl_tree : public binary_tree_base<K, V, Compare, avl_node>
 {
     using base = binary_tree_base<K, V, Compare, avl_node>;
 
-//    using base::m_header;
+    using base::m_header;
 public:
     using typename base::node_t;
 
@@ -146,6 +146,15 @@ public:
     using base::count;
     using base::empty;
 
+    using base::begin;
+    using base::end;
+    using base::cbegin;
+    using base::cend;
+    using base::rbegin;
+    using base::rend;
+    using base::crbegin;
+    using base::crend;
+
     iterator insert(pointer n)                                          noexcept
     {
         auto result        = this->base::insert_internal(n);
@@ -163,17 +172,17 @@ public:
         return it;
     }
 
-    pointer erase(const key_type& k)                                    noexcept
+    iterator erase(const key_type& k)                                   noexcept
     {
         if(empty())
         {
-            return nullptr;
+            return end();
         }
 
         pointer to_erase = root()->find(k);
         if(nullptr == to_erase)
         {
-            return nullptr;
+            return end();
         }
 
         erase_return ret  = this->base::erase_internal(to_erase);
@@ -189,7 +198,7 @@ public:
             balance(to_erase->parent);
         }
 
-        return ret.first;
+        return iterator(ret.first, pointer(&m_header));
     }
 
 private:

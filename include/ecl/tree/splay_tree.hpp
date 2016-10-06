@@ -36,7 +36,7 @@ class splay_tree : public binary_tree_base<K, V, Compare, splay_node>
 {
     using base = binary_tree_base<K, V, Compare, splay_node>;
 
-   using base::m_header;
+    using base::m_header;
 public:
     using typename base::node_t;
 
@@ -85,17 +85,17 @@ public:
         return it;
     }
 
-    pointer erase(const key_type& k)                                    noexcept
+    iterator erase(const key_type& k)                                   noexcept
     {
         if(empty())
         {
-            return nullptr;
+            return end();
         }
 
         pointer to_erase = root()->find(k);
         if(nullptr == to_erase)
         {
-            return nullptr;
+            return end();
         }
 
         erase_return ret = this->base::erase_internal(to_erase);
@@ -105,7 +105,7 @@ public:
             splay(to_erase->parent);
         }
 
-        return ret.first;
+        return iterator(ret.first, pointer(&m_header));
     }
 
     iterator find(const key_type& k)                                    noexcept

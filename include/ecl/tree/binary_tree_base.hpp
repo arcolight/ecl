@@ -34,6 +34,8 @@ struct node_base
     // using key_type      = typename std::add_const<K>::type;
     using key_type      = K;
     using value_type    = V;
+    using pair_type     = std::pair<key_type, value_type>;
+    using pair_type_ext = std::pair<const key_type&, value_type&>;
 
     using key_compare   = Compare<key_type>;
 
@@ -61,18 +63,18 @@ struct node_base
     {}
 
     constexpr node_base(key_type&& k, value_type&& v)                   noexcept
-        : key ( std::forward<key_type>   (k) )
-        , val ( std::forward<value_type> (v) )
+        : key ( std::forward<key_type>   ( k ) )
+        , val ( std::forward<value_type> ( v ) )
     {}
 
-    constexpr node_base(const std::pair<key_type, value_type>& p)       noexcept
+    constexpr node_base(const pair_type& p)                             noexcept
         : key ( p.first  )
         , val ( p.second )
     {}
 
-    constexpr node_base(std::pair<key_type, value_type>&& p)            noexcept
-        : key ( std::forward<key_type>   (p.first ) )
-        , val ( std::forward<value_type> (p.second) )
+    constexpr node_base(pair_type&& p)                                  noexcept
+        : key ( std::forward<key_type>   ( p.first  ) )
+        , val ( std::forward<value_type> ( p.second ) )
     {}
 
     constexpr node_base(const node_base& other)                         noexcept
@@ -88,8 +90,8 @@ struct node_base
         std::swap(left,   other.left  );
         std::swap(right,  other.right );
         std::swap(parent, other.parent);
-        std::swap(val,    other.val   );
         std::swap(key,    other.key   );
+        std::swap(val,    other.val   );
     }
 
     node_base& operator=(const node_base& other)                        noexcept
@@ -108,8 +110,8 @@ struct node_base
         std::swap(left,   other.left  );
         std::swap(right,  other.right );
         std::swap(parent, other.parent);
-        std::swap(val,    other.val   );
         std::swap(key,    other.key   );
+        std::swap(val,    other.val   );
 
         return *this;
     }
@@ -465,12 +467,13 @@ struct node_base
         return static_cast<const_pointer>(this);
     }
 
-    pointer    left   {};
-    pointer    right  {};
-    pointer    parent {};
+    pointer       left   {};
+    pointer       right  {};
+    pointer       parent {};
 
-    key_type   key    {};
-    value_type val    {};
+    key_type      key    { };
+    value_type    val    { };
+    pair_type_ext pair   { key, val };
 };
 
 template
@@ -580,6 +583,9 @@ protected:
     };
 
 public:
+    struct iterator;
+    struct const_iterator;
+
     struct iterator :
         public base_iterator<binary_tree_base::pointer>
     {
@@ -592,9 +598,9 @@ public:
 
     public:
         using self_type  = iterator;
-        using value_type = V;
-        using reference  = V&;
-        using pointer    = V*;
+        using value_type = typename node_t::pair_type_ext;
+        using reference  = typename std::add_lvalue_reference<value_type>::type;
+        using pointer    = typename std::add_pointer<value_type>::type;
 
         iterator(binary_tree_base::pointer n,
                  binary_tree_base::pointer e)
@@ -629,27 +635,42 @@ public:
 
         reference  operator*()                                          noexcept
         {
-            return m_n->val;
+            return m_n->pair;
         }
 
-        bool operator==(const self_type& rhs)                              const
+        bool operator==(const self_type& rhs)                     const noexcept
         {
             return (m_n == rhs.m_n) && (m_e == rhs.m_e);
         }
 
-        bool operator!=(const self_type& rhs)                              const
+        bool operator!=(const self_type& rhs)                     const noexcept
         {
             return !operator==(rhs);
         }
 
-        bool operator==(const binary_tree_base::pointer& rhs)              const
+        bool operator==(const binary_tree_base::pointer& rhs)     const noexcept
         {
             return m_n == rhs;
         }
 
-        bool operator!=(const binary_tree_base::pointer& rhs)              const
+        bool operator!=(const binary_tree_base::pointer& rhs)     const noexcept
         {
             return !operator==(rhs);
+        }
+
+        operator const_iterator()                                 const noexcept
+        {
+            return const_iterator(m_n, m_e);
+        }
+
+        operator binary_tree_base::pointer()                      const noexcept
+        {
+            return m_n;
+        }
+
+        operator binary_tree_base::const_pointer()                const noexcept
+        {
+            return m_n;
         }
     };
 
@@ -665,9 +686,9 @@ public:
 
     public:
         using self_type  = const_iterator;
-        using value_type = const V;
-        using reference  = const V&;
-        using pointer    = const V*;
+        using value_type = const typename node_t::pair_type_ext;
+        using reference  = typename std::add_lvalue_reference<value_type>::type;
+        using pointer    = typename std::add_pointer<value_type>::type;
 
         const_iterator(binary_tree_base::const_pointer n,
                        binary_tree_base::const_pointer e)
@@ -702,27 +723,43 @@ public:
 
         reference  operator*()                                    const noexcept
         {
-            return m_n->val;
+            return m_n->pair;
         }
 
-        bool operator==(const self_type& rhs)                              const
+        bool operator==(const self_type& rhs)                     const noexcept
         {
             return (m_n == rhs.m_n) && (m_e == rhs.m_e);
         }
 
-        bool operator!=(const self_type& rhs)                              const
+        bool operator!=(const self_type& rhs)                     const noexcept
         {
             return !operator==(rhs);
         }
 
-        bool operator==(const binary_tree_base::const_pointer& rhs)        const
+        bool operator==(binary_tree_base::const_pointer& rhs)     const noexcept
         {
             return m_n == rhs;
         }
 
-        bool operator!=(const binary_tree_base::const_pointer& rhs)        const
+        bool operator!=(binary_tree_base::const_pointer& rhs)     const noexcept
         {
             return !operator==(rhs);
+        }
+
+        operator iterator()                                       const noexcept
+        {
+            return iterator(const_cast<binary_tree_base::pointer>(m_n),
+                            const_cast<binary_tree_base::pointer>(m_e));
+        }
+
+        operator binary_tree_base::pointer()                      const noexcept
+        {
+            return m_n;
+        }
+
+        operator binary_tree_base::const_pointer()                const noexcept
+        {
+            return m_n;
         }
     };
 
@@ -858,11 +895,16 @@ public:
         return const_iterator(p, const_pointer(&m_header));
     }
 
-    pointer erase(const key_type& k)                                    noexcept
+    iterator erase(const key_type& k)                                   noexcept
     {
         erase_return ret = erase_internal(k);
 
-        return ret.first;
+        if(nullptr == ret.first)
+        {
+            return end();
+        }
+
+        return iterator(ret.first, pointer(&m_header));
     }
 
 protected:

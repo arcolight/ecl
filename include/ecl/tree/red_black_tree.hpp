@@ -156,6 +156,15 @@ public:
     using base::count;
     using base::empty;
 
+    using base::begin;
+    using base::end;
+    using base::cbegin;
+    using base::cend;
+    using base::rbegin;
+    using base::rend;
+    using base::crbegin;
+    using base::crend;
+
     iterator insert(pointer n)                                          noexcept
     {
         auto result        = this->base::insert_internal(n);
@@ -175,17 +184,17 @@ public:
         return it;
     }
 
-    pointer erase(const key_type& k)                                    noexcept
+    iterator erase(const key_type& k)                                   noexcept
     {
         if(empty())
         {
-            return nullptr;
+            return end();
         }
 
         pointer to_erase = root()->find(k);
         if(nullptr == to_erase) // not found
         {
-            return nullptr;
+            return end();
         }
 
         pointer suc   = to_erase->successor();
@@ -213,7 +222,7 @@ public:
 
         erase_return ret = this->erase_internal(to_erase);
 
-        return ret.first;
+        return iterator(ret.first, pointer(&m_header));
     }
 
 private:
