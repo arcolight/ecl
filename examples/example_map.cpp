@@ -3,7 +3,7 @@
 #include <string>
 #include <ostream>
 
-#include <ecl/fixed_size_map.hpp>
+#include <ecl/map.hpp>
 
 enum class E
 {
@@ -44,13 +44,13 @@ using value_type = std::uint32_t;
 
 using map_t      = ecl::map<key_type, value_type, 16>;
 
-auto m0 = ecl::create_map<key_type, value_type>
-(
-      std::make_pair(E::e1, 1u)
-    , std::make_pair(E::e2, 2u)
-    , std::make_pair(E::e3, 4u)
-    , std::make_pair(E::e3, 3u) // overwrite E::e3 element
-);
+ auto m0 = ecl::create_map<key_type, value_type>
+ (
+       std::make_pair(E::e1, 1u)
+     , std::make_pair(E::e2, 2u)
+     , std::make_pair(E::e3, 4u)
+     , std::make_pair(E::e3, 3u) // overwrite E::e3 element
+ );
 
 template<typename T>
 void dump_map(std::string prefix, T& m)
@@ -92,19 +92,14 @@ int main(int, char**, char**)
         , { E::e10 , 20 }
     };
 
-    dump_map("[m1]", m1);
+    map_t m2;
 
-    // m1.erase(E::e1);
-    // m1.erase(E::e3);
-    // m1.erase(E::e5);
-    // m1.erase(E::e7);
-    // m1.erase(E::e9);
-
-    m1.erase(m1.begin(), m1.end());
+    m2[E::e1] = 1;
 
     dump_map("[m1]", m1);
-
-    dump_map("[m0]", m0);
+    auto i = m1.begin();
+    std::advance(i, 0);
+    m1.erase(i, m1.end());
     dump_map("[m1]", m1);
 
     return 0;
