@@ -385,7 +385,7 @@ void dump_tree(const std::string prefix, const T& tree)
     std::cout << prefix << "iterator :         ";
     for(auto& v : tree)
     {
-        std::cout << v << " ";
+        std::cout << v.second << " ";
     }
     std::cout << std::endl;
 
@@ -394,7 +394,7 @@ void dump_tree(const std::string prefix, const T& tree)
     std::cout << prefix << "reverse iterator : ";
     for(auto it = tree.rbegin(); it != it_end; ++it)
     {
-        std::cout << *it << " ";
+        std::cout << (*it).second << " ";
     }
     std::cout << std::endl;
 
@@ -488,7 +488,7 @@ void erase_tree_static(const std::string prefix, T& tree, key_type from, key_typ
     for(key_type i = from; i < to; ++i)
     {
         std::cout << prefix << "erasing node " << i << ": ";
-        if(nullptr != tree.erase(i))
+        if(tree.end() != tree.erase(i))
         {
             ++count;
             std::cout << "done." << std::endl;
@@ -516,12 +516,12 @@ void erase_tree_dynamic(const std::string prefix, T& tree, key_type from, key_ty
     while(!tree.empty())
     {
         key_type i = std::rand() % (to - from) + from;
-        typename T::node_t::pointer p = tree.erase(i);
-        if(nullptr != p)
+        typename T::iterator p = tree.erase(i);
+        if(tree.end() != p)
         {
             std::cout << prefix << "erasing node " << i << ": ";
             ++count;
-            delete p;
+            delete typename T::pointer(p);
             std::cout << "done." << std::endl;
             dump_tree(prefix, tree);
         }
