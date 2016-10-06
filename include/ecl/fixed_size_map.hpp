@@ -5,6 +5,7 @@
 #include <type_traits>
 #include <array>
 #include <initializer_list>
+#include <bitset>
 
 #include <ecl/tree/red_black_tree.hpp>
 
@@ -14,51 +15,58 @@ namespace ecl
 template<typename K, typename V, std::size_t N, typename Compare = std::less<K>>
 class map
 {
-    using tree_t                 = tree::red_black_tree<K, V>;
-    using tree_node_t            = typename tree_t::node_t;
+    using tree_t                  = tree::red_black_tree<K, V>;
+    using tree_node_t             = typename tree_t::node_t;
+    using tree_node_pointer_t     = typename std::add_pointer<tree_node_t>::type;
+    using tree_node_reference_t   = typename std::add_lvalue_reference<tree_node_t>::type;
 
 public:
-    using key_type               = typename tree_t::key_type;
-    using mapped_type            = typename tree_t::value_type;
-    using value_type             = std::pair<key_type, mapped_type>;
-    using size_type              = std::size_t;
-    using key_compare            = Compare;
-    using value_compare          = std::less<value_type>;
+    using key_type                = typename tree_t::key_type;
+    using mapped_type             = typename tree_t::value_type;
+    using value_type              = std::pair<key_type, mapped_type>;
+    using size_type               = std::size_t;
+    using key_compare             = Compare;
+    using value_compare           = std::less<value_type>;
 
-    using reference              = typename std::add_lvalue_reference<value_type>::type;
-    using pointer                = typename std::add_pointer<value_type>::type;
-    using const_pointer          = typename std::add_pointer<const value_type>::type;
+    using reference               = typename std::add_lvalue_reference<value_type>::type;
+    using pointer                 = typename std::add_pointer<value_type>::type;
+    using const_pointer           = typename std::add_pointer<const value_type>::type;
 
-    using iterator               = typename tree_t::iterator;
-    using reverse_iterator       = typename tree_t::reverse_iterator;
+    using iterator                = typename tree_t::iterator;
+    using reverse_iterator        = typename tree_t::reverse_iterator;
 
-    using const_iterator         = typename tree_t::const_iterator;
-    using const_reverse_iterator = typename tree_t::const_reverse_iterator;
+    using const_iterator          = typename tree_t::const_iterator;
+    using const_reverse_iterator  = typename tree_t::const_reverse_iterator;
 
     map()                                                               noexcept
     {
-        // nodes_pool_init();
+        init();
     }
 
     template<typename... Args>
-    explicit map (Args&&... args)
+    explicit map (Args&&... args)                                       noexcept
         : m_nodes_pool { { std::forward<Args>(args)... } }
     {
         static_assert(std::is_nothrow_default_constructible<mapped_type>::value,
             "Mapped type should be nothrow default constructible.");
 
-        nodes_pool_init();
+        init();
 
-        build_tree();
+        for(auto& n : m_nodes_pool)
+        {
+            insert({ n.key, n.val });
+        }
     }
 
-    // map(std::initializer_list<value_type> ilist)                        noexcept
-    // {
-    //     for(auto& e : ilist)
-    //     {
-    //         operator[e.first] = e.second;
-    //     }
-    // }
+    map(std::initializer_list<value_type> ilist)                        noexcept
+    {
+        init();
+
+        for(auto& e : ilist)
+        {
+            insert(e);
+        }
+    }
 
     // map& operator=(const map& other)                                    noexcept
     // map& operator=(map&& other)                                         noexcept;
@@ -91,33 +99,38 @@ public:
 
     void clear()                                                        noexcept
     {
-        nodes_pool_init();
+        m_tree.clear();
     }
 
     std::pair<iterator, bool> insert(const value_type& value)           noexcept
     {
-        if(size() < N)
-        {
-            m_tree.insert();
-        }
-    }
+        tree_node_pointer_t ptr = get_free_node();
 
-    template<class P>
-    std::pair<iterator, bool> insert(P&& value)                         noexcept
-    {
-        tree_node_t* ptr = get_node();
         if(nullptr == ptr)
         {
             return { end(), false };
         }
 
-        ptr->val = value;
-        m_tree.insert(ptr);
+        ptr->key = value.first;
+        ptr->val = value.second;
+        iterator i = m_tree.insert(ptr);
+
+        if(i != ptr)
+        {
+            return { i, false };
+        }
+
+        mark_as_used(*ptr);
+
+        return { i, true };
     }
 
-    iterator insert( const_iterator hint, const value_type& value )     noexcept;
-    template< class P >
-    iterator insert( const_iterator hint, P&& value )                   noexcept;
+    template<class P>
+    std::pair<iterator, bool> insert(P&& value)                         noexcept
+    {
+        insert(value_type(std::forward(value)));
+    }
+
     template< class InputIt >
     void insert( InputIt first, InputIt last )                          noexcept;
     void insert( std::initializer_list<value_type> ilist )              noexcept;
@@ -131,7 +144,7 @@ public:
     {
         while(first != last)
         {
-            m_tree.erase(first);
+            erase(first);
             ++first;
         }
 
@@ -140,15 +153,9 @@ public:
 
     size_type erase( const key_type& key )                              noexcept
     {
-        iterator i = search(key);
+        pointer ptr = m_tree.erase(key);
 
-        if(i == end())
-        {
-            return 0;
-        }
-
-        m_tree.erase(i);
-        return 1;
+        return (nullptr == ptr) ? 0 : 1;
     }
 
     void swap( map& other )                                             noexcept
@@ -197,33 +204,7 @@ public:
 
         if(i == end())
         {
-            if(size() < N)
-            {
-                tree_node_t* ptr = get_node();
-
-                std::cout << __LINE__ << " get_node(): " << ptr->val << std::endl;
-
-                // ptr should not be nullptr if size() < N
-
-                m_tree.insert(ptr);
-                return ptr->val;
-            }
-
-            std::cout << "164: not_found()" << std::endl;
-            return not_found();
-        }
-
-        return *i;
-    }
-
-    mapped_type& operator[](const key_type& k)                          noexcept
-    {
-        iterator i = search(k);
-
-        if(i == end())
-        {
-            std::cout << "177: not_found()" << std::endl;
-            return not_found();
+            return *insert({ k, mapped_type() }).first;
         }
 
         return *i;
@@ -239,11 +220,6 @@ public:
         }
 
         return *i;
-    }
-
-    const mapped_type& operator[](const key_type& k)              const noexcept
-    {
-        return operator[](k);
     }
 
     iterator begin()                                                    noexcept
@@ -307,8 +283,14 @@ public:
     }
 
 private:
+    void init()                                                         noexcept
+    {
+        m_nodes_used_flags.reset();
+    }
+
     mapped_type& not_found()                                            noexcept
     {
+        m_not_found = mapped_type();
         return m_not_found;
     }
 
@@ -317,46 +299,38 @@ private:
         return m_not_found;
     }
 
-    tree_node_t* get_node()                                             noexcept
+    tree_node_pointer_t get_free_node()                                 noexcept
     {
-        for(auto& n : m_nodes_pool)
+        for(std::size_t i = 0; i < N; ++i)
         {
-            if(is_node_unused(n))
+            if(!m_nodes_used_flags[i])
             {
-                return &n;
+                return &m_nodes_pool[i];
             }
         }
 
         return nullptr;
     }
 
-    bool is_node_unused(tree_node_t& n)                           const noexcept
+    void mark_as_free(tree_node_t& n)                                   noexcept
     {
-        return !n.have_parent() &&
-               !n.have_left()   &&
-               !n.have_right();
-    }
-
-    void mark_as_unused(tree_node_t& n)                                 noexcept
-    {
-        n.parent = nullptr;
-        n.left   = nullptr;
-        n.right  = nullptr;
-    }
-
-    void nodes_pool_init()                                              noexcept
-    {
-        for(auto& n : m_nodes_pool)
+        for(std::size_t i = 0; i < N; ++i)
         {
-            mark_as_unused(n);
+            if(n == m_nodes_pool[i])
+            {
+                m_nodes_used_flags[i] = false;
+            }
         }
     }
 
-    inline void build_tree()                                            noexcept
+    void mark_as_used(tree_node_t& n)                                   noexcept
     {
-        for(auto& n : m_nodes_pool)
+        for(std::size_t i = 0; i < N; ++i)
         {
-            iterator i = m_tree.insert(&n);
+            if(n == m_nodes_pool[i])
+            {
+                m_nodes_used_flags[i] = true;
+            }
         }
     }
 
@@ -384,10 +358,12 @@ private:
         return static_cast<const tree_t*>(&m_tree)->find(k);
     }
 
-    tree_t                     m_tree       {};
-    std::array<tree_node_t, N> m_nodes_pool {};
+    tree_t                             m_tree             {};
+    std::array<tree_node_t, N>         m_nodes_pool       {};
 
-    mapped_type                m_not_found  {};
+    std::bitset<N>                     m_nodes_used_flags {};
+
+    mapped_type                        m_not_found        {};
 };
 
 template
@@ -403,7 +379,7 @@ constexpr inline const map
                            , V
                            , sizeof...(Args)
                            , Compare
-                       > create_map(/*V&& def, */Args&&... args)
+                       > create_map(Args&&... args)                     noexcept
 {
     static_assert(std::is_nothrow_default_constructible<V>::value,
         "Value type should be nothrow default constructible.");
@@ -414,7 +390,7 @@ constexpr inline const map
                , V
                , sizeof...(Args)
                , Compare
-           >(/*std::forward<V>(def), */std::forward<Args>(args)...);
+           >(std::forward<Args>(args)...);
 }
 
 } // namespace ecl

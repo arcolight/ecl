@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <string>
+#include <ostream>
 
 #include <ecl/fixed_size_map.hpp>
 
@@ -11,6 +12,20 @@ enum class E
     , e3
     , e4
 };
+
+std::ostream& operator<<(std::ostream& s, E e)
+{
+    switch(e)
+    {
+        case E::e1: s << "E::e1"; break;
+        case E::e2: s << "E::e2"; break;
+        case E::e3: s << "E::e3"; break;
+        case E::e4: s << "E::e4"; break;
+        default:                  break;
+    }
+
+    return s;
+}
 
 using key_type   = E;
 using value_type = std::uint32_t;
@@ -29,7 +44,7 @@ int main(int, char**, char**)
 {
     map_t m1;
 
-    // m1[E::e1] = "1";
+    // m1[E::e1] = 1;
 
     std::cout << "map elements count: " << m.size() << std::endl;
 
