@@ -395,6 +395,16 @@ struct node_base
         right  = nullptr;
     }
 
+    inline void init()                                                  noexcept
+    {
+        detach();
+
+        val = value_type();
+        key = key_type();
+
+        _s = detail::conditional_storage<Storage>();
+    }
+
     inline erase_return erase_internal()                                noexcept
     {
         pointer this_p = static_cast<pointer>(this);
@@ -528,6 +538,13 @@ public:
     using key_compare   = typename node_t::key_compare;
 
     using erase_return  = typename node_t::erase_return;
+
+    binary_tree_base()
+    {
+        m_header.parent = &m_header;
+        m_header.left   = &m_header;
+        m_header.right  = &m_header;
+    }
 
 // Iterators start
 protected:
@@ -968,18 +985,22 @@ public:
 
     erase_return erase(const key_type& k)                               noexcept
     {
-        return erase_internal(k);
+        auto p = erase_internal(k);
+
+        if(nullptr != p.first)
+        {
+            p.first->detach();
+        }
+
+        return p;
     }
 
 protected:
-
     insert_return insert_internal(pointer n)                            noexcept
     {
-        n->parent = nullptr;
-        n->left   = nullptr;
-        n->right  = nullptr;
+        n->detach();
 
-        if( ! m_header.have_parent())
+        if(m_header.parent == &m_header)
         {
             m_header.parent = n;
             m_header.left   = n;

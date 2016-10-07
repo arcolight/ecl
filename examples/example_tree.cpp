@@ -612,6 +612,11 @@ void test_tree(const std::string prefix, typename T::node_t (& nodes)[N], std::s
     find_in_tree(prefix, static_tree, 0, static_cast<key_type>(N) + 1);
     erase_tree_static(prefix, static_tree, 0, static_cast<key_type>(N) + 1);
 
+    fill_tree_static(prefix, static_tree, nodes);
+    dump_tree(prefix, static_tree);
+    find_in_tree(prefix, static_tree, 0, static_cast<key_type>(N) + 1);
+    erase_tree_static(prefix, static_tree, 0, static_cast<key_type>(N) + 1);
+
     T dynamic_tree;
     fill_tree_dynamic(prefix, dynamic_tree, 0, dynamic_nodes_count, dynamic_nodes_count);
     dump_tree(prefix, dynamic_tree);
