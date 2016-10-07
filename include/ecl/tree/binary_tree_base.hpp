@@ -144,7 +144,7 @@ struct node_base
 
     inline pointer most_left()                                          noexcept
     {
-        pointer result = static_cast<pointer>(this);
+        pointer result = pointer_to_this();
         while(result->have_left())
         {
             result = result->left;
@@ -154,7 +154,7 @@ struct node_base
 
     inline const_pointer most_left()                              const noexcept
     {
-        const_pointer result = static_cast<const_pointer>(this);
+        const_pointer result = const_pointer_to_this();
         while(result->have_left())
         {
             result = result->left;
@@ -164,7 +164,7 @@ struct node_base
 
     inline pointer most_right()                                         noexcept
     {
-        pointer result = static_cast<pointer>(this);
+        pointer result = pointer_to_this();
         while(result->have_right())
         {
             result = result->right;
@@ -174,7 +174,7 @@ struct node_base
 
     inline const_pointer most_right()                             const noexcept
     {
-        const_pointer result = static_cast<const_pointer>(this);
+        const_pointer result = const_pointer_to_this();
         while(result->have_right())
         {
             result = result->right;
@@ -266,7 +266,7 @@ struct node_base
 
     inline bool is_left()                                         const noexcept
     {
-        const_pointer t = static_cast<const_pointer>(this);
+        const_pointer t = const_pointer_to_this();
 
         if(nullptr == t->parent)
         {
@@ -278,7 +278,7 @@ struct node_base
 
     inline bool is_right()                                        const noexcept
     {
-        const_pointer t = static_cast<const_pointer>(this);
+        const_pointer t = const_pointer_to_this();
 
         if(nullptr == t->parent)
         {
@@ -329,14 +329,24 @@ struct node_base
         return !have_parent() && have_no_child();
     }
 
-    inline pointer insert(pointer n)                                    noexcept
+    inline pointer pointer_to_this()                                    noexcept
+    {
+        return static_cast<pointer>(this);
+    }
+
+    inline const_pointer const_pointer_to_this()                  const noexcept
+    {
+        return static_cast<const_pointer>(this);
+    }
+
+    inline pointer insert(pointer n, bool allow_update = true)          noexcept
     {
         if(key_compare()(n->key, key))
         {
             if( ! have_left())
             {
                 left = n;
-                n->parent = static_cast<pointer>(this);
+                n->parent = pointer_to_this();
                 return left;
             }
             return left->insert(n);
@@ -346,19 +356,27 @@ struct node_base
             if( ! have_right())
             {
                 right = n;
-                n->parent = static_cast<pointer>(this);
+                n->parent = pointer_to_this();
                 return right;
             }
             return right->insert(n);
         }
 
-        val = n->val;
+        if(allow_update)
+        {
+            val = n->val;
+        }
 
-        return static_cast<pointer>(this);
+        return pointer_to_this();
     }
 
     inline void link(pointer p)                                         noexcept
     {
+        if(nullptr == p)
+        {
+            return;
+        }
+
         if(key_compare()(p->key, key))
         {
             left = p;
@@ -367,18 +385,168 @@ struct node_base
         {
             right = p;
         }
-        p->parent = static_cast<pointer>(this);
+        p->parent = pointer_to_this();
+    }
+
+    inline pointer& link_from_parent()                            const noexcept
+    {
+        return is_left() ? parent->left : parent->right;
+    }
+
+    enum class adjacency_type
+    {
+          none
+        , left_child
+        , right_child
+        , parent
+    };
+
+    inline adjacency_type adjacency(pointer p)                    const noexcept
+    {
+        if(left == p)
+        {
+            return adjacency_type::left_child;
+        }
+
+        if(right == p)
+        {
+            return adjacency_type::right_child;
+        }
+
+        if(p->left  == const_pointer_to_this() ||
+           p->right == const_pointer_to_this())
+        {
+            return adjacency_type::parent;
+        }
+
+        return adjacency_type::none;
     }
 
     inline void replace_from(pointer suc)                               noexcept
     {
-        key = suc->key;
-        val = suc->val;
+        switch(adjacency(suc))
+        {
+            case adjacency_type::left_child:
+                if(have_parent())
+                {
+                    link_from_parent() = suc;
+                }
+
+                suc->parent = parent;
+                parent      = suc;
+                left        = suc->left;
+                suc->left   = pointer_to_this();
+
+                if(have_right() && suc->have_right())
+                {
+                    right->parent      = suc;
+                    suc->right->parent = pointer_to_this();
+                    std::swap(right, suc->right);
+                }
+                else if(have_right())
+                {
+                    suc->right    = right;
+                    right->parent = suc;
+                }
+                else if(suc->have_right())
+                {
+                    right              = suc->right;
+                    suc->right->parent = pointer_to_this();
+                }
+            break;
+            case adjacency_type::right_child:
+                if(have_parent())
+                {
+                    link_from_parent() = suc;
+                }
+
+                suc->parent = parent;
+                parent      = suc;
+                right       = suc->right;
+                suc->right  = pointer_to_this();
+
+                if(have_left() && suc->have_left())
+                {
+                    left->parent      = suc;
+                    suc->left->parent = pointer_to_this();
+                    std::swap(left, suc->left);
+                }
+                else if(have_left())
+                {
+                    suc->left    = left;
+                    left->parent = suc;
+                }
+                else if(suc->have_left())
+                {
+                    left              = suc->left;
+                    suc->left->parent = pointer_to_this();
+                }
+            break;
+            case adjacency_type::parent:
+                suc->replace_from(pointer_to_this());
+            break;
+            case adjacency_type::none:
+                if(have_parent() && suc->have_parent())
+                {
+                    std::swap(link_from_parent(), suc->link_from_parent());
+                }
+                else if(have_parent())
+                {
+                    link_from_parent() = suc;
+                }
+                else if(suc->have_parent())
+                {
+                    suc->link_from_parent() = pointer_to_this();
+                }
+
+                if(have_left() && suc->have_left())
+                {
+                    std::swap(left->parent, suc->left->parent);
+                }
+                else if(have_left())
+                {
+                    left->parent = suc;
+                }
+                else if(suc->have_left())
+                {
+                    suc->left->parent = pointer_to_this();
+                }
+
+                if(have_right() && suc->have_right())
+                {
+                    std::swap(right->parent, suc->right->parent);
+                }
+                else if(have_right())
+                {
+                    right->parent = suc;
+                }
+                else if(suc->have_right())
+                {
+                    suc->right->parent = pointer_to_this();
+                }
+            break;
+        }
+
+//        pointer parent_suc = suc->parent;
+//        pointer left_suc   = suc->left;
+//        pointer right_suc  = suc->right;
+
+//        if(have_parent()) { parent->link(suc); }
+//        suc->link(left);
+//        suc->link(right);
+//        if(nullptr == left)  { suc->left  = nullptr; }
+//        if(nullptr == right) { suc->right = nullptr; }
+
+//        if(nullptr != parent_suc) { parent_suc->link(pointer_to_this()); }
+//        link(left_suc);
+//        link(right_suc);
+//        if(nullptr == left_suc)  { left  = nullptr; }
+//        if(nullptr == right_suc) { right = nullptr; }
     }
 
     inline pointer successor()                                          noexcept
     {
-        pointer suc = static_cast<pointer>(this);
+        pointer suc = pointer_to_this();
 
         if(have_right())
         {
@@ -407,7 +575,7 @@ struct node_base
 
     inline erase_return erase_internal()                                noexcept
     {
-        pointer this_p = static_cast<pointer>(this);
+        pointer this_p = pointer_to_this();
 
         if(have_no_child())
         {
@@ -457,8 +625,11 @@ struct node_base
     inline erase_return erase()                                         noexcept
     {
         pointer s = successor();
-        replace_from(s);
-        return s->erase_internal();
+        if(pointer_to_this() != s)
+        {
+            replace_from(s);
+        }
+        return erase_internal();
     }
 
     inline pointer find(const key_type& k)                              noexcept
@@ -480,7 +651,7 @@ struct node_base
             return right->find(k);
         }
 
-        return static_cast<pointer>(this);
+        return pointer_to_this();
     }
 
     inline const_pointer find(const key_type& k)                  const noexcept
@@ -502,7 +673,7 @@ struct node_base
             return right->find(k);
         }
 
-        return static_cast<const_pointer>(this);
+        return const_pointer_to_this();
     }
 
     pointer                              left   { nullptr };
@@ -908,9 +1079,9 @@ public:
 
 // Iterators end
 
-    iterator insert(pointer n)
+    iterator insert(pointer n, bool allow_update = true)
     {
-        return insert_internal(n).first;
+        return insert_internal(n, allow_update).first;
     }
 
     std::size_t count()                                           const noexcept
@@ -996,7 +1167,7 @@ public:
     }
 
 protected:
-    insert_return insert_internal(pointer n)                            noexcept
+    insert_return insert_internal(pointer n, bool allow_update)         noexcept
     {
         n->detach();
 
@@ -1015,7 +1186,7 @@ protected:
             };
         }
 
-        pointer inserted_n = m_header.parent->insert(n);
+        pointer inserted_n = m_header.parent->insert(n, allow_update);
         // new node
         if(inserted_n == n)
         {

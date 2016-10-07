@@ -42,7 +42,7 @@ std::ostream& operator<<(std::ostream& s, E e)
 using key_type   = E;
 using value_type = std::uint32_t;
 
-using map_t      = ecl::map<key_type, value_type, 16>;
+using map_t      = ecl::map<key_type, value_type, 8>;
 
  auto m0 = ecl::create_map<key_type, value_type>
  (
@@ -53,8 +53,49 @@ using map_t      = ecl::map<key_type, value_type, 16>;
  );
 
 template<typename T>
+void fill_map_ilist(std::string prefix, T& m)
+{
+    std::cout << ">>> Insert to map" << std::endl;
+    m.insert(
+    {
+          { E::e1  , 1  }
+        , { E::e2  , 3  }
+        , { E::e3  , 5  }
+        , { E::e4  , 7  }
+        , { E::e5  , 9  }
+        , { E::e6  , 11 }
+        , { E::e7  , 13 }
+        , { E::e8  , 15 }
+        , { E::e9  , 17 }
+        , { E::e10 , 19 }
+    });
+
+    dump_map(prefix, m);
+}
+
+template<typename T>
+void fill_map_operator(std::string prefix, T& m)
+{
+    std::cout << ">>> Assign via operator[]" << std::endl;
+
+    m[E::e1]  = 5;
+    m[E::e2]  = 10;
+    m[E::e3]  = 15;
+    m[E::e4]  = 20;
+    m[E::e5]  = 25;
+    m[E::e6]  = 30;
+    m[E::e7]  = 35;
+    m[E::e8]  = 40;
+    m[E::e9]  = 45;
+    m[E::e10] = 50;
+
+    dump_map(prefix, m);
+}
+
+template<typename T>
 void dump_map(std::string prefix, T& m)
 {
+    std::cout << ">>> Dump map" << std::endl;
     std::cout << prefix << " map elements count: " << m.size() << std::endl;
 
     std::cout << prefix << " range-for interation over map: ";
@@ -64,16 +105,77 @@ void dump_map(std::string prefix, T& m)
     }
     std::cout << std::endl;
 
-    std::cout << prefix << "[E::e1]:  " << m[E::e1]  << std::endl;
-    std::cout << prefix << "[E::e2]:  " << m[E::e2]  << std::endl;
-    std::cout << prefix << "[E::e3]:  " << m[E::e3]  << std::endl;
-    std::cout << prefix << "[E::e4]:  " << m[E::e4]  << std::endl;
-    std::cout << prefix << "[E::e5]:  " << m[E::e5]  << std::endl;
-    std::cout << prefix << "[E::e6]:  " << m[E::e6]  << std::endl;
-    std::cout << prefix << "[E::e7]:  " << m[E::e7]  << std::endl;
-    std::cout << prefix << "[E::e8]:  " << m[E::e8]  << std::endl;
-    std::cout << prefix << "[E::e9]:  " << m[E::e9]  << std::endl;
-    std::cout << prefix << "[E::e10]: " << m[E::e10] << std::endl;
+    std::cout << prefix << ".at(E::e1):  " << m.at(E::e1)  << std::endl;
+    std::cout << prefix << ".at(E::e2):  " << m.at(E::e2)  << std::endl;
+    std::cout << prefix << ".at(E::e3):  " << m.at(E::e3)  << std::endl;
+    std::cout << prefix << ".at(E::e4):  " << m.at(E::e4)  << std::endl;
+    std::cout << prefix << ".at(E::e5):  " << m.at(E::e5)  << std::endl;
+    std::cout << prefix << ".at(E::e6):  " << m.at(E::e6)  << std::endl;
+    std::cout << prefix << ".at(E::e7):  " << m.at(E::e7)  << std::endl;
+    std::cout << prefix << ".at(E::e8):  " << m.at(E::e8)  << std::endl;
+    std::cout << prefix << ".at(E::e9):  " << m.at(E::e9)  << std::endl;
+    std::cout << prefix << ".at(E::e10): " << m.at(E::e10) << std::endl;
+}
+
+template<typename T>
+void erase_map_by_key(std::string prefix, T& m)
+{
+    std::cout << ">>> Erase map by keys" << std::endl;
+    std::cout << prefix << ".erase(E::e1) : " << m.erase(E::e1)  << std::endl;
+    std::cout << prefix << ".erase(E::e2) : " << m.erase(E::e2)  << std::endl;
+    std::cout << prefix << ".erase(E::e3) : " << m.erase(E::e3)  << std::endl;
+    std::cout << prefix << ".erase(E::e4) : " << m.erase(E::e4)  << std::endl;
+    std::cout << prefix << ".erase(E::e5) : " << m.erase(E::e5)  << std::endl;
+    std::cout << prefix << ".erase(E::e6) : " << m.erase(E::e6)  << std::endl;
+    std::cout << prefix << ".erase(E::e7) : " << m.erase(E::e7)  << std::endl;
+    std::cout << prefix << ".erase(E::e8) : " << m.erase(E::e8)  << std::endl;
+    std::cout << prefix << ".erase(E::e9) : " << m.erase(E::e9)  << std::endl;
+    std::cout << prefix << ".erase(E::e10): " << m.erase(E::e10) << std::endl;
+
+    dump_map(prefix, m);
+}
+
+template<typename T>
+void erase_map_by_irange(std::string prefix, T& m)
+{
+    std::cout << ">>> Erase map by iterator range" << std::endl;
+
+    m.erase(m.begin(), m.end());
+
+    dump_map(prefix, m);
+}
+
+template<typename T>
+void erase_map_by_iterator(std::string prefix, T& m)
+{
+    std::cout << ">>> Erase map by iterator" << std::endl;
+    typename T::const_iterator it = m.begin();
+//                   std::cout << it->first << ":" << it->second << std::endl;
+    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
+    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
+    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
+    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
+    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
+    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
+    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
+    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
+    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
+    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
+
+//    it = m.begin();
+//                      std::cout << it->first << ":" << it->second << std::endl;
+//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+
+    dump_map(prefix, m);
 }
 
 int main(int, char**, char**)
@@ -91,16 +193,14 @@ int main(int, char**, char**)
         , { E::e9  , 18 }
         , { E::e10 , 20 }
     };
+    dump_map("m1", m1);
+    erase_map_by_key("m1", m1);
 
-    map_t m2;
+    fill_map_ilist("m1", m1);
+    erase_map_by_irange("m1", m1);
 
-    m2[E::e1] = 1;
-
-    dump_map("[m1]", m1);
-    auto i = m1.begin();
-    std::advance(i, 0);
-    m1.erase(i, m1.end());
-    dump_map("[m1]", m1);
+    fill_map_operator("m1", m1);
+    erase_map_by_iterator("m1", m1);
 
     return 0;
 }

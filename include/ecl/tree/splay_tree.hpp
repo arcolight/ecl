@@ -70,9 +70,9 @@ public:
     using base::crbegin;
     using base::crend;
 
-    iterator insert(pointer n)                                          noexcept
+    iterator insert(pointer n, bool allow_update = true)                noexcept
     {
-        auto result        = this->base::insert_internal(n);
+        auto result        = this->base::insert_internal(n, allow_update);
         pointer inserted_n = result.second;
         iterator it        = result.first;
 

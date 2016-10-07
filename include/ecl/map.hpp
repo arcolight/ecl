@@ -91,12 +91,26 @@ public:
 
     mapped_type& at(const key_type& key)                                noexcept
     {
-        return *search(key);
+        auto it = search(key);
+
+        if(end() == it)
+        {
+            return not_found();
+        }
+
+        return it->second;
     }
 
     const mapped_type& at(const key_type& key)                    const noexcept
     {
-        return *search(key);
+        auto it = search(key);
+
+        if(end() == it)
+        {
+            return not_found();
+        }
+
+        return it->second;
     }
 
     bool empty()                                                  const noexcept
@@ -121,26 +135,7 @@ public:
 
     std::pair<iterator, bool> insert(const value_type& value)           noexcept
     {
-        tree_node_pointer_t ptr = get_free_node();
-
-        if(nullptr == ptr)
-        {
-            return { end(), false };
-        }
-
-        ptr->key = value.first;
-        ptr->val = value.second;
-
-        iterator i = m_tree.insert(ptr);
-
-        if(i != ptr)
-        {
-            return { i, false };
-        }
-
-        mark_as_used(*ptr);
-
-        return { i, true };
+        return insert_internal(value, false);
     }
 
     template<class P>
@@ -154,8 +149,7 @@ public:
     {
         while(first != last)
         {
-            insert(first);
-            ++first;
+            insert(first++);
         }
     }
 
@@ -169,21 +163,8 @@ public:
 
     iterator erase( const_iterator pos )                                noexcept
     {
-//        std::cout << "<<<<<<<<<<<" << std::endl;
-//        for(auto& e : m_tree)
-//        {
-//            std::cout << e.first << ":"<< e.second << " ";
-//        }
-//        std::cout << std::endl;
-//        for(auto& it = pos; it != end(); ++it)
-//        {
-//            std::cout << it->first << ":"<< it->second << " ";
-//        }
-//        std::cout << std::endl;
-//        std::cout << ">>>>>>>>>>>" << std::endl;
-
-        const_iterator next = pos;
-        ++next;
+        iterator next = pos;
+        std::advance(next, 1);
 
         auto ret = m_tree.erase(pos->first);
 
@@ -192,22 +173,16 @@ public:
             return end();
         }
 
-        mark_as_unused(*ret.first);
+        mark_as_unused(*(ret.first));
 
         return next;
     }
 
     iterator erase( const_iterator first, const_iterator last )         noexcept
     {
-        std::cout << "erasing from " << (*first).first << " : " << (*first).second << " to " << (*last).first << " : " << (*last).second << std::endl;
         while(first != last)
         {
-            std::cout << "erasing " << (*first).first << " : " << (*first).second << std::endl;
-            const_iterator next = first;
-            std::advance(next, 1);
-            erase(first);
-            first = next;
-            std::cout << "first = " << (*first).first << " : " << (*first).second << std::endl;
+            erase(first++);
         }
 
         return first;
@@ -273,11 +248,11 @@ public:
 
         if(i == end())
         {
-            iterator it = insert({ k, mapped_type() }).first;
-            return (*it).second;
+            iterator it = insert_internal({ k, mapped_type() }, true).first;
+            return it->second;
         }
 
-        return (*i).second;
+        return i->second;
     }
 
     const mapped_type& operator[](key_type&& k)                   const noexcept
@@ -353,6 +328,31 @@ public:
     }
 
 private:
+    std::pair<iterator, bool> insert_internal(const value_type& value,
+                                              bool allow_update)        noexcept
+    {
+        tree_node_pointer_t ptr = get_free_node();
+
+        if(nullptr == ptr)
+        {
+            return { end(), false };
+        }
+
+        ptr->key = value.first;
+        ptr->val = value.second;
+
+        iterator i = m_tree.insert(ptr, allow_update);
+
+        if(i != ptr)
+        {
+            return { i, false };
+        }
+
+        mark_as_used(*ptr);
+
+        return { i, true };
+    }
+
     void init()                                                         noexcept
     {
         for(auto& n : m_nodes_pool)
@@ -384,7 +384,6 @@ private:
 
     void mark_as_unused(tree_node_reference_t n)                        noexcept
     {
-        n.detach();
         n._s.x = false;
     }
 
@@ -421,10 +420,10 @@ private:
         return m_tree.find(k);
     }
 
-    tree_t                             m_tree             {};
-    std::array<tree_node_t, N>         m_nodes_pool       {};
+    tree_t                     m_tree       {};
+    std::array<tree_node_t, N> m_nodes_pool {};
 
-    mapped_type                        m_not_found        {};
+    mapped_type                m_not_found  {};
 };
 
 template
