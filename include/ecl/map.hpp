@@ -164,7 +164,7 @@ public:
     iterator erase( const_iterator pos )                                noexcept
     {
         iterator next = pos;
-        std::advance(next, 1);
+        ++next;
 
         auto ret = m_tree.erase(pos->first);
 
@@ -174,6 +174,11 @@ public:
         }
 
         mark_as_unused(*(ret.first));
+
+        if(nullptr != ret.second)
+        {
+            return ++pos;
+        }
 
         return next;
     }

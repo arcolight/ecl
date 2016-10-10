@@ -372,11 +372,6 @@ struct node_base
 
     inline void link(pointer p)                                         noexcept
     {
-        if(nullptr == p)
-        {
-            return;
-        }
-
         if(key_compare()(p->key, key))
         {
             left = p;
@@ -388,160 +383,10 @@ struct node_base
         p->parent = pointer_to_this();
     }
 
-    inline pointer& link_from_parent()                            const noexcept
-    {
-        return is_left() ? parent->left : parent->right;
-    }
-
-    enum class adjacency_type
-    {
-          none
-        , left_child
-        , right_child
-        , parent
-    };
-
-    inline adjacency_type adjacency(pointer p)                    const noexcept
-    {
-        if(left == p)
-        {
-            return adjacency_type::left_child;
-        }
-
-        if(right == p)
-        {
-            return adjacency_type::right_child;
-        }
-
-        if(p->left  == const_pointer_to_this() ||
-           p->right == const_pointer_to_this())
-        {
-            return adjacency_type::parent;
-        }
-
-        return adjacency_type::none;
-    }
-
     inline void replace_from(pointer suc)                               noexcept
     {
-        switch(adjacency(suc))
-        {
-            case adjacency_type::left_child:
-                if(have_parent())
-                {
-                    link_from_parent() = suc;
-                }
-
-                suc->parent = parent;
-                parent      = suc;
-                left        = suc->left;
-                suc->left   = pointer_to_this();
-
-                if(have_right() && suc->have_right())
-                {
-                    right->parent      = suc;
-                    suc->right->parent = pointer_to_this();
-                    std::swap(right, suc->right);
-                }
-                else if(have_right())
-                {
-                    suc->right    = right;
-                    right->parent = suc;
-                }
-                else if(suc->have_right())
-                {
-                    right              = suc->right;
-                    suc->right->parent = pointer_to_this();
-                }
-            break;
-            case adjacency_type::right_child:
-                if(have_parent())
-                {
-                    link_from_parent() = suc;
-                }
-
-                suc->parent = parent;
-                parent      = suc;
-                right       = suc->right;
-                suc->right  = pointer_to_this();
-
-                if(have_left() && suc->have_left())
-                {
-                    left->parent      = suc;
-                    suc->left->parent = pointer_to_this();
-                    std::swap(left, suc->left);
-                }
-                else if(have_left())
-                {
-                    suc->left    = left;
-                    left->parent = suc;
-                }
-                else if(suc->have_left())
-                {
-                    left              = suc->left;
-                    suc->left->parent = pointer_to_this();
-                }
-            break;
-            case adjacency_type::parent:
-                suc->replace_from(pointer_to_this());
-            break;
-            case adjacency_type::none:
-                if(have_parent() && suc->have_parent())
-                {
-                    std::swap(link_from_parent(), suc->link_from_parent());
-                }
-                else if(have_parent())
-                {
-                    link_from_parent() = suc;
-                }
-                else if(suc->have_parent())
-                {
-                    suc->link_from_parent() = pointer_to_this();
-                }
-
-                if(have_left() && suc->have_left())
-                {
-                    std::swap(left->parent, suc->left->parent);
-                }
-                else if(have_left())
-                {
-                    left->parent = suc;
-                }
-                else if(suc->have_left())
-                {
-                    suc->left->parent = pointer_to_this();
-                }
-
-                if(have_right() && suc->have_right())
-                {
-                    std::swap(right->parent, suc->right->parent);
-                }
-                else if(have_right())
-                {
-                    right->parent = suc;
-                }
-                else if(suc->have_right())
-                {
-                    suc->right->parent = pointer_to_this();
-                }
-            break;
-        }
-
-//        pointer parent_suc = suc->parent;
-//        pointer left_suc   = suc->left;
-//        pointer right_suc  = suc->right;
-
-//        if(have_parent()) { parent->link(suc); }
-//        suc->link(left);
-//        suc->link(right);
-//        if(nullptr == left)  { suc->left  = nullptr; }
-//        if(nullptr == right) { suc->right = nullptr; }
-
-//        if(nullptr != parent_suc) { parent_suc->link(pointer_to_this()); }
-//        link(left_suc);
-//        link(right_suc);
-//        if(nullptr == left_suc)  { left  = nullptr; }
-//        if(nullptr == right_suc) { right = nullptr; }
+        key = suc->key;
+        val = suc->val;
     }
 
     inline pointer successor()                                          noexcept
@@ -629,7 +474,7 @@ struct node_base
         {
             replace_from(s);
         }
-        return erase_internal();
+        return s->erase_internal();
     }
 
     inline pointer find(const key_type& k)                              noexcept

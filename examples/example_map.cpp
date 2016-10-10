@@ -151,29 +151,29 @@ void erase_map_by_iterator(std::string prefix, T& m)
     std::cout << ">>> Erase map by iterator" << std::endl;
     typename T::const_iterator it = m.begin();
 //                   std::cout << it->first << ":" << it->second << std::endl;
-    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
-    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
-    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
-    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
-    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
-    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
-    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
-    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
-    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
-    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
+//    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
+//    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
+//    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
+//    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
+//    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
+//    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
+//    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
+//    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
+//    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
+//    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
 
-//    it = m.begin();
-//                      std::cout << it->first << ":" << it->second << std::endl;
-//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
-//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
-//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
-//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
-//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
-//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
-//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
-//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
-//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
-//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+    it = m.begin();
+                      std::cout << it->first << ":" << it->second << std::endl;
+    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
 
     dump_map(prefix, m);
 }
@@ -198,6 +198,7 @@ int main(int, char**, char**)
 
     fill_map_ilist("m1", m1);
     erase_map_by_irange("m1", m1);
+//    map_t m1;
 
     fill_map_operator("m1", m1);
     erase_map_by_iterator("m1", m1);
