@@ -25,6 +25,11 @@ struct splay_node : public node_base<K, V, Compare, ecl::tree::splay_node, Stora
     using base = node_base<K, V, Compare, ecl::tree::splay_node, Storage>;
 
     using node_base<K, V, Compare, ecl::tree::splay_node, Storage>::node_base;
+    using typename base::pointer;
+
+    void replace_from(pointer)                                          noexcept
+    {
+    }
 };
 
 template

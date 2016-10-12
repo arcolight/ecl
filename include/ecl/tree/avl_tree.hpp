@@ -27,10 +27,16 @@ struct avl_node : public node_base<K, V, Compare, ecl::tree::avl_node, Storage>
     using base = node_base<K, V, Compare, ecl::tree::avl_node, Storage>;
 
     using node_base<K, V, Compare, ecl::tree::avl_node, Storage>::node_base;
+    using typename base::pointer;
 
     using height_t = std::int8_t;
 
     height_t height { 1 };
+
+    void replace_from(pointer s)                                        noexcept
+    {
+        fix_height(this);
+    }
 };
 
 template

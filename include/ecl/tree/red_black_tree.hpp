@@ -48,6 +48,11 @@ struct red_black_node : public node_base
     using typename base::pointer;
 
     node_color color { node_color::RED };
+
+    void replace_from(pointer s)                                        noexcept
+    {
+        mark_as(this, s);
+    }
 };
 
 template

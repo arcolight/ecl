@@ -94,20 +94,20 @@ struct node_base
     {}
 
     constexpr node_base(const node_base& other)                         noexcept
-        : left   (other.left)
-        , right  (other.right)
-        , parent (other.parent)
-        , key    (other.key)
-        , val    (other.val)
+        : left   ( other.left   )
+        , right  ( other.right  )
+        , parent ( other.parent )
+        , key    ( other.key    )
+        , val    ( other.val    )
     {}
 
     node_base(node_base&& other)
     {
-        std::swap(left,   other.left  );
-        std::swap(right,  other.right );
-        std::swap(parent, other.parent);
-        std::swap(key,    other.key   );
-        std::swap(val,    other.val   );
+        std::swap ( left   , other.left   );
+        std::swap ( right  , other.right  );
+        std::swap ( parent , other.parent );
+        std::swap ( key    , other.key    );
+        std::swap ( val    , other.val    );
     }
 
     node_base& operator=(const node_base& other)                        noexcept
@@ -121,13 +121,13 @@ struct node_base
         return *this;
     }
 
-    node_base& operator=(const node_base&& other)
+    node_base& operator=(node_base&& other)
     {
-        std::swap(left,   other.left  );
-        std::swap(right,  other.right );
-        std::swap(parent, other.parent);
-        std::swap(key,    other.key   );
-        std::swap(val,    other.val   );
+        std::swap ( left   , other.left   );
+        std::swap ( right  , other.right  );
+        std::swap ( parent , other.parent );
+        std::swap ( key    , other.key    );
+        std::swap ( val    , other.val    );
 
         return *this;
     }
@@ -383,12 +383,6 @@ struct node_base
         p->parent = pointer_to_this();
     }
 
-    inline void replace_from(pointer suc)                               noexcept
-    {
-        key = suc->key;
-        val = suc->val;
-    }
-
     inline pointer successor()                                          noexcept
     {
         pointer suc = pointer_to_this();
@@ -467,14 +461,54 @@ struct node_base
         }
     }
 
+    inline void replace_with(pointer n)                                 noexcept
+    {
+        if(have_parent())
+        {
+            parent->link(n);
+        }
+        else
+        {
+            n->parent = nullptr;
+        }
+
+        if(have_left())
+        {
+            n->link(left);
+        }
+        else
+        {
+            n->left = nullptr;
+        }
+
+        if(have_right())
+        {
+            n->link(right);
+        }
+        else
+        {
+            n->right = nullptr;
+        }
+    }
+
+    inline void replace_from(pointer)                                   noexcept
+    {
+    }
+
     inline erase_return erase()                                         noexcept
     {
         pointer s = successor();
+
+        s->erase_internal();
+
         if(pointer_to_this() != s)
         {
-            replace_from(s);
+            s->replace_from(pointer_to_this());
+            replace_with(s);
+            return { pointer_to_this(), s };
         }
-        return s->erase_internal();
+
+        return { pointer_to_this(), left };
     }
 
     inline pointer find(const key_type& k)                              noexcept
@@ -826,11 +860,6 @@ public:
                             const_cast<binary_tree_base::pointer>(m_e));
         }
 
-        operator binary_tree_base::pointer()                      const noexcept
-        {
-            return m_n;
-        }
-
         operator binary_tree_base::const_pointer()                const noexcept
         {
             return m_n;
@@ -1056,7 +1085,7 @@ protected:
         pointer removed   = ret.first;
         pointer successor = ret.second;
 
-        if(removed == pointer(m_header.parent) && (nullptr == successor))
+        if(removed == pointer(m_header.parent) && (1 == count()))
         {
             m_size = 0;
             m_header.parent = pointer(&m_header);
@@ -1075,6 +1104,7 @@ protected:
 
         if(m_header.left == removed)
         {
+//            m_header.left = m_header.parent->most_left();
             if(nullptr != successor)
             {
                 m_header.left = successor->most_left();
@@ -1087,6 +1117,7 @@ protected:
 
         if(m_header.right == removed)
         {
+//            m_header.right = m_header.parent->most_right();
             if(nullptr != successor)
             {
                 m_header.right = successor->most_right();
