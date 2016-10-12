@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include <ecl/tree/simple_binary_tree.hpp>
 #include <ecl/tree/red_black_tree.hpp>
 #include <ecl/tree/avl_tree.hpp>

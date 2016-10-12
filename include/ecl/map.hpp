@@ -174,8 +174,7 @@ public:
             return end();
         }
 
-        iterator next = pos;
-        ++next;
+        iterator next = std::next(pos);
 
         auto ret = m_tree.erase(pos->first);
 

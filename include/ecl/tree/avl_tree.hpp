@@ -35,6 +35,7 @@ struct avl_node : public node_base<K, V, Compare, ecl::tree::avl_node, Storage>
 
     void replace_from(pointer s)                                        noexcept
     {
+        height = s->height;
         fix_height(this);
     }
 };
@@ -201,14 +202,35 @@ public:
 
         erase_return ret  = this->base::erase_internal(to_erase);
         pointer removed   = ret.first;
+        pointer successor = ret.second;
+
+//        if(to_erase != removed)
+//        {
+//            balance(to_erase);
+//            balance(removed->parent);
+//        }
+//        else
+//        {
+//            balance(to_erase->parent);
+//        }
 
         if(to_erase != removed)
         {
-            balance(to_erase);
-            balance(removed->parent);
+//            std::cout << ">>> balance: " << successor->key << std::endl;
+            balance(successor);
+//            std::cout << ">>> balance: " << successor->parent->key << std::endl;
+            balance(successor->parent);
         }
         else
         {
+            if(to_erase->parent != nullptr)
+            {
+//                std::cout << ">>> balance: " << to_erase->parent->key << std::endl;
+            }
+            else
+            {
+//                std::cout << ">>> balance: nullptr" << std::endl;
+            }
             balance(to_erase->parent);
         }
 

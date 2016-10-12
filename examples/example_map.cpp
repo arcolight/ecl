@@ -1,9 +1,9 @@
+#include <ecl/map.hpp>
+
 #include <iostream>
 #include <cstdlib>
 #include <string>
 #include <ostream>
-
-#include <ecl/map.hpp>
 
 enum class E
 {
@@ -181,25 +181,25 @@ void erase_map_by_iterator(std::string prefix, T& m)
 
 int main(int, char**, char**)
 {
-//    map_t m1
-//    {
-//          { E::e1  , 2  }
-//        , { E::e2  , 4  }
-//        , { E::e3  , 6  }
-//        , { E::e4  , 8  }
-//        , { E::e5  , 10 }
-//        , { E::e6  , 12 }
-//        , { E::e7  , 14 }
-//        , { E::e8  , 16 }
-//        , { E::e9  , 18 }
-//        , { E::e10 , 20 }
-//    };
-//    dump_map("m1", m1);
-//    erase_map_by_key("m1", m1);
+    map_t m1
+    {
+          { E::e1  , 2  }
+        , { E::e2  , 4  }
+        , { E::e3  , 6  }
+        , { E::e4  , 8  }
+        , { E::e5  , 10 }
+        , { E::e6  , 12 }
+        , { E::e7  , 14 }
+        , { E::e8  , 16 }
+        , { E::e9  , 18 }
+        , { E::e10 , 20 }
+    };
+    dump_map("m1", m1);
+    erase_map_by_key("m1", m1);
 
-//    fill_map_ilist("m1", m1);
-//    erase_map_by_irange("m1", m1);
-    map_t m1;
+    fill_map_ilist("m1", m1);
+    erase_map_by_irange("m1", m1);
+//    map_t m1;
 
     fill_map_operator("m1", m1);
     erase_map_by_iterator("m1", m1);
