@@ -14,23 +14,29 @@ namespace ecl
 template<typename K, typename V, std::size_t N, typename Compare = std::less<K>>
 class map
 {
-    using tree_t                  = tree::red_black_tree
-                                    <
-                                          K
-                                        , V
-                                        , std::less
-                                        , bool
-                                    >;
-    using tree_node_t             = typename tree_t::node_t;
-    using tree_node_pointer_t     = typename std::add_pointer
-                                             <
-                                                 tree_node_t
-                                             >::type;
-    using tree_node_reference_t   = typename std::add_lvalue_reference
-                                             <
-                                                 tree_node_t
-                                             >::type;
-
+    using tree_t                    = tree::red_black_tree
+                                      <
+                                            K
+                                          , V
+                                          , std::less
+                                          , bool
+                                      >;
+    using tree_node_t               = typename tree_t::node_t;
+    using tree_node_pointer_t       = typename std::add_pointer
+                                               <
+                                                   tree_node_t
+                                               >::type;
+    using const_tree_node_pointer_t = typename std::add_pointer
+                                               <
+                                                   typename std::add_const
+                                                   <
+                                                       tree_node_t
+                                                   >::type
+                                               >::type;
+    using tree_node_reference_t     = typename std::add_lvalue_reference
+                                               <
+                                                   tree_node_t
+                                               >::type;
 public:
     using key_type                = typename tree_t::key_type;
     using mapped_type             = typename tree_t::value_type;
@@ -163,6 +169,11 @@ public:
 
     iterator erase( const_iterator pos )                                noexcept
     {
+        if(end() == pos)
+        {
+            return end();
+        }
+
         iterator next = pos;
         ++next;
 
@@ -174,11 +185,6 @@ public:
         }
 
         mark_as_unused(*(ret.first));
-
-        if(nullptr != ret.second)
-        {
-            return ++pos;
-        }
 
         return next;
     }

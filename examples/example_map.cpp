@@ -90,6 +90,7 @@ void fill_map_operator(std::string prefix, T& m)
     m[E::e10] = 50;
 
     dump_map(prefix, m);
+//    m.print();
 }
 
 template<typename T>
@@ -150,55 +151,55 @@ void erase_map_by_iterator(std::string prefix, T& m)
 {
     std::cout << ">>> Erase map by iterator" << std::endl;
     typename T::const_iterator it = m.begin();
-//                   std::cout << it->first << ":" << it->second << std::endl;
-//    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
-//    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
-//    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
-//    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
-//    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
-//    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
-//    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
-//    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
-//    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
-//    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
+                   std::cout << it->first << ":" << it->second << std::endl;
+    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
+    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
+    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
+    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
+    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
+    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
+    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
+    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
+    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
+    m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
 
-    it = m.begin();
-                      std::cout << it->first << ":" << it->second << std::endl;
-    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
-    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
-    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
-    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
-    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
-    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
-    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
-    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
-    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
-    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+//    it = m.begin();
+//                      std::cout << it->first << ":" << it->second << std::endl;
+//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
 
     dump_map(prefix, m);
 }
 
 int main(int, char**, char**)
 {
-    map_t m1
-    {
-          { E::e1  , 2  }
-        , { E::e2  , 4  }
-        , { E::e3  , 6  }
-        , { E::e4  , 8  }
-        , { E::e5  , 10 }
-        , { E::e6  , 12 }
-        , { E::e7  , 14 }
-        , { E::e8  , 16 }
-        , { E::e9  , 18 }
-        , { E::e10 , 20 }
-    };
-    dump_map("m1", m1);
-    erase_map_by_key("m1", m1);
+//    map_t m1
+//    {
+//          { E::e1  , 2  }
+//        , { E::e2  , 4  }
+//        , { E::e3  , 6  }
+//        , { E::e4  , 8  }
+//        , { E::e5  , 10 }
+//        , { E::e6  , 12 }
+//        , { E::e7  , 14 }
+//        , { E::e8  , 16 }
+//        , { E::e9  , 18 }
+//        , { E::e10 , 20 }
+//    };
+//    dump_map("m1", m1);
+//    erase_map_by_key("m1", m1);
 
-    fill_map_ilist("m1", m1);
-    erase_map_by_irange("m1", m1);
-//    map_t m1;
+//    fill_map_ilist("m1", m1);
+//    erase_map_by_irange("m1", m1);
+    map_t m1;
 
     fill_map_operator("m1", m1);
     erase_map_by_iterator("m1", m1);
