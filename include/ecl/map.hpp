@@ -147,7 +147,7 @@ public:
     template<class P>
     std::pair<iterator, bool> insert(P&& value)                         noexcept
     {
-        insert(value_type(std::forward<P>(value)));
+        return insert(value_type(std::forward<P>(value)));
     }
 
     template< class InputIt >
