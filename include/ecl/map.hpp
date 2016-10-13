@@ -252,6 +252,31 @@ public:
         return value_compare();
     }
 
+    mapped_type& operator[](const key_type& k)                          noexcept
+    {
+        iterator i = search(k);
+
+        if(i == end())
+        {
+            iterator it = insert_internal({ k, mapped_type() }, true).first;
+            return it->second;
+        }
+
+        return i->second;
+    }
+
+    const mapped_type& operator[](const key_type& k)              const noexcept
+    {
+        const_iterator i = search(k);
+
+        if(i == end())
+        {
+            return not_found();
+        }
+
+        return i->second;
+    }
+
     mapped_type& operator[](key_type&& k)                               noexcept
     {
         iterator i = search(std::forward<key_type>(k));
