@@ -147,9 +147,9 @@ void erase_map_by_irange(std::string prefix, T& m)
 }
 
 template<typename T>
-void erase_map_by_iterator(std::string prefix, T& m)
+void erase_map_by_iterator_increment(std::string prefix, T& m)
 {
-    std::cout << ">>> Erase map by iterator" << std::endl;
+    std::cout << ">>> Erase map by iterator (increment)" << std::endl;
     typename T::const_iterator it = m.begin();
                    std::cout << it->first << ":" << it->second << std::endl;
     m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
@@ -179,6 +179,26 @@ void erase_map_by_iterator(std::string prefix, T& m)
     dump_map(prefix, m);
 }
 
+template<typename T>
+void erase_map_by_iterator_assign_return(std::string prefix, T& m)
+{
+    std::cout << ">>> Erase map by iterator (assign return)" << std::endl;
+    typename T::const_iterator it = m.begin();
+                      std::cout << it->first << ":" << it->second << std::endl;
+    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
+
+    dump_map(prefix, m);
+}
+
 int main(int, char**, char**)
 {
     map_t m1
@@ -202,7 +222,10 @@ int main(int, char**, char**)
 //    map_t m1;
 
     fill_map_operator("m1", m1);
-    erase_map_by_iterator("m1", m1);
+    erase_map_by_iterator_increment("m1", m1);
+
+    fill_map_operator("m1", m1);
+    erase_map_by_iterator_assign_return("m1", m1);
 
     return 0;
 }
