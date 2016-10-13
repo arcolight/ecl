@@ -217,5 +217,26 @@ int main(int, char**, char**)
     fill_map_operator("m1", m1);
     erase_map_by_iterator_assign_return("m1", m1);
 
+    const auto m2 = ecl::create_map<const char*, const char*>
+    (
+          std::make_pair("key 1", "value 1")
+        , std::make_pair("key 2", "value 2")
+        , std::make_pair("key 3", "value 3")
+        , std::make_pair("key 4", "value 4")
+        , std::make_pair("key 5", "value 5")
+        , std::make_pair("key 6", "value 6")
+    );
+
+    if(m2["asd"] == nullptr)
+    {
+        std::cout << "nullptr!" << std::endl;
+    }
+
+    std::cout << "m2" << " range-for interation over map: ";
+    for(auto& p : m2)
+    {
+        std::cout << "(" << p.first << ":" << p.second << ") ";
+    }
+    std::cout << std::endl;
     return 0;
 }

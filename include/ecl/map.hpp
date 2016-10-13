@@ -274,7 +274,7 @@ public:
             return not_found();
         }
 
-        return *i;
+        return i->second;
     }
 
     iterator begin()                                                    noexcept
