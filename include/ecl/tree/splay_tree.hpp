@@ -14,16 +14,22 @@ template
       typename K
     , typename V
     , template <typename> class Compare = std::less
+    , typename Storage = void
 >
-struct splay_node : public node_base<K, V, Compare, ecl::tree::splay_node>
+struct splay_node : public node_base<K, V, Compare, ecl::tree::splay_node, Storage>
 {
     // Full namespace is workaround for clang bug
     // about template-template parameters
     //
     // http://stackoverflow.com/questions/17687459/clang-not-accepting-use-of-template-template-parameter-when-using-crtp
-    using base = node_base<K, V, Compare, ecl::tree::splay_node>;
+    using base = node_base<K, V, Compare, ecl::tree::splay_node, Storage>;
 
-    using node_base<K, V, Compare, ecl::tree::splay_node>::node_base;
+    using node_base<K, V, Compare, ecl::tree::splay_node, Storage>::node_base;
+    using typename base::pointer;
+
+    void replace_from(pointer)                                          noexcept
+    {
+    }
 };
 
 template
@@ -31,12 +37,13 @@ template
       typename K
     , typename V
     , template <typename> class Compare = std::less
+    , typename Storage = void
 >
-class splay_tree : public binary_tree_base<K, V, Compare, splay_node>
+class splay_tree : public binary_tree_base<K, V, Compare, splay_node, Storage>
 {
-    using base = binary_tree_base<K, V, Compare, splay_node>;
+    using base = binary_tree_base<K, V, Compare, splay_node, Storage>;
 
-   using base::m_header;
+    using base::m_header;
 public:
     using typename base::node_t;
 
@@ -68,9 +75,9 @@ public:
     using base::crbegin;
     using base::crend;
 
-    iterator insert(pointer n)                                          noexcept
+    iterator insert(pointer n, bool allow_update = true)                noexcept
     {
-        auto result        = this->base::insert_internal(n);
+        auto result        = this->base::insert_internal(n, allow_update);
         pointer inserted_n = result.second;
         iterator it        = result.first;
 
@@ -85,17 +92,17 @@ public:
         return it;
     }
 
-    pointer erase(const key_type& k)                                    noexcept
+    erase_return erase(const key_type& k)                               noexcept
     {
         if(empty())
         {
-            return nullptr;
+            return { nullptr, nullptr };
         }
 
         pointer to_erase = root()->find(k);
         if(nullptr == to_erase)
         {
-            return nullptr;
+            return { nullptr, nullptr };
         }
 
         erase_return ret = this->base::erase_internal(to_erase);
@@ -105,7 +112,7 @@ public:
             splay(to_erase->parent);
         }
 
-        return ret.first;
+        return ret;
     }
 
     iterator find(const key_type& k)                                    noexcept

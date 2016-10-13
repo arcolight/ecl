@@ -385,7 +385,7 @@ void dump_tree(const std::string prefix, const T& tree)
     std::cout << prefix << "iterator :         ";
     for(auto& v : tree)
     {
-        std::cout << v << " ";
+        std::cout << v.second << " ";
     }
     std::cout << std::endl;
 
@@ -394,7 +394,7 @@ void dump_tree(const std::string prefix, const T& tree)
     std::cout << prefix << "reverse iterator : ";
     for(auto it = tree.rbegin(); it != it_end; ++it)
     {
-        std::cout << *it << " ";
+        std::cout << (*it).second << " ";
     }
     std::cout << std::endl;
 
@@ -488,7 +488,7 @@ void erase_tree_static(const std::string prefix, T& tree, key_type from, key_typ
     for(key_type i = from; i < to; ++i)
     {
         std::cout << prefix << "erasing node " << i << ": ";
-        if(nullptr != tree.erase(i))
+        if(nullptr != tree.erase(i).first)
         {
             ++count;
             std::cout << "done." << std::endl;
@@ -516,12 +516,12 @@ void erase_tree_dynamic(const std::string prefix, T& tree, key_type from, key_ty
     while(!tree.empty())
     {
         key_type i = std::rand() % (to - from) + from;
-        typename T::node_t::pointer p = tree.erase(i);
-        if(nullptr != p)
+        typename T::erase_return p = tree.erase(i);
+        if(nullptr != p.first)
         {
             std::cout << prefix << "erasing node " << i << ": ";
             ++count;
-            delete p;
+            delete p.first;
             std::cout << "done." << std::endl;
             dump_tree(prefix, tree);
         }
@@ -607,6 +607,11 @@ template<typename T, std::size_t N>
 void test_tree(const std::string prefix, typename T::node_t (& nodes)[N], std::size_t dynamic_nodes_count)
 {
     T static_tree;
+    fill_tree_static(prefix, static_tree, nodes);
+    dump_tree(prefix, static_tree);
+    find_in_tree(prefix, static_tree, 0, static_cast<key_type>(N) + 1);
+    erase_tree_static(prefix, static_tree, 0, static_cast<key_type>(N) + 1);
+
     fill_tree_static(prefix, static_tree, nodes);
     dump_tree(prefix, static_tree);
     find_in_tree(prefix, static_tree, 0, static_cast<key_type>(N) + 1);
