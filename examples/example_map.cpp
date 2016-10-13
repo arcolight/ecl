@@ -44,13 +44,13 @@ using value_type = std::uint32_t;
 
 using map_t      = ecl::map<key_type, value_type, 8>;
 
- auto m0 = ecl::create_map<key_type, value_type>
- (
-       std::make_pair(E::e1, 1u)
-     , std::make_pair(E::e2, 2u)
-     , std::make_pair(E::e3, 4u)
-     , std::make_pair(E::e3, 3u) // overwrite E::e3 element
- );
+const auto m0 = ecl::create_map<key_type, value_type>
+(
+      std::make_pair(E::e1, 1u)
+    , std::make_pair(E::e2, 2u)
+    , std::make_pair(E::e3, 4u)
+    , std::make_pair(E::e3, 3u) // overwrite E::e3 element
+);
 
 template<typename T>
 void fill_map_ilist(std::string prefix, T& m)
@@ -90,14 +90,14 @@ void fill_map_operator(std::string prefix, T& m)
     m[E::e10] = 50;
 
     dump_map(prefix, m);
-//    m.print();
 }
 
 template<typename T>
 void dump_map(std::string prefix, T& m)
 {
     std::cout << ">>> Dump map" << std::endl;
-    std::cout << prefix << " map elements count: " << m.size() << std::endl;
+    std::cout << prefix << " map elements size:     " << m.size()     << std::endl;
+    std::cout << prefix << " map elements max_size: " << m.max_size() << std::endl;
 
     std::cout << prefix << " range-for interation over map: ";
     for(auto& p : m)
@@ -163,19 +163,6 @@ void erase_map_by_iterator_increment(std::string prefix, T& m)
     m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
     m.erase(it++); std::cout << it->first << ":" << it->second << std::endl;
 
-//    it = m.begin();
-//                      std::cout << it->first << ":" << it->second << std::endl;
-//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
-//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
-//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
-//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
-//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
-//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
-//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
-//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
-//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
-//    it = m.erase(it); std::cout << it->first << ":" << it->second << std::endl;
-
     dump_map(prefix, m);
 }
 
@@ -201,6 +188,9 @@ void erase_map_by_iterator_assign_return(std::string prefix, T& m)
 
 int main(int, char**, char**)
 {
+    dump_map("m0", m0);
+//    erase_map_by_key("m0", m0); // Will emit compile error.
+
     map_t m1
     {
           { E::e1  , 2  }
@@ -214,12 +204,12 @@ int main(int, char**, char**)
         , { E::e9  , 18 }
         , { E::e10 , 20 }
     };
+
     dump_map("m1", m1);
     erase_map_by_key("m1", m1);
 
     fill_map_ilist("m1", m1);
     erase_map_by_irange("m1", m1);
-//    map_t m1;
 
     fill_map_operator("m1", m1);
     erase_map_by_iterator_increment("m1", m1);
