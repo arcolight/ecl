@@ -55,7 +55,7 @@ void write_sock(const char* const buf, std::size_t size);
 
 void write_sock(const char* const buf, std::size_t size)
 {
-    std::cout << buf;
+//    std::cout << buf;
     send(new_sd, buf, size, 0);
 }
 
@@ -116,21 +116,52 @@ void start_server(const char* port)
     struct addrinfo  host_info;
     struct addrinfo* host_info_list;
 
-    static server_t server;
+    static server_t server(write_sock);
+//    (
+//          std::make_pair(name::page_400::name() , ecl::web::static_resource < resources::res_400_html_t    >())
+//        , std::make_pair(name::page_404::name() , ecl::web::static_resource < resources::res_404_html_t    >())
+//        , std::make_pair(name::page_500::name() , ecl::web::static_resource < resources::res_500_html_t    >())
+
+//        , std::make_pair(name::index_1::name()  , ecl::web::static_resource < resources::res_index_html_t  >())
+//        , std::make_pair(name::index_2::name()  , ecl::web::static_resource < resources::res_index_html_t  >())
+
+//        , std::make_pair(name::icon::name()     , ecl::web::static_resource < resources::res_icon_png_t    >())
+//        , std::make_pair(name::favicon::name()  , ecl::web::static_resource < resources::res_favicon_png_t >())
+//        , std::make_pair(name::style::name()    , ecl::web::static_resource < resources::res_style_css_t   >())
+//        , std::make_pair(name::jquery::name()   , ecl::web::static_resource < resources::res_jquery_js_t   >())
+//    );
 
     bool resource_result = true;
 
-    resource_result &= server.attach_resource( name::page_400::name() , ecl::web::static_resource < resources::res_400_html_t    >() );
-    resource_result &= server.attach_resource( name::page_404::name() , ecl::web::static_resource < resources::res_404_html_t    >() );
-    resource_result &= server.attach_resource( name::page_500::name() , ecl::web::static_resource < resources::res_500_html_t    >() );
+    server_t::resource_t < resources::res_400_html_t    > res_400     ( ecl::web::content_type::TEXT_HTML       );
+    server_t::resource_t < resources::res_404_html_t    > res_404     ( ecl::web::content_type::TEXT_HTML       );
+    server_t::resource_t < resources::res_500_html_t    > res_500     ( ecl::web::content_type::TEXT_HTML       );
 
-    resource_result &= server.attach_resource( name::index_1::name()  , ecl::web::static_resource < resources::res_index_html_t  >() );
-    resource_result &= server.attach_resource( name::index_2::name()  , ecl::web::static_resource < resources::res_index_html_t  >() );
+    server_t::resource_t < resources::res_index_html_t  > res_index_1 ( ecl::web::content_type::TEXT_HTML       );
+    server_t::resource_t < resources::res_index_html_t  > res_index_2 ( ecl::web::content_type::TEXT_HTML       );
 
-    resource_result &= server.attach_resource( name::icon::name()     , ecl::web::static_resource < resources::res_icon_png_t    >() );
-    resource_result &= server.attach_resource( name::favicon::name()  , ecl::web::static_resource < resources::res_favicon_png_t >() );
-    resource_result &= server.attach_resource( name::style::name()    , ecl::web::static_resource < resources::res_style_css_t   >() );
-    resource_result &= server.attach_resource( name::jquery::name()   , ecl::web::static_resource < resources::res_jquery_js_t   >() );
+    server_t::resource_t < resources::res_icon_png_t    > res_icon    ( ecl::web::content_type::IMAGE_PNG       );
+    server_t::resource_t < resources::res_favicon_png_t > res_favicon ( ecl::web::content_type::IMAGE_PNG       );
+    server_t::resource_t < resources::res_style_css_t   > res_style   ( ecl::web::content_type::TEXT_CSS        );
+    server_t::resource_t < resources::res_jquery_js_t   > res_jquery  ( ecl::web::content_type::TEXT_JAVASCRIPT );
+
+    resource_result &= server.attach_resource( name::page_400::name() , res_400     );
+    resource_result &= server.attach_resource( name::page_404::name() , res_404     );
+    resource_result &= server.attach_resource( name::page_500::name() , res_500     );
+
+    resource_result &= server.attach_resource( name::index_1::name()  , res_index_1 );
+    resource_result &= server.attach_resource( name::index_2::name()  , res_index_2 );
+
+    resource_result &= server.attach_resource( name::icon::name()     , res_icon    );
+    resource_result &= server.attach_resource( name::favicon::name()  , res_favicon );
+    resource_result &= server.attach_resource( name::style::name()    , res_style   );
+    resource_result &= server.attach_resource( name::jquery::name()   , res_jquery  );
+
+    if(!resource_result)
+    {
+        std::cout << "Resource adding error!" << std::endl;
+        exit(1);
+    }
 
     memset(&host_info, 0, sizeof host_info);
 

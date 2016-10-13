@@ -4,6 +4,7 @@
 #include <cstddef>
 
 #include <ecl/str_const.hpp>
+#include <ecl/web/types.hpp>
 
 namespace ecl
 {

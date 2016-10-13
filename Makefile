@@ -34,7 +34,7 @@ TESTS_DIR = ./tests
 BIN_DIR = ./bin
 DOC_DIR = ./doc
 
-HTTP_PARSER_DIR = thirdparty/http-parser
+HTTP_PARSER_DIR = ./thirdparty/http-parser
 
 TESTS_BIN = tests
 
