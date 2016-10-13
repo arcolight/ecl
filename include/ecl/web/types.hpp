@@ -9,8 +9,10 @@ namespace ecl
 namespace web
 {
 
-using url_t    = const char*;
-using header_t = std::pair<const char*, const char*>;
+using url_t          = const char*;
+using header_name_t  = const char*;
+using header_value_t = const char*;
+using header_t       = std::pair<header_name_t, header_value_t>;
 
 } // namespace web
 

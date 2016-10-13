@@ -6,6 +6,8 @@
 #include <ecl/web/constants.hpp>
 #include <ecl/web/i_request_cache.hpp>
 
+#include <ecl/map.hpp>
+
 namespace ecl
 {
 
@@ -19,13 +21,12 @@ template
 >
 struct request_cache : public i_request_cache
 {
+private:
+    using header_map_t = ecl::map<header_name_t, header_value_t, HEADERS_COUNT>;
+
+public:
     ~request_cache()                                                    noexcept
     {
-        for(auto& h : m_headers)
-        {
-            h.first  = nullptr;
-            h.second = nullptr;
-        }
     }
 
     virtual std::size_t cache(const char* buf,
@@ -52,9 +53,9 @@ struct request_cache : public i_request_cache
         return m_met;
     }
 
-    virtual header_t get_hdr(std::size_t num)                  noexcept override
+    virtual header_value_t get_hdr(header_name_t&& num)        noexcept override
     {
-        return m_headers[num];
+        return m_headers[std::forward<header_name_t>(num)];
     }
 
     virtual void set_ver(version v)                            noexcept override
@@ -74,8 +75,7 @@ struct request_cache : public i_request_cache
 
     virtual void set_hdr(header_t h)                           noexcept override
     {
-        m_headers[m_headers_count] = h;
-        ++m_headers_count;
+        m_headers.insert(h);
     }
 
     char* get_raw_rq()                                                  noexcept
@@ -89,14 +89,13 @@ struct request_cache : public i_request_cache
     }
 
 private:
-    char        m_rq_raw[CACHE_SIZE] {   };
-    std::size_t m_rq_raw_size        { 0 };
+    char         m_rq_raw[CACHE_SIZE] {   };
+    std::size_t  m_rq_raw_size        { 0 };
 
-    version     m_ver                    { version::HTTP11 };
-    url_t       m_url                    { "/"             };
-    method      m_met                    { method::GET     };
-    header_t    m_headers[HEADERS_COUNT] {                 };
-    std::size_t m_headers_count          { 0               };
+    version      m_ver                { version::HTTP11 };
+    url_t        m_url                { "/"             };
+    method       m_met                { method::GET     };
+    header_map_t m_headers            {                 };
 };
 
 } // namespace web
