@@ -24,7 +24,7 @@ STR_CONST = str_const
 STATIC_MAP = static_map
 TREE = tree
 CMD = command_processor
-STATIC_MAP = static_map
+MAP = map
 JSON = json
 WEB = web
 
@@ -103,8 +103,8 @@ $(EXAMPLE_PREFIX)_$(JSON): out_dir
 $(EXAMPLE_PREFIX)_$(STR_CONST): out_dir
 	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(STR_CONST)_$(CXX).map $(EXAMPLES_DIR)/$(EXAMPLE_PREFIX)_$(STR_CONST).cpp -o $(BIN_DIR)/$(STR_CONST)_$(CXX)
 
-$(EXAMPLE_PREFIX)_$(STATIC_MAP): out_dir
-	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(STATIC_MAP)_$(CXX).map $(EXAMPLES_DIR)/$(EXAMPLE_PREFIX)_$(STATIC_MAP).cpp -o $(BIN_DIR)/$(STATIC_MAP)_$(CXX)
+$(EXAMPLE_PREFIX)_$(MAP): out_dir
+	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(MAP)_$(CXX).map $(EXAMPLES_DIR)/$(EXAMPLE_PREFIX)_$(MAP).cpp -o $(BIN_DIR)/$(MAP)_$(CXX)
 
 $(EXAMPLE_PREFIX)_$(TREE): out_dir
 	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(TREE)_$(CXX).map $(EXAMPLES_DIR)/$(EXAMPLE_PREFIX)_$(TREE).cpp -o $(BIN_DIR)/$(TREE)_$(CXX)

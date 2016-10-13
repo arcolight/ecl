@@ -16,20 +16,28 @@ template
       typename K
     , typename V
     , template <typename> class Compare = std::less
+    , typename Storage = void
 >
-struct avl_node : public node_base<K, V, Compare, ecl::tree::avl_node>
+struct avl_node : public node_base<K, V, Compare, ecl::tree::avl_node, Storage>
 {
     // Full namespace is workaround for clang bug
     // about template-template parameters
     //
     // http://stackoverflow.com/questions/17687459/clang-not-accepting-use-of-template-template-parameter-when-using-crtp
-    using base = node_base<K, V, Compare, ecl::tree::avl_node>;
+    using base = node_base<K, V, Compare, ecl::tree::avl_node, Storage>;
 
-    using node_base<K, V, Compare, ecl::tree::avl_node>::node_base;
+    using node_base<K, V, Compare, ecl::tree::avl_node, Storage>::node_base;
+    using typename base::pointer;
 
     using height_t = std::int8_t;
 
     height_t height { 1 };
+
+    void replace_from(pointer s)                                        noexcept
+    {
+        height = s->height;
+        fix_height(this);
+    }
 };
 
 template
@@ -37,9 +45,10 @@ template
       typename K
     , typename V
     , template <typename> class Compare
+    , typename Storage
 >
-auto height(const avl_node<K, V, Compare>* n)                           noexcept
-    -> typename avl_node<K, V, Compare>::height_t
+auto height(const avl_node<K, V, Compare, Storage>* n)                  noexcept
+    -> typename avl_node<K, V, Compare, Storage>::height_t
 {
     return (nullptr == n) ? 0 : n->height;
 }
@@ -49,9 +58,10 @@ template
       typename K
     , typename V
     , template <typename> class Compare
+    , typename Storage
 >
-auto balance_factor(const avl_node<K, V, Compare>* n)                   noexcept
-    -> typename avl_node<K, V, Compare>::height_t
+auto balance_factor(const avl_node<K, V, Compare, Storage>* n)          noexcept
+    -> typename avl_node<K, V, Compare, Storage>::height_t
 {
     if(nullptr == n)
     {
@@ -66,8 +76,9 @@ template
       typename K
     , typename V
     , template <typename> class Compare
+    , typename Storage
 >
-bool is_left_heavy(const avl_node<K, V, Compare>* n)                    noexcept
+bool is_left_heavy(const avl_node<K, V, Compare, Storage>* n)           noexcept
 {
     return (balance_factor(n) < 0);
 }
@@ -77,8 +88,9 @@ template
       typename K
     , typename V
     , template <typename> class Compare
+    , typename Storage
 >
-bool is_right_heavy(const avl_node<K, V, Compare>* n)                   noexcept
+bool is_right_heavy(const avl_node<K, V, Compare, Storage>* n)          noexcept
 {
     return (balance_factor(n) > 0);
 }
@@ -88,8 +100,9 @@ template
       typename K
     , typename V
     , template <typename> class Compare
+    , typename Storage
 >
-bool is_balanced(const avl_node<K, V, Compare>* n)                      noexcept
+bool is_balanced(const avl_node<K, V, Compare, Storage>* n)             noexcept
 {
     return (balance_factor(n) == 0);
 }
@@ -99,8 +112,9 @@ template
       typename K
     , typename V
     , template <typename> class Compare
+    , typename Storage
 >
-void fix_height(avl_node<K, V, Compare>* n)                             noexcept
+void fix_height(avl_node<K, V, Compare, Storage>* n)                    noexcept
 {
     if(nullptr == n)
     {
@@ -118,12 +132,13 @@ template
       typename K
     , typename V
     , template <typename> class Compare = std::less
+    , typename Storage = void
 >
-class avl_tree : public binary_tree_base<K, V, Compare, avl_node>
+class avl_tree : public binary_tree_base<K, V, Compare, avl_node, Storage>
 {
-    using base = binary_tree_base<K, V, Compare, avl_node>;
+    using base = binary_tree_base<K, V, Compare, avl_node, Storage>;
 
-//    using base::m_header;
+    using base::m_header;
 public:
     using typename base::node_t;
 
@@ -146,9 +161,18 @@ public:
     using base::count;
     using base::empty;
 
-    iterator insert(pointer n)                                          noexcept
+    using base::begin;
+    using base::end;
+    using base::cbegin;
+    using base::cend;
+    using base::rbegin;
+    using base::rend;
+    using base::crbegin;
+    using base::crend;
+
+    iterator insert(pointer n, bool allow_update = true)                noexcept
     {
-        auto result        = this->base::insert_internal(n);
+        auto result        = this->base::insert_internal(n, allow_update);
         pointer inserted_n = result.second;
         iterator it        = result.first;
 
@@ -163,33 +187,32 @@ public:
         return it;
     }
 
-    pointer erase(const key_type& k)                                    noexcept
+    erase_return erase(const key_type& k)                               noexcept
     {
         if(empty())
         {
-            return nullptr;
+            return { nullptr, nullptr };
         }
 
         pointer to_erase = root()->find(k);
         if(nullptr == to_erase)
         {
-            return nullptr;
+            return { nullptr, nullptr };
         }
 
         erase_return ret  = this->base::erase_internal(to_erase);
-        pointer removed   = ret.first;
+        pointer successor = ret.second;
 
-        if(to_erase != removed)
+        if(nullptr != successor)
         {
-            balance(to_erase);
-            balance(removed->parent);
+            balance(successor->successor());
         }
         else
         {
             balance(to_erase->parent);
         }
 
-        return ret.first;
+        return ret;
     }
 
 private:

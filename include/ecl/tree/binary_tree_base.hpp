@@ -14,16 +14,32 @@ namespace ecl
 namespace tree
 {
 
+namespace detail
+{
+    template<typename T>
+    struct conditional_storage
+    {
+        T x {};
+    };
+
+    template<>
+    struct conditional_storage<void>
+    {
+
+    };
+} // namespace detail
+
 template
 <
       typename K
     , typename V
     , template <typename> class Compare
-    , template <typename, typename, template <typename> class> class N
+    , template <typename, typename, template <typename> class, typename> class N
+    , typename Storage = void
 >
 struct node_base
 {
-    using node_t        = N<K, V, Compare>;
+    using node_t        = N<K, V, Compare, Storage>;
 
     using pointer       = typename std::add_pointer<node_t>::type;
     using const_pointer = typename std::add_pointer
@@ -34,6 +50,8 @@ struct node_base
     // using key_type      = typename std::add_const<K>::type;
     using key_type      = K;
     using value_type    = V;
+    using pair_type     = std::pair<key_type, value_type>;
+    using pair_type_ext = std::pair<const key_type&, value_type&>;
 
     using key_compare   = Compare<key_type>;
 
@@ -61,35 +79,35 @@ struct node_base
     {}
 
     constexpr node_base(key_type&& k, value_type&& v)                   noexcept
-        : key ( std::forward<key_type>   (k) )
-        , val ( std::forward<value_type> (v) )
+        : key ( std::forward<key_type>   ( k ) )
+        , val ( std::forward<value_type> ( v ) )
     {}
 
-    constexpr node_base(const std::pair<key_type, value_type>& p)       noexcept
+    constexpr node_base(const pair_type& p)                             noexcept
         : key ( p.first  )
         , val ( p.second )
     {}
 
-    constexpr node_base(std::pair<key_type, value_type>&& p)            noexcept
-        : key ( std::forward<key_type>   (p.first ) )
-        , val ( std::forward<value_type> (p.second) )
+    constexpr node_base(pair_type&& p)                                  noexcept
+        : key ( std::forward<key_type>   ( p.first  ) )
+        , val ( std::forward<value_type> ( p.second ) )
     {}
 
     constexpr node_base(const node_base& other)                         noexcept
-        : left   (other.left)
-        , right  (other.right)
-        , parent (other.parent)
-        , key    (other.key)
-        , val    (other.val)
+        : left   ( other.left   )
+        , right  ( other.right  )
+        , parent ( other.parent )
+        , key    ( other.key    )
+        , val    ( other.val    )
     {}
 
     node_base(node_base&& other)
     {
-        std::swap(left,   other.left  );
-        std::swap(right,  other.right );
-        std::swap(parent, other.parent);
-        std::swap(val,    other.val   );
-        std::swap(key,    other.key   );
+        std::swap ( left   , other.left   );
+        std::swap ( right  , other.right  );
+        std::swap ( parent , other.parent );
+        std::swap ( key    , other.key    );
+        std::swap ( val    , other.val    );
     }
 
     node_base& operator=(const node_base& other)                        noexcept
@@ -103,20 +121,30 @@ struct node_base
         return *this;
     }
 
-    node_base& operator=(const node_base&& other)
+    node_base& operator=(node_base&& other)
     {
-        std::swap(left,   other.left  );
-        std::swap(right,  other.right );
-        std::swap(parent, other.parent);
-        std::swap(val,    other.val   );
-        std::swap(key,    other.key   );
+        std::swap ( left   , other.left   );
+        std::swap ( right  , other.right  );
+        std::swap ( parent , other.parent );
+        std::swap ( key    , other.key    );
+        std::swap ( val    , other.val    );
 
         return *this;
     }
 
+    bool operator==(const node_base& rhs)                                  const
+    {
+        return ((key == rhs.key) && (val == rhs.val));
+    }
+
+    bool operator!=(const node_base& rhs)                                  const
+    {
+        return !(*this == rhs);
+    }
+
     inline pointer most_left()                                          noexcept
     {
-        pointer result = static_cast<pointer>(this);
+        pointer result = pointer_to_this();
         while(result->have_left())
         {
             result = result->left;
@@ -126,7 +154,7 @@ struct node_base
 
     inline const_pointer most_left()                              const noexcept
     {
-        const_pointer result = static_cast<const_pointer>(this);
+        const_pointer result = const_pointer_to_this();
         while(result->have_left())
         {
             result = result->left;
@@ -136,7 +164,7 @@ struct node_base
 
     inline pointer most_right()                                         noexcept
     {
-        pointer result = static_cast<pointer>(this);
+        pointer result = pointer_to_this();
         while(result->have_right())
         {
             result = result->right;
@@ -146,7 +174,7 @@ struct node_base
 
     inline const_pointer most_right()                             const noexcept
     {
-        const_pointer result = static_cast<const_pointer>(this);
+        const_pointer result = const_pointer_to_this();
         while(result->have_right())
         {
             result = result->right;
@@ -238,7 +266,7 @@ struct node_base
 
     inline bool is_left()                                         const noexcept
     {
-        const_pointer t = static_cast<const_pointer>(this);
+        const_pointer t = const_pointer_to_this();
 
         if(nullptr == t->parent)
         {
@@ -250,7 +278,7 @@ struct node_base
 
     inline bool is_right()                                        const noexcept
     {
-        const_pointer t = static_cast<const_pointer>(this);
+        const_pointer t = const_pointer_to_this();
 
         if(nullptr == t->parent)
         {
@@ -296,14 +324,29 @@ struct node_base
         return nullptr != parent;
     }
 
-    inline pointer insert(pointer n)                                    noexcept
+    inline bool alone()                                           const noexcept
+    {
+        return !have_parent() && have_no_child();
+    }
+
+    inline pointer pointer_to_this()                                    noexcept
+    {
+        return static_cast<pointer>(this);
+    }
+
+    inline const_pointer const_pointer_to_this()                  const noexcept
+    {
+        return static_cast<const_pointer>(this);
+    }
+
+    inline pointer insert(pointer n, bool allow_update = true)          noexcept
     {
         if(key_compare()(n->key, key))
         {
             if( ! have_left())
             {
                 left = n;
-                n->parent = static_cast<pointer>(this);
+                n->parent = pointer_to_this();
                 return left;
             }
             return left->insert(n);
@@ -313,15 +356,18 @@ struct node_base
             if( ! have_right())
             {
                 right = n;
-                n->parent = static_cast<pointer>(this);
+                n->parent = pointer_to_this();
                 return right;
             }
             return right->insert(n);
         }
 
-        val = n->val;
+        if(allow_update)
+        {
+            val = n->val;
+        }
 
-        return static_cast<pointer>(this);
+        return pointer_to_this();
     }
 
     inline void link(pointer p)                                         noexcept
@@ -334,18 +380,12 @@ struct node_base
         {
             right = p;
         }
-        p->parent = static_cast<pointer>(this);
-    }
-
-    inline void replace_from(pointer suc)                               noexcept
-    {
-        key = suc->key;
-        val = suc->val;
+        p->parent = pointer_to_this();
     }
 
     inline pointer successor()                                          noexcept
     {
-        pointer suc = static_cast<pointer>(this);
+        pointer suc = pointer_to_this();
 
         if(have_right())
         {
@@ -355,9 +395,26 @@ struct node_base
         return suc;
     }
 
+    inline void detach()                                                noexcept
+    {
+        parent = nullptr;
+        left   = nullptr;
+        right  = nullptr;
+    }
+
+    inline void init()                                                  noexcept
+    {
+        detach();
+
+        val = value_type();
+        key = key_type();
+
+        _s = detail::conditional_storage<Storage>();
+    }
+
     inline erase_return erase_internal()                                noexcept
     {
-        pointer this_p = static_cast<pointer>(this);
+        pointer this_p = pointer_to_this();
 
         if(have_no_child())
         {
@@ -404,11 +461,54 @@ struct node_base
         }
     }
 
+    inline void replace_with(pointer n)                                 noexcept
+    {
+        if(have_parent())
+        {
+            parent->link(n);
+        }
+        else
+        {
+            n->parent = nullptr;
+        }
+
+        if(have_left())
+        {
+            n->link(left);
+        }
+        else
+        {
+            n->left = nullptr;
+        }
+
+        if(have_right())
+        {
+            n->link(right);
+        }
+        else
+        {
+            n->right = nullptr;
+        }
+    }
+
+    inline void replace_from(pointer)                                   noexcept
+    {
+    }
+
     inline erase_return erase()                                         noexcept
     {
         pointer s = successor();
-        replace_from(s);
-        return s->erase_internal();
+
+        s->erase_internal();
+
+        if(pointer_to_this() != s)
+        {
+            s->replace_from(pointer_to_this());
+            replace_with(s);
+            return { pointer_to_this(), s };
+        }
+
+        return { pointer_to_this(), left };
     }
 
     inline pointer find(const key_type& k)                              noexcept
@@ -430,7 +530,7 @@ struct node_base
             return right->find(k);
         }
 
-        return static_cast<pointer>(this);
+        return pointer_to_this();
     }
 
     inline const_pointer find(const key_type& k)                  const noexcept
@@ -452,15 +552,18 @@ struct node_base
             return right->find(k);
         }
 
-        return static_cast<const_pointer>(this);
+        return const_pointer_to_this();
     }
 
-    pointer    left   {};
-    pointer    right  {};
-    pointer    parent {};
+    pointer                              left   { nullptr };
+    pointer                              right  { nullptr };
+    pointer                              parent { nullptr };
 
-    key_type   key    {};
-    value_type val    {};
+    key_type                             key    { };
+    value_type                           val    { };
+    pair_type_ext                        pair   { key, val };
+
+    detail::conditional_storage<Storage> _s     {};
 };
 
 template
@@ -468,12 +571,13 @@ template
       typename K
     , typename V
     , template <typename> class Compare
-    , template <typename, typename, template <typename> class> class N
+    , template <typename, typename, template <typename> class, typename> class N
+    , typename Storage = void
 >
 class binary_tree_base
 {
 public:
-    using node_t        = typename N<K, V, Compare>::node_t;
+    using node_t        = typename N<K, V, Compare, Storage>::node_t;
 
     using pointer       = typename node_t::pointer;
     using const_pointer = typename node_t::const_pointer;
@@ -484,6 +588,13 @@ public:
     using key_compare   = typename node_t::key_compare;
 
     using erase_return  = typename node_t::erase_return;
+
+    binary_tree_base()
+    {
+        m_header.parent = &m_header;
+        m_header.left   = &m_header;
+        m_header.right  = &m_header;
+    }
 
 // Iterators start
 protected:
@@ -570,6 +681,9 @@ protected:
     };
 
 public:
+    struct iterator;
+    struct const_iterator;
+
     struct iterator :
         public base_iterator<binary_tree_base::pointer>
     {
@@ -582,9 +696,9 @@ public:
 
     public:
         using self_type  = iterator;
-        using value_type = V;
-        using reference  = V&;
-        using pointer    = V*;
+        using value_type = typename node_t::pair_type_ext;
+        using reference  = typename std::add_lvalue_reference<value_type>::type;
+        using pointer    = typename std::add_pointer<value_type>::type;
 
         iterator(binary_tree_base::pointer n,
                  binary_tree_base::pointer e)
@@ -619,27 +733,47 @@ public:
 
         reference  operator*()                                          noexcept
         {
-            return m_n->val;
+            return m_n->pair;
         }
 
-        bool operator==(const self_type& rhs)                              const
+        pointer    operator->()                                         noexcept
+        {
+            return &(m_n->pair);
+        }
+
+        bool operator==(const self_type& rhs)                     const noexcept
         {
             return (m_n == rhs.m_n) && (m_e == rhs.m_e);
         }
 
-        bool operator!=(const self_type& rhs)                              const
+        bool operator!=(const self_type& rhs)                     const noexcept
         {
             return !operator==(rhs);
         }
 
-        bool operator==(const binary_tree_base::pointer& rhs)              const
+        bool operator==(const binary_tree_base::pointer& rhs)     const noexcept
         {
             return m_n == rhs;
         }
 
-        bool operator!=(const binary_tree_base::pointer& rhs)              const
+        bool operator!=(const binary_tree_base::pointer& rhs)     const noexcept
         {
             return !operator==(rhs);
+        }
+
+        operator const_iterator()                                 const noexcept
+        {
+            return const_iterator(m_n, m_e);
+        }
+
+        operator binary_tree_base::pointer()                      const noexcept
+        {
+            return m_n;
+        }
+
+        operator binary_tree_base::const_pointer()                const noexcept
+        {
+            return m_n;
         }
     };
 
@@ -655,9 +789,9 @@ public:
 
     public:
         using self_type  = const_iterator;
-        using value_type = const V;
-        using reference  = const V&;
-        using pointer    = const V*;
+        using value_type = const typename node_t::pair_type_ext;
+        using reference  = typename std::add_lvalue_reference<value_type>::type;
+        using pointer    = typename std::add_pointer<value_type>::type;
 
         const_iterator(binary_tree_base::const_pointer n,
                        binary_tree_base::const_pointer e)
@@ -692,27 +826,43 @@ public:
 
         reference  operator*()                                    const noexcept
         {
-            return m_n->val;
+            return m_n->pair;
         }
 
-        bool operator==(const self_type& rhs)                              const
+        pointer    operator->()                                   const noexcept
+        {
+            return &(m_n->pair);
+        }
+
+        bool operator==(const self_type& rhs)                     const noexcept
         {
             return (m_n == rhs.m_n) && (m_e == rhs.m_e);
         }
 
-        bool operator!=(const self_type& rhs)                              const
+        bool operator!=(const self_type& rhs)                     const noexcept
         {
             return !operator==(rhs);
         }
 
-        bool operator==(const binary_tree_base::const_pointer& rhs)        const
+        bool operator==(binary_tree_base::const_pointer& rhs)     const noexcept
         {
             return m_n == rhs;
         }
 
-        bool operator!=(const binary_tree_base::const_pointer& rhs)        const
+        bool operator!=(binary_tree_base::const_pointer& rhs)     const noexcept
         {
             return !operator==(rhs);
+        }
+
+        operator iterator()                                       const noexcept
+        {
+            return iterator(const_cast<binary_tree_base::pointer>(m_n),
+                            const_cast<binary_tree_base::pointer>(m_e));
+        }
+
+        operator binary_tree_base::const_pointer()                const noexcept
+        {
+            return m_n;
         }
     };
 
@@ -781,11 +931,31 @@ public:
         return const_reverse_iterator(begin());
     }
 
+    iterator make_iterator(pointer p)                             const noexcept
+    {
+        if(nullptr == p)
+        {
+            return end();
+        }
+
+        return iterator(p, pointer(&m_header));
+    }
+
+    const_iterator make_iterator(const_pointer p)                 const noexcept
+    {
+        if(nullptr == p)
+        {
+            return end();
+        }
+
+        return const_iterator(p, const_pointer(&m_header));
+    }
+
 // Iterators end
 
-    iterator insert(pointer n)
+    iterator insert(pointer n, bool allow_update = true)
     {
-        return insert_internal(n).first;
+        return insert_internal(n, allow_update).first;
     }
 
     std::size_t count()                                           const noexcept
@@ -830,6 +1000,11 @@ public:
 
     iterator find(const key_type& k)                                    noexcept
     {
+        if(empty())
+        {
+            return end();
+        }
+
         pointer p = m_header.parent->find(k);
         if(nullptr == p)
         {
@@ -840,6 +1015,11 @@ public:
 
     const_iterator find(const key_type& k)                        const noexcept
     {
+        if(empty())
+        {
+            return end();
+        }
+
         const_pointer p = m_header.parent->find(k);
         if(nullptr == p)
         {
@@ -848,22 +1028,24 @@ public:
         return const_iterator(p, const_pointer(&m_header));
     }
 
-    pointer erase(const key_type& k)                                    noexcept
+    erase_return erase(const key_type& k)                               noexcept
     {
-        erase_return ret = erase_internal(k);
+        auto p = erase_internal(k);
 
-        return ret.first;
+        if(nullptr != p.first)
+        {
+            p.first->detach();
+        }
+
+        return p;
     }
 
 protected:
-
-    insert_return insert_internal(pointer n)                            noexcept
+    insert_return insert_internal(pointer n, bool allow_update)         noexcept
     {
-        n->parent            = nullptr;
-        n->left              = nullptr;
-        n->right             = nullptr;
+        n->detach();
 
-        if( ! m_header.have_parent())
+        if(m_header.parent == &m_header)
         {
             m_header.parent = n;
             m_header.left   = n;
@@ -871,10 +1053,14 @@ protected:
 
             ++m_size;
 
-            return { iterator(m_header.parent, pointer(&m_header)), m_header.parent };
+            return
+            {
+                  iterator(m_header.parent, pointer(&m_header))
+                , m_header.parent
+            };
         }
 
-        pointer inserted_n = m_header.parent->insert(n);
+        pointer inserted_n = m_header.parent->insert(n, allow_update);
         // new node
         if(inserted_n == n)
         {
@@ -899,7 +1085,7 @@ protected:
         pointer removed   = ret.first;
         pointer successor = ret.second;
 
-        if(removed == pointer(m_header.parent) && (nullptr == successor))
+        if(removed == pointer(m_header.parent) && (1 == count()))
         {
             m_size = 0;
             m_header.parent = pointer(&m_header);
@@ -918,6 +1104,7 @@ protected:
 
         if(m_header.left == removed)
         {
+//            m_header.left = m_header.parent->most_left();
             if(nullptr != successor)
             {
                 m_header.left = successor->most_left();
@@ -930,6 +1117,7 @@ protected:
 
         if(m_header.right == removed)
         {
+//            m_header.right = m_header.parent->most_right();
             if(nullptr != successor)
             {
                 m_header.right = successor->most_right();
