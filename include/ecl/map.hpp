@@ -147,6 +147,7 @@ public:
         for(auto& n : m_nodes_pool)
         {
             m_tree.erase(n.key);
+            mark_as_unused(n);
         }
     }
 
