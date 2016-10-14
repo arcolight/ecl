@@ -11,14 +11,20 @@
 namespace ecl
 {
 
-template<typename K, typename V, std::size_t N, typename Compare = std::less<K>>
+template
+<
+      typename K
+    , typename V
+    , std::size_t N
+    , template <typename> class Compare = std::less
+>
 class map
 {
     using tree_t                    = tree::red_black_tree
                                       <
                                             K
                                           , V
-                                          , std::less
+                                          , Compare
                                           , bool
                                       >;
     using tree_node_t               = typename tree_t::node_t;
@@ -42,7 +48,7 @@ public:
     using mapped_type             = typename tree_t::value_type;
     using value_type              = std::pair<key_type, mapped_type>;
     using size_type               = std::size_t;
-    using key_compare             = Compare;
+    using key_compare             = Compare<K>;
     using value_compare           = std::less<value_type>;
 
     using reference               = typename std::add_lvalue_reference
@@ -466,7 +472,7 @@ template
       typename K
     , typename V
     , typename... Args
-    , typename Compare = std::less<K>
+    , template <typename> class Compare = std::less
 >
 constexpr inline const map
                        <
