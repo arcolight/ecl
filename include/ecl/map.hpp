@@ -142,7 +142,10 @@ public:
 
     void clear()                                                        noexcept
     {
-        m_tree.clear();
+        for(auto& n : m_nodes_pool)
+        {
+            m_tree.erase(n.key);
+        }
     }
 
     std::pair<iterator, bool> insert(const value_type& value)           noexcept
