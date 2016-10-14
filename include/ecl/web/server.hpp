@@ -1,6 +1,8 @@
 #ifndef ECL_WEB_SERVER_HPP
 #define ECL_WEB_SERVER_HPP
 
+#include <cstring>
+
 #include "http_parser.h"
 
 #include <ecl/web/request_cache.hpp>
@@ -25,30 +27,44 @@ template
 >
 class server
 {
+public:
+    using stream_t     = ecl::stream<OUT_STREAM_SIZE>;
+    template<typename T>
+    using resource_t   = static_resource<T, stream_t>;
+    using i_resource_t = i_resource<stream_t>;
+
+private:
+    template<typename T>
+    struct char_ptr_cmp
+    {
+        bool operator()(char const *a, char const *b)
+        {
+           return (std::strcmp(a, b) < 0);
+        }
+    };
+
     using request_cache_t = request_cache<CACHE_SIZE, HEADERS_COUNT>;
-    using stream_t        = ecl::stream<OUT_STREAM_SIZE>;
-    using i_resource_t    = i_resource<stream_t>;
-    using resources_map_t = ecl::map<url_t, i_resource_t*, RESOURCES_COUNT>;
+    using resources_map_t = ecl::map
+                            <
+                                  url_t
+                                , i_resource_t*
+                                , RESOURCES_COUNT
+                                , char_ptr_cmp
+                            >;
+
+    using handlers_map_t = ecl::map<status_code, i_resource_t*, 30>;
 
     int on_message_begin()
     {
+        m_cache.clear();
         return 0;
     }
 
     int on_url(const char* at, std::size_t length)
     {
-        m_cache.set_url(at);
+        std::cout << ">>> on_url " << std::string(at).substr(0, length) << std::endl;
         const_cast<char*>(at)[length] = 0;
-
-        http_parser_url u;
-        http_parser_parse_url(at, length, 1, &u);
-        // for(int f = UF_SCHEMA; f < UF_MAX; ++f)
-        // {
-        //     if(u.field_set & (1 << f))
-        //     {
-        //         std::cout << "field " << f << " is set: " << std::string(at + u.field_data[f].off).substr(0, u.field_data[f].len) << std::endl;
-        //     }
-        // }
+        m_cache.set_url(at);
 
         return 0;
     }
@@ -60,16 +76,16 @@ class server
 
     int on_header_field(const char* at, std::size_t length)
     {
-        m_hdr.first         = at;
         const_cast<char*>(at)[length] = 0;
+        m_hdr.first = at;
 
         return 0;
     }
 
     int on_header_value(const char* at, std::size_t length)
     {
-        m_hdr.second = at;
         const_cast<char*>(at)[length] = 0;
+        m_hdr.second = at;
 
         m_cache.set_hdr(m_hdr);
 
@@ -81,8 +97,11 @@ class server
         return 0;
     }
 
-    int on_body(const char*, std::size_t)
+    int on_body(const char* at, std::size_t length)
     {
+        const_cast<char*>(at)[length] = 0;
+        m_cache.set_body(std::make_pair(at, length));
+
         return 0;
     }
 
@@ -153,9 +172,6 @@ class server
     }
 
 public:
-    template<typename T>
-    using resource_t = static_resource<T, stream_t>;
-
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
     server(send_callback_t cb)
@@ -180,33 +196,39 @@ public:
 
     void process_request(const char* buf, std::size_t buf_size)
     {
+        std::cout << ">>> Process request." << std::endl;
         m_cache.cache(buf, buf_size);
 
         http_parser_execute(&m_parser,
                             &m_parser_settings,
                             m_cache.get_raw_rq(),
                             m_cache.get_raw_rq_size());
+        std::cout << ">>> Parse done." << std::endl;
     }
 
     bool attach_resource(url_t url, i_resource_t& res)
     {
-        auto ret = m_resources.insert(std::make_pair(url, &res));
-        return ret.second;
+        return m_resources.insert(std::make_pair(url, &res)).second;
     }
 
 private:
     void call_resource()
     {
-        i_resource_t* res = m_resources[m_cache.get_url()];
+        std::cout << ">>> Call resource " << m_cache.get_url(url_field::PATH) << std::endl;
+        i_resource_t* res = m_resources[m_cache.get_url(url_field::PATH)];
         if(nullptr != res)
         {
-            std::cout << ">>> size: " << res->size() << std::endl;
-            std::cout << ">>> type: " << to_string(res->type()) << std::endl;
+            std::cout << ">>> Found: " << m_cache.get_url(url_field::PATH) << std::endl;
             res->on_request(m_stream, m_cache);
         }
         else
         {
-            std::cout << m_cache.get_url() << " not found!" << std::endl;
+            std::cout << ">>> Not found." << std::endl;
+            if(nullptr != m_resources["/404.html"])
+            {
+                std::cout << ">>> 404.html" << std::endl;
+                m_resources["/404.html"]->on_request(m_stream, m_cache);
+            }
         }
     }
 

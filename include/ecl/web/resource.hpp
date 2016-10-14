@@ -24,8 +24,13 @@ struct static_resource : public i_resource<ST>
         : m_type ( t )
     {}
 
-    virtual bool on_request(ST& st, i_request_cache& cache)             override
+    virtual status_code on_request(ST& st, i_request_cache& cache)      override
     {
+        if(method::GET != cache.get_met())
+        {
+            return status_code::METHOD_NOT_ALLOWED;
+        }
+
         write_status_line(st, cache.get_ver(), status_code::OK);
 
         set_content_type_header(st, m_type);
@@ -39,27 +44,7 @@ struct static_resource : public i_resource<ST>
 
         st.flush();
 
-        return true;
-    }
-
-    virtual std::size_t size()                                          override
-    {
-        return T::size;
-    }
-
-    virtual const uint8_t* data()                                       override
-    {
-        return T::data;
-    }
-
-    virtual bool compressed()                                           override
-    {
-        return T::compressed;
-    }
-
-    virtual content_type type()                                         override
-    {
-        return m_type;
+        return status_code::OK;
     }
 
 private:

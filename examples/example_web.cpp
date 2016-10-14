@@ -25,9 +25,8 @@
 #include "web_resources/404_html.h"
 #include "web_resources/500_html.h"
 
-// #include "cgis.hpp"
-
-#define RECV_BUFFER_SIZE 2048
+#include "server.hpp"
+#include "cgis.hpp"
 
 namespace name
 {
@@ -90,8 +89,6 @@ void write_sock(const char* const buf, std::size_t size)
 //     RECV_BUFFER_SIZE
 // >;
 
-using server_t = ecl::web::server<RECV_BUFFER_SIZE>;
-
 static char buffer[RECV_BUFFER_SIZE];
 
 [[ noreturn ]]
@@ -145,6 +142,8 @@ void start_server(const char* port)
     server_t::resource_t < resources::res_style_css_t   > res_style   ( ecl::web::content_type::TEXT_CSS        );
     server_t::resource_t < resources::res_jquery_js_t   > res_jquery  ( ecl::web::content_type::TEXT_JAVASCRIPT );
 
+    cgi_info c_info;
+
     resource_result &= server.attach_resource( name::page_400::name() , res_400     );
     resource_result &= server.attach_resource( name::page_404::name() , res_404     );
     resource_result &= server.attach_resource( name::page_500::name() , res_500     );
@@ -156,6 +155,8 @@ void start_server(const char* port)
     resource_result &= server.attach_resource( name::favicon::name()  , res_favicon );
     resource_result &= server.attach_resource( name::style::name()    , res_style   );
     resource_result &= server.attach_resource( name::jquery::name()   , res_jquery  );
+
+    resource_result &= server.attach_resource( name::info::name()     , c_info      );
 
     if(!resource_result)
     {
@@ -255,9 +256,7 @@ void start_server(const char* port)
         // std::cout << std::endl;
         std::cout << buffer << std::endl;
 
-        ecl::stream<RECV_BUFFER_SIZE> out_stream(write_sock);
-        server.process_request(/*out_stream, */buffer, static_cast<std::size_t>(bytes_recieved));
-        out_stream.flush();
+        server.process_request(buffer, static_cast<std::size_t>(bytes_recieved));
 
         close(new_sd);
     }

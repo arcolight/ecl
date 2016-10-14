@@ -11,10 +11,13 @@ namespace ecl
 namespace web
 {
 
-using url_t           = const char*;
-using header_name_t   = const char*;
-using header_value_t  = const char*;
-using header_t        = std::pair<header_name_t, header_value_t>;
+using url_t          = const char*;
+using url_field_t    = const char*;
+using header_name_t  = const char*;
+using header_value_t = const char*;
+using header_t       = std::pair<header_name_t, header_value_t>;
+using body_ptr_t     = const char*;
+using body_t         = std::pair<body_ptr_t, std::size_t>;
 
 using send_callback_t = std::function
                         <
