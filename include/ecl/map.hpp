@@ -62,6 +62,7 @@ public:
     using const_reverse_iterator  = typename tree_t::const_reverse_iterator;
 
     map()                                                               noexcept
+        : m_nodes_pool()
     {
         init();
     }
@@ -82,6 +83,7 @@ public:
     }
 
     map(std::initializer_list<value_type> ilist)                        noexcept
+        : m_nodes_pool()
     {
         init();
 
