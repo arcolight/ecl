@@ -54,7 +54,7 @@ void write_sock(const char* const buf, std::size_t size);
 
 void write_sock(const char* const buf, std::size_t size)
 {
-//    std::cout << buf;
+    std::cout << buf << std::endl;
     send(new_sd, buf, size, 0);
 }
 
@@ -130,23 +130,23 @@ void start_server(const char* port)
 
     bool resource_result = true;
 
-    server_t::resource_t < resources::res_400_html_t    > res_400     ( ecl::web::content_type::TEXT_HTML       );
-    server_t::resource_t < resources::res_404_html_t    > res_404     ( ecl::web::content_type::TEXT_HTML       );
-    server_t::resource_t < resources::res_500_html_t    > res_500     ( ecl::web::content_type::TEXT_HTML       );
+    server_t::static_resource_t < resources::res_400_html_t    > res_400     ( ecl::web::content_type::TEXT_HTML       , ecl::web::status_code::BAD_REQUEST           );
+    server_t::static_resource_t < resources::res_404_html_t    > res_404     ( ecl::web::content_type::TEXT_HTML       , ecl::web::status_code::NOT_FOUND             );
+    server_t::static_resource_t < resources::res_500_html_t    > res_500     ( ecl::web::content_type::TEXT_HTML       , ecl::web::status_code::INTERNAL_SERVER_ERROR );
 
-    server_t::resource_t < resources::res_index_html_t  > res_index_1 ( ecl::web::content_type::TEXT_HTML       );
-    server_t::resource_t < resources::res_index_html_t  > res_index_2 ( ecl::web::content_type::TEXT_HTML       );
+    server_t::static_resource_t < resources::res_index_html_t  > res_index_1 ( ecl::web::content_type::TEXT_HTML       );
+    server_t::static_resource_t < resources::res_index_html_t  > res_index_2 ( ecl::web::content_type::TEXT_HTML       );
 
-    server_t::resource_t < resources::res_icon_png_t    > res_icon    ( ecl::web::content_type::IMAGE_PNG       );
-    server_t::resource_t < resources::res_favicon_png_t > res_favicon ( ecl::web::content_type::IMAGE_PNG       );
-    server_t::resource_t < resources::res_style_css_t   > res_style   ( ecl::web::content_type::TEXT_CSS        );
-    server_t::resource_t < resources::res_jquery_js_t   > res_jquery  ( ecl::web::content_type::TEXT_JAVASCRIPT );
+    server_t::static_resource_t < resources::res_icon_png_t    > res_icon    ( ecl::web::content_type::IMAGE_PNG       );
+    server_t::static_resource_t < resources::res_favicon_png_t > res_favicon ( ecl::web::content_type::IMAGE_PNG       );
+    server_t::static_resource_t < resources::res_style_css_t   > res_style   ( ecl::web::content_type::TEXT_CSS        );
+    server_t::static_resource_t < resources::res_jquery_js_t   > res_jquery  ( ecl::web::content_type::TEXT_JAVASCRIPT );
 
     cgi_info c_info;
 
-    resource_result &= server.attach_resource( name::page_400::name() , res_400     );
-    resource_result &= server.attach_resource( name::page_404::name() , res_404     );
-    resource_result &= server.attach_resource( name::page_500::name() , res_500     );
+    resource_result &= server.attach_handler( res_400 );
+    resource_result &= server.attach_handler( res_404 );
+    resource_result &= server.attach_handler( res_500 );
 
     resource_result &= server.attach_resource( name::index_1::name()  , res_index_1 );
     resource_result &= server.attach_resource( name::index_2::name()  , res_index_2 );

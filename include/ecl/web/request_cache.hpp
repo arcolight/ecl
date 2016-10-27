@@ -101,9 +101,7 @@ public:
 
         http_parser_url parser_url;
         http_parser_url_init(&parser_url);
-        int res = http_parser_parse_url(u, std::strlen(m_url), 0, &parser_url);
-
-        std::cout << ">>> url parse res: " << res << std::endl;
+        http_parser_parse_url(u, std::strlen(m_url), 0, &parser_url);
 
         for(int f = UF_SCHEMA; f < UF_MAX; ++f)
         {
@@ -112,15 +110,7 @@ public:
                 const char* p = m_url + parser_url.field_data[f].off;
                 m_url_fields[to_url_field(f)] = p;
                 const_cast<char*>(p)[parser_url.field_data[f].len] = 0;
-                std::cout << ">>> Insert " << p << std::endl;
             }
-        }
-
-        std::cout << ">>> map size: " << m_url_fields.size() << std::endl;
-
-        for(auto& e : m_url_fields)
-        {
-            std::cout << to_string(e.first) << " : " << e.second << std::endl;
         }
     }
 

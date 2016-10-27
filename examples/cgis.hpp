@@ -30,15 +30,14 @@ using json_info_t = ecl::json::object
 
 struct cgi_info : public server_t::i_resource_t
 {
-    virtual ~cgi_info()                                                 override
+    virtual ~cgi_info()                                        noexcept override
     {}
 
     virtual ecl::web::status_code on_request(
             server_t::i_resource_t::stream_t& st,
             ecl::web::i_request_cache&        c
-        )                                                               override
+        )                                                      noexcept override
     {
-        std::cout << "Call" << std::endl;
         switch(c.get_met())
         {
             case ecl::web::method::GET:
@@ -83,13 +82,13 @@ using json_settings_t = ecl::json::object
 
 struct cgi_settings : public server_t::i_resource_t
 {
-    virtual ~cgi_settings()                                             override
+    virtual ~cgi_settings()                                    noexcept override
     {}
 
     virtual ecl::web::status_code on_request(
             server_t::i_resource_t::stream_t&,
             ecl::web::i_request_cache&        c
-        )                                                               override
+        )                                                      noexcept override
     {
         switch(c.get_met())
         {

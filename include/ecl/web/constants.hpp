@@ -120,7 +120,7 @@ enum class content_encoding
     GZIP
 };
 
-static inline url_field to_url_field(int f)
+static inline url_field to_url_field(int f)                             noexcept
 {
     switch(http_parser_url_fields(f))
     {
@@ -137,7 +137,7 @@ static inline url_field to_url_field(int f)
      return url_field::UNKNOWN;
 }
 
-static inline str_const to_string(url_field f)
+static inline str_const to_string(url_field f)                          noexcept
 {
     switch(f)
     {
@@ -324,20 +324,72 @@ static inline int to_int(status_code c)                                 noexcept
     return 0;
 }
 
+static inline bool is_error(status_code c)                              noexcept
+{
+    switch(c)
+    {
+        case status_code::CONTINUE:                      return false;
+        case status_code::SWITCHING_PROTO:               return false;
+
+        case status_code::OK:                            return false;
+        case status_code::CREATED:                       return false;
+        case status_code::ACCEPTED:                      return false;
+        case status_code::NO_CONTENT:                    return false;
+        case status_code::RESET_CONTENT:                 return false;
+        case status_code::PARTIAL_CONTENT:               return false;
+
+        case status_code::MULTIPLE_CHOICES:              return false;
+        case status_code::MOVED_PERMANENTLY:             return false;
+        case status_code::FOUND:                         return false;
+        case status_code::SEE_OTHER:                     return false;
+        case status_code::NOT_MODIFIED:                  return false;
+        case status_code::USE_PROXY:                     return false;
+        case status_code::SWITCH_PROXY:                  return false;
+        case status_code::TEMPORARY_REDIRECT:            return false;
+        case status_code::PERMANENT_REDIRECT:            return false;
+
+        case status_code::BAD_REQUEST:                   return true;
+        case status_code::UNAUTHORIZED:                  return true;
+        case status_code::PAYMENT_REQUIRED:              return true;
+        case status_code::FORBIDDEN:                     return true;
+        case status_code::NOT_FOUND:                     return true;
+        case status_code::METHOD_NOT_ALLOWED:            return true;
+        case status_code::NOT_ACCEPTABLE:                return true;
+        case status_code::REQUEST_TIMEOUT:               return true;
+        case status_code::CONFLICT:                      return true;
+        case status_code::GONE:                          return true;
+        case status_code::LENGTH_REQUIRED:               return true;
+        case status_code::PRECONDITION_FAILED:           return true;
+        case status_code::REQUEST_ENTITY_TOO_LARGE:      return true;
+        case status_code::REQUEST_URI_TOO_LONG:          return true;
+        case status_code::UNSUPPORTED_MEDIA_TYPE:        return true;
+        case status_code::REQUEST_RANGE_NOT_SATISFIABLE: return true;
+        case status_code::EXPECTATION_FAILED:            return true;
+
+        case status_code::INTERNAL_SERVER_ERROR:         return true;
+        case status_code::NOT_IMPLEMENTED:               return true;
+        case status_code::BAD_GATEWAY:                   return true;
+        case status_code::SERVICE_UNAVAILABLE:           return true;
+        case status_code::GATEWAY_TIMEOUT:               return true;
+        case status_code::HTTP_VERSION_NOT_SUPPORTED:    return true;
+    }
+    return false;
+}
+
 template<typename T>
-static void write_status(T& st, status_code code)
+static void write_status(T& st, status_code code)                       noexcept
 {
     st << to_int(code) << " " << to_string(code);
 }
 
 template<typename T>
-static void write_version(T& st, version ver)
+static void write_version(T& st, version ver)                           noexcept
 {
     st << to_string(ver) << " ";
 }
 
 template<typename T>
-static void write_status_line(T& st, version ver, status_code code)
+static void write_status_line(T& st, version ver, status_code code)     noexcept
 {
     write_version<T>(st, ver);
     write_status<T>(st, code);
@@ -345,7 +397,7 @@ static void write_status_line(T& st, version ver, status_code code)
 }
 
 template<typename T>
-static void set_content_type_header(T& st, content_type t)
+static void set_content_type_header(T& st, content_type t)              noexcept
 {
     st << to_string(header_name::CONTENT_TYPE)
        << ":"
@@ -353,7 +405,7 @@ static void set_content_type_header(T& st, content_type t)
 }
 
 template<typename T>
-static void set_content_encoding_header(T& st, content_encoding e)
+static void set_content_encoding_header(T& st, content_encoding e)      noexcept
 {
     st << to_string(header_name::CONTENT_ENCODING)
        << ":"
@@ -361,7 +413,7 @@ static void set_content_encoding_header(T& st, content_encoding e)
 }
 
 template<typename T>
-static void redirect(T& st, const char* location, version ver)
+static void redirect(T& st, const char* location, version ver)          noexcept
 {
     ecl::web::write_status_line(st, ver, ecl::web::status_code::SEE_OTHER);
 

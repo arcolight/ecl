@@ -28,10 +28,16 @@ template
 class server
 {
 public:
-    using stream_t     = ecl::stream<OUT_STREAM_SIZE>;
+    using stream_t            = ecl::stream<OUT_STREAM_SIZE>;
+
     template<typename T>
-    using resource_t   = static_resource<T, stream_t>;
-    using i_resource_t = i_resource<stream_t>;
+    using resource_t          = static_resource<T, stream_t>;
+
+    template<typename T>
+    using static_resource_t   = static_resource<T, stream_t>;
+
+    using i_resource_t        = i_resource<stream_t>;
+    using i_static_resource_t = i_static_resource<stream_t>;
 
 private:
     template<typename T>
@@ -52,7 +58,7 @@ private:
                                 , char_ptr_cmp
                             >;
 
-    using handlers_map_t = ecl::map<status_code, i_resource_t*, 30>;
+    using handlers_map_t = ecl::map<status_code, i_static_resource_t*, 40>;
 
     int on_message_begin()
     {
@@ -62,7 +68,6 @@ private:
 
     int on_url(const char* at, std::size_t length)
     {
-        std::cout << ">>> on_url " << std::string(at).substr(0, length) << std::endl;
         const_cast<char*>(at)[length] = 0;
         m_cache.set_url(at);
 
@@ -99,6 +104,8 @@ private:
 
     int on_body(const char* at, std::size_t length)
     {
+        std::cout << ">>> Body with size: " << length << std::cout;
+
         const_cast<char*>(at)[length] = 0;
         m_cache.set_body(std::make_pair(at, length));
 
@@ -107,17 +114,20 @@ private:
 
     int on_message_complete()
     {
+        std::cout << ">>> Call" << std::endl;
         call_resource();
         return 0;
     }
 
     int on_chunk_header()
     {
+        std::cout << ">>> Chunk header" << std::cout;
         return 0;
     }
 
     int on_chunk_complete()
     {
+        std::cout << ">>> Chunk complete" << std::cout;
         return 0;
     }
 
@@ -194,40 +204,59 @@ public:
         m_parser_settings.on_chunk_complete   = on_chunk_complete_static;
     }
 
-    void process_request(const char* buf, std::size_t buf_size)
+    void process_request(const char* buf, std::size_t buf_size)         noexcept
     {
-        std::cout << ">>> Process request." << std::endl;
         m_cache.cache(buf, buf_size);
 
         http_parser_execute(&m_parser,
                             &m_parser_settings,
                             m_cache.get_raw_rq(),
                             m_cache.get_raw_rq_size());
-        std::cout << ">>> Parse done." << std::endl;
+
+        if(m_parser.http_errno != HPE_OK)
+        {
+            std::cout << http_errno_name((http_errno)m_parser.http_errno) << std::endl;
+            std::cout << http_errno_description((http_errno)m_parser.http_errno) << std::endl;
+        }
+
+        std::cout << ">>> END OF REQUEST" << std::endl;
     }
 
-    bool attach_resource(url_t url, i_resource_t& res)
+    bool attach_resource(url_t url, i_resource_t& res)                  noexcept
     {
         return m_resources.insert(std::make_pair(url, &res)).second;
+    }
+
+    bool attach_handler(i_static_resource_t& handler)                   noexcept
+    {
+        return m_handlers.insert(std::make_pair
+                                 (
+                                       handler.get_status_code()
+                                     , &handler)
+                                 ).second;
     }
 
 private:
     void call_resource()
     {
-        std::cout << ">>> Call resource " << m_cache.get_url(url_field::PATH) << std::endl;
         i_resource_t* res = m_resources[m_cache.get_url(url_field::PATH)];
+
+        status_code result = status_code::NOT_FOUND;
         if(nullptr != res)
         {
-            std::cout << ">>> Found: " << m_cache.get_url(url_field::PATH) << std::endl;
-            res->on_request(m_stream, m_cache);
+            result = res->on_request(m_stream, m_cache);
         }
-        else
+
+        if(is_error(result))
         {
-            std::cout << ">>> Not found." << std::endl;
-            if(nullptr != m_resources["/404.html"])
+            std::cout << "Error: " << to_string(result) << std::endl;
+            if(nullptr != m_handlers[result])
             {
-                std::cout << ">>> 404.html" << std::endl;
-                m_resources["/404.html"]->on_request(m_stream, m_cache);
+                m_handlers[result]->on_request(m_stream, m_cache);
+            }
+            else
+            {
+                write_status_line(m_stream, version::HTTP11, status_code::NOT_FOUND);
             }
         }
     }
@@ -242,6 +271,7 @@ private:
     request_cache_t      m_cache           {};
 
     resources_map_t      m_resources       {};
+    handlers_map_t       m_handlers        {};
 };
 
 } // namespace web
