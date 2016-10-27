@@ -15,7 +15,7 @@ Influenced by boost::MSM, but more simple.
 
 ### bit_field
 Class for serialization and deserialization of bitfield-like structures.
-Main problem in bitfields is compiler-specific implementation and ending problems.
+Main problem in bitfields is compiler-specific implementation and endianess problems.
 bitfield class architecture independent. Of course, at cost of complexity.
 
 ### scope_guard
@@ -32,7 +32,7 @@ std::stream or any other object that support operator<< and deserialized from C-
 
 ### stream
 Simple implementation of stream. (iostream is too complex for embedded systems and uses dynamic memory)
-Flush function can be specialized as template arg. It will be called, when stream becomes full.
+Flush function can be passed as constructor arg. It will be called, when stream becomes full.
 
 ### singleton
 Meyers singleton implementation.
@@ -47,28 +47,36 @@ Circular buffer class.
 Binary tree implementation. Can be used with statically allocated nodes, so no memory allocation needed.
 
 ### red_black_tree
-Red-black tree implementation. Can be used with statically allocated nodes, so no memory allocation needed.
+Red-black tree implementation.
 
-### static_map
-Simple map class with constant fields. Uses RB-tree for element access.
+### avl_tree
+AVL tree implementation.
+
+### splay_tree
+Splay tree implementation.
+
+### map
+Simple constant-size map class. Uses RB-tree for element access.
 
 build
 ===
 
 Targets:
 
-    * all - all tests
-    * test_fsm
-    * test_scope_guard
-    * test_circular_buffer
-    * test_bitfield
-    * test_singleton
-    * test_stream
-    * test_json
-    * test_str_const
-    * test_tree
-    * test_static_map
-    * test_command_processor
+    * all - all examples and tests
+    * examples - all examples
+    * tests - tests
+    * example_fsm
+    * example_scope_guard
+    * example_cb
+    * example_bitfield
+    * example_singleton
+    * example_stream
+    * example_json
+    * example_str_const
+    * example_tree
+    * example_static_map
+    * example_command_processor
 
 gcc:
 
