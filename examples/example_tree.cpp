@@ -634,9 +634,10 @@ int main(int argc, char* argv[], char**)
 
     std::size_t dynamic_nodes_count = NODES_COUNT;
 
+    // This doesn't work for ARM with qemu. argc will be 0.
     if(argc == 2)
     {
-        dynamic_nodes_count = std::max(1, std::stoi(std::string(argv[1])));
+        dynamic_nodes_count = std::strtoul(argv[1], 0, 10);
     }
 
     test_tree< tree_t       > ( TREE_PREFIX       , simple_nodes , dynamic_nodes_count);
