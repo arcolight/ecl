@@ -65,6 +65,19 @@ out_dir:
 
 examples: $(EXAMPLE_PREFIX)_$(FSM) $(EXAMPLE_PREFIX)_$(SG) $(EXAMPLE_PREFIX)_$(CB) $(EXAMPLE_PREFIX)_$(BF) $(EXAMPLE_PREFIX)_$(SINGLETON) $(EXAMPLE_PREFIX)_$(STREAM) $(EXAMPLE_PREFIX)_$(JSON) $(EXAMPLE_PREFIX)_$(STR_CONST) $(EXAMPLE_PREFIX)_$(CMD) $(EXAMPLE_PREFIX)_$(TREE) $(EXAMPLE_PREFIX)_$(MAP)
 
+gen_web_res:
+	@mkdir -p $(WEB_RES_GEN_DIR)
+	./res_gen.sh $(WEB_DEF_PAGES_DIR)/400.html            $(WEB_RES_GEN_DIR)/
+	./res_gen.sh $(WEB_DEF_PAGES_DIR)/403.html            $(WEB_RES_GEN_DIR)/
+	./res_gen.sh $(WEB_DEF_PAGES_DIR)/404.html            $(WEB_RES_GEN_DIR)/
+	./res_gen.sh $(WEB_DEF_PAGES_DIR)/500.html            $(WEB_RES_GEN_DIR)/
+	./res_gen.sh $(WEB_RES_SRC_DIR)/index.html            $(WEB_RES_GEN_DIR)/ -c
+	./res_gen.sh $(WEB_RES_SRC_DIR)/authorized_index.html $(WEB_RES_GEN_DIR)/ -c
+	./res_gen.sh $(WEB_RES_SRC_DIR)/style.css             $(WEB_RES_GEN_DIR)/ -c
+	./res_gen.sh $(WEB_RES_SRC_DIR)/icon.png              $(WEB_RES_GEN_DIR)/ -c
+	./res_gen.sh $(WEB_RES_SRC_DIR)/favicon.png           $(WEB_RES_GEN_DIR)/ -c
+	./res_gen.sh $(WEB_RES_SRC_DIR)/jquery.js             $(WEB_RES_GEN_DIR)/ -c
+
 $(EXAMPLE_PREFIX)_$(FSM): out_dir
 	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(FSM)_$(CXX).map $(EXAMPLES_DIR)/$(EXAMPLE_PREFIX)_$(FSM).cpp -o $(BIN_DIR)/$(FSM)_$(CXX)
 
