@@ -45,6 +45,8 @@ HEADER_FILE=$OUT_DIR/$HEADER_NAME
 SOURCE_NAME=$RES_NAME_PROG.cpp
 SOURCE_FILE=$OUT_DIR/$SOURCE_NAME
 
+NAMESPACE_NAME=resources
+
 HEADER_GUARD_PREF="WEB_RES_GENERATED"
 HEADER_GUARD_DEF=$HEADER_GUARD_PREF\_$(echo $HEADER_NAME | tr '.' '_' | tr [:lower:] [:upper:])
 echo "#ifndef $HEADER_GUARD_DEF"                                                    >  $HEADER_FILE
@@ -52,23 +54,34 @@ echo "#define $HEADER_GUARD_DEF"                                                
 echo ""                                                                             >> $HEADER_FILE
 echo "#include <cstddef>"                                                           >> $HEADER_FILE
 echo ""                                                                             >> $HEADER_FILE
-echo "typedef struct $STRUCT_NAME"                                                  >> $HEADER_FILE
+echo "namespace ${NAMESPACE_NAME}"                                                  >> $HEADER_FILE
+echo "{"                                                                            >> $HEADER_FILE
+echo ""                                                                             >> $HEADER_FILE
+echo "using ${STRUCT_NAME_TPD} = struct ${STRUCT_NAME}"                             >> $HEADER_FILE
 echo "{"                                                                            >> $HEADER_FILE
 echo -n "    static constexpr "                                                     >> $HEADER_FILE
 $XXD -i $RES_FILE | sed 's/[a-z_0-9]*_len/size/' | sed 's/[a-z_0-9]*\[\]/data\[\]/' >> $HEADER_FILE
-echo "} ${STRUCT_NAME_TPD};"                                                        >> $HEADER_FILE
+sed -i -e 's/  0x/        0x/'                                                         $HEADER_FILE
+sed -i -e 's/};/    };/'                                                               $HEADER_FILE
+sed -i -e 's/unsigned int/\n    static constexpr size_t/'                              $HEADER_FILE
+echo ""                                                                             >> $HEADER_FILE
+echo -n "    static constexpr bool compressed = "                                   >> $HEADER_FILE
+if [ "$3" = "-c" ]; then
+    echo "true;"                                                                    >> $HEADER_FILE
+else
+    echo "false;"                                                                   >> $HEADER_FILE
+fi
+echo "};"                                                                           >> $HEADER_FILE
+echo ""                                                                             >> $HEADER_FILE
+echo "} // namespace ${NAMESPACE_NAME}"                                             >> $HEADER_FILE
 echo ""                                                                             >> $HEADER_FILE
 echo "#endif // $HEADER_GUARD_DEF"                                                  >> $HEADER_FILE
 
 echo " * $HEADER_FILE generated"
 
-sed -i -e 's/  0x/        0x/'                            $HEADER_FILE
-sed -i -e 's/};/    };/'                                  $HEADER_FILE
-sed -i -e 's/unsigned int/\n    static constexpr size_t/' $HEADER_FILE
-
-echo "#include \"$HEADER_NAME\""                           >  $SOURCE_FILE
-echo ""                                                    >> $SOURCE_FILE
-echo "constexpr unsigned char ${STRUCT_NAME_TPD}::data[];" >> $SOURCE_FILE
+echo "#include \"$HEADER_NAME\""                                              >  $SOURCE_FILE
+echo ""                                                                       >> $SOURCE_FILE
+echo "constexpr unsigned char ${NAMESPACE_NAME}::${STRUCT_NAME_TPD}::data[];" >> $SOURCE_FILE
 
 echo " * $SOURCE_FILE generated"
 

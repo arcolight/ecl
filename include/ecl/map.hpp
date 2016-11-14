@@ -11,7 +11,13 @@
 namespace ecl
 {
 
-template<typename K, typename V, std::size_t N, template<typename> class Compare = std::less>
+template
+<
+      typename K
+    , typename V
+    , std::size_t N
+    , template <typename> class Compare = std::less
+>
 class map
 {
     using tree_t                    = tree::red_black_tree
@@ -472,7 +478,7 @@ template
       typename K
     , typename V
     , typename... Args
-    , template<typename> class Compare = std::less
+    , template <typename> class Compare = std::less
 >
 constexpr inline const map
                        <

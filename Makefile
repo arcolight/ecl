@@ -25,6 +25,7 @@ TREE = tree
 CMD = command_processor
 MAP = map
 JSON = json
+WEB = web
 
 INCLUDE_DIR = ./include
 EXAMPLES_DIR = ./examples
@@ -32,10 +33,26 @@ TESTS_DIR = ./tests
 BIN_DIR = ./bin
 DOC_DIR = ./doc
 
+HTTP_PARSER_DIR = ./thirdparty/http-parser
+
 TESTS_BIN = tests
 
 EXAMPLE_PREFIX = example
 GCOV_PREFIX = gcov
+
+WEB_DEF_PAGES_DIR=./web_def_pages
+WEB_RES_SRC_DIR = ./examples/web_resources_src
+WEB_RES_GEN_DIR = ./examples/web_resources
+WEB_GEN_SOURCES = $(WEB_RES_GEN_DIR)/400_html.cpp              \
+				  $(WEB_RES_GEN_DIR)/403_html.cpp              \
+				  $(WEB_RES_GEN_DIR)/404_html.cpp              \
+				  $(WEB_RES_GEN_DIR)/500_html.cpp              \
+				  $(WEB_RES_GEN_DIR)/favicon_png.cpp           \
+				  $(WEB_RES_GEN_DIR)/icon_png.cpp              \
+				  $(WEB_RES_GEN_DIR)/index_html.cpp            \
+				  $(WEB_RES_GEN_DIR)/authorized_index_html.cpp \
+				  $(WEB_RES_GEN_DIR)/jquery_js.cpp             \
+				  $(WEB_RES_GEN_DIR)/style_css.cpp
 
 ifndef GCOV
 	GCOV=gcov
@@ -81,6 +98,9 @@ $(EXAMPLE_PREFIX)_$(TREE): out_dir
 $(EXAMPLE_PREFIX)_$(CMD): out_dir
 	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -Wl,-Map=$(BIN_DIR)/$(CMD)_$(CXX).map $(EXAMPLES_DIR)/$(EXAMPLE_PREFIX)_$(CMD).cpp -o $(BIN_DIR)/$(CMD)_$(CXX)
 
+$(EXAMPLE_PREFIX)_$(WEB): out_dir gen_web_res
+	$(CXX) $(FLAGS) -I$(INCLUDE_DIR) -I$(HTTP_PARSER_DIR) -Wl,-Map=$(BIN_DIR)/$(WEB)_$(CXX).map $(EXAMPLES_DIR)/$(EXAMPLE_PREFIX)_$(WEB).cpp $(WEB_GEN_SOURCES) $(HTTP_PARSER_DIR)/http_parser.c -o $(BIN_DIR)/$(WEB)_$(CXX)
+
 tests: out_dir clean_gcov
 	$(CXX) $(TESTS_FLAGS) -I$(INCLUDE_DIR) $(TESTS_DIR)/$(TESTS_BIN).cpp -lboost_unit_test_framework -o $(BIN_DIR)/$(TESTS_BIN)_$(CXX)
 
@@ -107,3 +127,4 @@ clean_doc:
 
 clean: clean_doc clean_gcov
 	$(RM) -r $(BIN_DIR)
+	$(RM) -r $(WEB_RES_GEN_DIR)

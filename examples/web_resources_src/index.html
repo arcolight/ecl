@@ -1,0 +1,167 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+"http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>ECL Web server test </title>
+        <link rel="stylesheet" type="text/css" media="screen" href="/etc/style.css" />
+        <link rel="icon" type="image/png" href="/favicon.png">
+        <script type="text/javascript" src="/etc/js/jquery.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function() {
+                function updateJson() {
+                    $.ajax({
+                      url: "info",
+                      dataType :'json',
+                      async: false,
+                      cache: false,
+                      success: function(data){
+                            $.each(data,function(k,v){
+                                $('#'+k).text(v);
+                            });
+                            setTimeout(updateJson, 600000);
+                         }
+                    });
+                }
+                updateJson();
+            });
+        </script>
+        <script type="text/javascript">
+            $(document).ready(function()
+            {
+                var upload_form = $('#upload_form'),
+                    file_input = $('#file_input'),
+                    submit_btn = $('#submit_btn');
+                file_input.on('change', onFilesSelected);
+                upload_form.on('submit', onFormSubmit);
+                /**
+                 * Loops through the selected files, displays their file name and size
+                 * in the file list, and enables the submit button for uploading.
+                 */
+                function onFilesSelected(e)
+                {
+                    // var files = e.target.files,
+                    //     file;
+                    // for (var i = 0; i < files.length; i++)
+                    // {
+                    //     file = files[i];
+                    // }
+                    submit_btn.attr('disabled', false);
+                }
+                /**
+                 * Loops through all known uploads and starts each upload
+                 * process, preventing default form submission.
+                 */
+                function onFormSubmit(e)
+                {
+                    var fileInput = document.getElementById('file_input');
+                    var file = fileInput.files[0];
+
+                    var file_size = file.size;
+                    var chunk_size = 512;
+                    var range_start = 0;
+                    var range_end = chunk_size;
+                    var chunk;
+
+                    var ch_count = file_size / chunk_size;
+
+                    for(i = 0; i < ch_count; i++)
+                    {
+                        chunk = file['slice'](range_start, range_end);
+
+                        sendChunk(chunk, range_start, range_end, file_size);
+
+                        range_start = range_end;
+                        range_end = range_start + chunk_size;
+
+                        if (range_end > file_size)
+                        {
+                            range_end = file_size;
+                        }
+                    }
+
+                    return false;
+                }
+
+                function sendChunk(chunk, range_start, range_end, file_size)
+                {
+                    var xhr = new XMLHttpRequest();
+
+                    xhr.overrideMimeType('application/octet-stream');
+
+                    xhr.open('POST', '/upload', true);
+                    if(range_start !== 0)
+                    {
+                        console.log(xhr);
+                        xhr.setRequestHeader('Content-Range', 'bytes ' + range_start + '-' + range_end + '/' + file_size);
+                    }
+
+                    xhr.send(chunk);
+                }
+            });
+        </script>
+    </head>
+    <body>
+        <div id="wrapper">
+            <div id="container">
+                <div id="header">
+                    <img src="/etc/img/icon.png" alt="ECL logo" />
+                    <div>
+                        <h1>ECL test page</h1><br>
+                    </div>
+                </div>
+                <div class="content">
+                    <form action="auth" method="POST">
+                    <input type="password" name="pass" value="" />
+                    <input type="submit" name="pass_send" value="send" /><br>
+                    </form>
+                </div>
+                <div class="content">
+                    <b>JSON value1: </b><span id="json_1">--</span><br>
+                    <b>JSON value2: </b><span id="json_2">--</span><br>
+                    <b>JSON value3: </b><span id="json_3">--</span><br>
+                </div>
+                <div class="content">
+                    <table>
+                    <tr><td><b>JSON val_1 number (int8_t)  : </b></td><td><input id="val_1" type="number" min="-127" max="128" value="" /><br></td></tr>
+                    <tr><td><b>JSON val_2 number (uint8_t) : </b></td><td><input id="val_2" type="number" min="0"    max="255" value="" /><br></td></tr>
+                    <tr><td><b>JSON val_3 string (8-char)  : </b></td><td><input id="val_3"                                    value="" /><br></td></tr>
+                    <tr><td><b>JSON val_4 number (int64_t) : </b></td><td><input id="val_4" type="number"                      value="" /><br></td></tr>
+                    <tr><td><b>JSON val_5 number (uint64_t): </b></td><td><input id="val_5" type="number"                      value="" /><br></td></tr>
+                    <input id="data_send" type="submit" name="data_send" value="send" /><br>
+                    <script type="text/javascript">
+                        $("#data_send").on("click", function()
+                        {
+                            var jsonToSend =
+                            {
+                                val_1 : parseInt($("#val_1").val(), 10),
+                                val_2 : parseInt($("#val_2").val(), 10),
+                                val_3 : $("#val_3").val(),
+                                val_4 : parseInt($("#val_4").val(), 10),
+                                val_5 : parseInt($("#val_5").val(), 10)
+                            }
+                            var dataToSend = JSON.stringify(jsonToSend);
+                            $.ajax
+                            ({
+                                url: "settings",
+                                dataType :'json',
+                                type: "POST",
+                                data: dataToSend,
+                                contentType: "application/json",
+                                success: function(){}
+                            });
+                        });
+                    </script>
+                    </table>
+                </div>
+                <div class="content">
+                    <form id="upload_form" action="/upload" method="post">
+                        <label for="file_input">Select File:</label>
+                        <input id="file_input" type="file">
+                        <input id="submit_btn" type="submit" value="Upload" disabled="true">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
