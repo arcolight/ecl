@@ -1,6 +1,8 @@
 #ifndef ECL_WEB_SERVER_HPP
 #define ECL_WEB_SERVER_HPP
 
+#include <cstring>
+
 #include "http_parser.h"
 
 #include <ecl/web/request_cache.hpp>
@@ -25,30 +27,49 @@ template
 >
 class server
 {
+public:
+    using stream_t            = ecl::stream<OUT_STREAM_SIZE>;
+
+    template<typename T>
+    using resource_t          = static_resource<T, stream_t>;
+
+    template<typename T>
+    using static_resource_t   = static_resource<T, stream_t>;
+
+    using i_resource_t        = i_resource<stream_t>;
+    using i_static_resource_t = i_static_resource<stream_t>;
+
+private:
+    template<typename T>
+    struct char_ptr_cmp
+    {
+        bool operator()(char const *a, char const *b)
+        {
+           return (std::strcmp(a, b) < 0);
+        }
+    };
+
     using request_cache_t = request_cache<CACHE_SIZE, HEADERS_COUNT>;
-    using stream_t        = ecl::stream<OUT_STREAM_SIZE>;
-    using i_resource_t    = i_resource<stream_t>;
-    using resources_map_t = ecl::map<url_t, i_resource_t*, RESOURCES_COUNT>;
+    using resources_map_t = ecl::map
+                            <
+                                  url_t
+                                , i_resource_t*
+                                , RESOURCES_COUNT
+                                , char_ptr_cmp
+                            >;
+
+    using handlers_map_t = ecl::map<status_code, i_static_resource_t*, 40>;
 
     int on_message_begin()
     {
+        m_cache.clear();
         return 0;
     }
 
     int on_url(const char* at, std::size_t length)
     {
-        m_cache.set_url(at);
         const_cast<char*>(at)[length] = 0;
-
-        http_parser_url u;
-        http_parser_parse_url(at, length, 1, &u);
-        // for(int f = UF_SCHEMA; f < UF_MAX; ++f)
-        // {
-        //     if(u.field_set & (1 << f))
-        //     {
-        //         std::cout << "field " << f << " is set: " << std::string(at + u.field_data[f].off).substr(0, u.field_data[f].len) << std::endl;
-        //     }
-        // }
+        m_cache.set_url(at);
 
         return 0;
     }
@@ -60,16 +81,16 @@ class server
 
     int on_header_field(const char* at, std::size_t length)
     {
-        m_hdr.first         = at;
         const_cast<char*>(at)[length] = 0;
+        m_hdr.first = at;
 
         return 0;
     }
 
     int on_header_value(const char* at, std::size_t length)
     {
-        m_hdr.second = at;
         const_cast<char*>(at)[length] = 0;
+        m_hdr.second = at;
 
         m_cache.set_hdr(m_hdr);
 
@@ -81,24 +102,32 @@ class server
         return 0;
     }
 
-    int on_body(const char*, std::size_t)
+    int on_body(const char* at, std::size_t length)
     {
+        std::cout << ">>> Body with size: " << length << std::cout;
+
+        const_cast<char*>(at)[length] = 0;
+        m_cache.set_body(std::make_pair(at, length));
+
         return 0;
     }
 
     int on_message_complete()
     {
+        std::cout << ">>> Call" << std::endl;
         call_resource();
         return 0;
     }
 
     int on_chunk_header()
     {
+        std::cout << ">>> Chunk header" << std::cout;
         return 0;
     }
 
     int on_chunk_complete()
     {
+        std::cout << ">>> Chunk complete" << std::cout;
         return 0;
     }
 
@@ -153,9 +182,6 @@ class server
     }
 
 public:
-    template<typename T>
-    using resource_t = static_resource<T, stream_t>;
-
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
     server(send_callback_t cb)
@@ -178,7 +204,7 @@ public:
         m_parser_settings.on_chunk_complete   = on_chunk_complete_static;
     }
 
-    void process_request(const char* buf, std::size_t buf_size)
+    void process_request(const char* buf, std::size_t buf_size)         noexcept
     {
         m_cache.cache(buf, buf_size);
 
@@ -186,27 +212,52 @@ public:
                             &m_parser_settings,
                             m_cache.get_raw_rq(),
                             m_cache.get_raw_rq_size());
+
+        if(m_parser.http_errno != HPE_OK)
+        {
+            std::cout << http_errno_name((http_errno)m_parser.http_errno) << std::endl;
+            std::cout << http_errno_description((http_errno)m_parser.http_errno) << std::endl;
+        }
+
+        std::cout << ">>> END OF REQUEST" << std::endl;
     }
 
-    bool attach_resource(url_t url, i_resource_t& res)
+    bool attach_resource(url_t url, i_resource_t& res)                  noexcept
     {
-        auto ret = m_resources.insert(std::make_pair(url, &res));
-        return ret.second;
+        return m_resources.insert(std::make_pair(url, &res)).second;
+    }
+
+    bool attach_handler(i_static_resource_t& handler)                   noexcept
+    {
+        return m_handlers.insert(std::make_pair
+                                 (
+                                       handler.get_status_code()
+                                     , &handler)
+                                 ).second;
     }
 
 private:
     void call_resource()
     {
-        i_resource_t* res = m_resources[m_cache.get_url()];
+        i_resource_t* res = m_resources[m_cache.get_url(url_field::PATH)];
+
+        status_code result = status_code::NOT_FOUND;
         if(nullptr != res)
         {
-            std::cout << ">>> size: " << res->size() << std::endl;
-            std::cout << ">>> type: " << to_string(res->type()) << std::endl;
-            res->on_request(m_stream, m_cache);
+            result = res->on_request(m_stream, m_cache);
         }
-        else
+
+        if(is_error(result))
         {
-            std::cout << m_cache.get_url() << " not found!" << std::endl;
+            std::cout << "Error: " << to_string(result) << std::endl;
+            if(nullptr != m_handlers[result])
+            {
+                m_handlers[result]->on_request(m_stream, m_cache);
+            }
+            else
+            {
+                write_status_line(m_stream, version::HTTP11, status_code::NOT_FOUND);
+            }
         }
     }
 
@@ -220,6 +271,7 @@ private:
     request_cache_t      m_cache           {};
 
     resources_map_t      m_resources       {};
+    handlers_map_t       m_handlers        {};
 };
 
 } // namespace web

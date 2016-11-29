@@ -6,6 +6,8 @@
 #include <ecl/str_const.hpp>
 #include <ecl/web/types.hpp>
 
+#include "http_parser.h"
+
 namespace ecl
 {
 
@@ -14,97 +16,143 @@ namespace web
 
 enum class version
 {
-    HTTP10 ,
-    HTTP11 ,
-    HTTP20
+      HTTP10
+    , HTTP11
+    , HTTP20
 };
 
 enum class status_code
 {
-    CONTINUE                      ,
-    SWITCHING_PROTO               ,
+      CONTINUE
+    , SWITCHING_PROTO
 
-    OK                            ,
-    CREATED                       ,
-    ACCEPTED                      ,
-    NO_CONTENT                    ,
-    RESET_CONTENT                 ,
-    PARTIAL_CONTENT               ,
+    , OK
+    , CREATED
+    , ACCEPTED
+    , NO_CONTENT
+    , RESET_CONTENT
+    , PARTIAL_CONTENT
 
-    MULTIPLE_CHOICES              ,
-    MOVED_PERMANENTLY             ,
-    FOUND                         ,
-    SEE_OTHER                     ,
-    NOT_MODIFIED                  ,
-    USE_PROXY                     ,
-    SWITCH_PROXY                  ,
-    TEMPORARY_REDIRECT            ,
-    PERMANENT_REDIRECT            ,
+    , MULTIPLE_CHOICES
+    , MOVED_PERMANENTLY
+    , FOUND
+    , SEE_OTHER
+    , NOT_MODIFIED
+    , USE_PROXY
+    , SWITCH_PROXY
+    , TEMPORARY_REDIRECT
+    , PERMANENT_REDIRECT
 
-    BAD_REQUEST                   ,
-    UNAUTHORIZED                  ,
-    PAYMENT_REQUIRED              ,
-    FORBIDDEN                     ,
-    NOT_FOUND                     ,
-    METHOD_NOT_ALLOWED            ,
-    NOT_ACCEPTABLE                ,
-    REQUEST_TIMEOUT               ,
-    CONFLICT                      ,
-    GONE                          ,
-    LENGTH_REQUIRED               ,
-    PRECONDITION_FAILED           ,
-    REQUEST_ENTITY_TOO_LARGE      ,
-    REQUEST_URI_TOO_LONG          ,
-    UNSUPPORTED_MEDIA_TYPE        ,
-    REQUEST_RANGE_NOT_SATISFIABLE ,
-    EXPECTATION_FAILED            ,
+    , BAD_REQUEST
+    , UNAUTHORIZED
+    , PAYMENT_REQUIRED
+    , FORBIDDEN
+    , NOT_FOUND
+    , METHOD_NOT_ALLOWED
+    , NOT_ACCEPTABLE
+    , REQUEST_TIMEOUT
+    , CONFLICT
+    , GONE
+    , LENGTH_REQUIRED
+    , PRECONDITION_FAILED
+    , REQUEST_ENTITY_TOO_LARGE
+    , REQUEST_URI_TOO_LONG
+    , UNSUPPORTED_MEDIA_TYPE
+    , REQUEST_RANGE_NOT_SATISFIABLE
+    , EXPECTATION_FAILED
 
-    INTERNAL_SERVER_ERROR         ,
-    NOT_IMPLEMENTED               ,
-    BAD_GATEWAY                   ,
-    SERVICE_UNAVAILABLE           ,
-    GATEWAY_TIMEOUT               ,
-    HTTP_VERSION_NOT_SUPPORTED
+    , INTERNAL_SERVER_ERROR
+    , NOT_IMPLEMENTED
+    , BAD_GATEWAY
+    , SERVICE_UNAVAILABLE
+    , GATEWAY_TIMEOUT
+    , HTTP_VERSION_NOT_SUPPORTED
 };
 
 enum class method
 {
-    GET     ,
-    HEAD    ,
-    PUT     ,
-    DELETE  ,
-    POST    ,
-    OPTIONS ,
-    TRACE   ,
-    CONNECT
+      GET
+    , HEAD
+    , PUT
+    , DELETE
+    , POST
+    , OPTIONS
+    , TRACE
+    , CONNECT
+};
+
+enum class url_field
+{
+      SCHEMA
+    , HOST
+    , PORT
+    , PATH
+    , QUERY
+    , FRAGMENT
+    , USERINFO
+    , UNKNOWN
 };
 
 enum class header_name
 {
-    CONTENT_TYPE     ,
-    CONTENT_LENGTH   ,
-    CONTENT_ENCODING ,
-    ACCEPT_ENCODING  ,
-    LOCATION
+      CONTENT_TYPE
+    , CONTENT_LENGTH
+    , CONTENT_ENCODING
+    , ACCEPT_ENCODING
+    , LOCATION
 };
 
 enum class content_type
 {
-    APPLICATION_JSON ,
-    TEXT_HTML        ,
-    TEXT_CSS         ,
-    TEXT_JAVASCRIPT  ,
-    IMAGE_PNG        ,
-    IMAGE_JPEG       ,
-    IMAGE_X_ICON     ,
-    IMAGE_GIF        ,
-    TEXT_PLAIN
+      APPLICATION_JSON
+    , TEXT_HTML
+    , TEXT_CSS
+    , TEXT_JAVASCRIPT
+    , IMAGE_PNG
+    , IMAGE_JPEG
+    , IMAGE_X_ICON
+    , IMAGE_GIF
+    , TEXT_PLAIN
 };
 
 enum class content_encoding
 {
     GZIP
 };
+
+static inline url_field to_url_field(int f)                             noexcept
+{
+    switch(http_parser_url_fields(f))
+    {
+        case UF_SCHEMA   : return url_field::SCHEMA;
+        case UF_HOST     : return url_field::HOST;
+        case UF_PORT     : return url_field::PORT;
+        case UF_PATH     : return url_field::PATH;
+        case UF_QUERY    : return url_field::QUERY;
+        case UF_FRAGMENT : return url_field::FRAGMENT;
+        case UF_USERINFO : return url_field::USERINFO;
+        case UF_MAX      : return url_field::UNKNOWN;
+    }
+
+     return url_field::UNKNOWN;
+}
+
+static inline str_const to_string(url_field f)                          noexcept
+{
+    switch(f)
+    {
+        case url_field::SCHEMA   : return { "SCHEMA"   };
+        case url_field::HOST     : return { "HOST"     };
+        case url_field::PORT     : return { "PORT"     };
+        case url_field::PATH     : return { "PATH"     };
+        case url_field::QUERY    : return { "QUERY"    };
+        case url_field::FRAGMENT : return { "FRAGMENT" };
+        case url_field::USERINFO : return { "USERINFO" };
+        case url_field::UNKNOWN  : return { ""         };
+    }
+
+     return { "" };
+}
 
 static inline str_const to_string(version v)                            noexcept
 {
@@ -276,20 +324,72 @@ static inline int to_int(status_code c)                                 noexcept
     return 0;
 }
 
+static inline bool is_error(status_code c)                              noexcept
+{
+    switch(c)
+    {
+        case status_code::CONTINUE:                      return false;
+        case status_code::SWITCHING_PROTO:               return false;
+
+        case status_code::OK:                            return false;
+        case status_code::CREATED:                       return false;
+        case status_code::ACCEPTED:                      return false;
+        case status_code::NO_CONTENT:                    return false;
+        case status_code::RESET_CONTENT:                 return false;
+        case status_code::PARTIAL_CONTENT:               return false;
+
+        case status_code::MULTIPLE_CHOICES:              return false;
+        case status_code::MOVED_PERMANENTLY:             return false;
+        case status_code::FOUND:                         return false;
+        case status_code::SEE_OTHER:                     return false;
+        case status_code::NOT_MODIFIED:                  return false;
+        case status_code::USE_PROXY:                     return false;
+        case status_code::SWITCH_PROXY:                  return false;
+        case status_code::TEMPORARY_REDIRECT:            return false;
+        case status_code::PERMANENT_REDIRECT:            return false;
+
+        case status_code::BAD_REQUEST:                   return true;
+        case status_code::UNAUTHORIZED:                  return true;
+        case status_code::PAYMENT_REQUIRED:              return true;
+        case status_code::FORBIDDEN:                     return true;
+        case status_code::NOT_FOUND:                     return true;
+        case status_code::METHOD_NOT_ALLOWED:            return true;
+        case status_code::NOT_ACCEPTABLE:                return true;
+        case status_code::REQUEST_TIMEOUT:               return true;
+        case status_code::CONFLICT:                      return true;
+        case status_code::GONE:                          return true;
+        case status_code::LENGTH_REQUIRED:               return true;
+        case status_code::PRECONDITION_FAILED:           return true;
+        case status_code::REQUEST_ENTITY_TOO_LARGE:      return true;
+        case status_code::REQUEST_URI_TOO_LONG:          return true;
+        case status_code::UNSUPPORTED_MEDIA_TYPE:        return true;
+        case status_code::REQUEST_RANGE_NOT_SATISFIABLE: return true;
+        case status_code::EXPECTATION_FAILED:            return true;
+
+        case status_code::INTERNAL_SERVER_ERROR:         return true;
+        case status_code::NOT_IMPLEMENTED:               return true;
+        case status_code::BAD_GATEWAY:                   return true;
+        case status_code::SERVICE_UNAVAILABLE:           return true;
+        case status_code::GATEWAY_TIMEOUT:               return true;
+        case status_code::HTTP_VERSION_NOT_SUPPORTED:    return true;
+    }
+    return false;
+}
+
 template<typename T>
-static void write_status(T& st, status_code code)
+static void write_status(T& st, status_code code)                       noexcept
 {
     st << to_int(code) << " " << to_string(code);
 }
 
 template<typename T>
-static void write_version(T& st, version ver)
+static void write_version(T& st, version ver)                           noexcept
 {
     st << to_string(ver) << " ";
 }
 
 template<typename T>
-static void write_status_line(T& st, version ver, status_code code)
+static void write_status_line(T& st, version ver, status_code code)     noexcept
 {
     write_version<T>(st, ver);
     write_status<T>(st, code);
@@ -297,7 +397,7 @@ static void write_status_line(T& st, version ver, status_code code)
 }
 
 template<typename T>
-void set_content_type_header(T& st, content_type t)
+static void set_content_type_header(T& st, content_type t)              noexcept
 {
     st << to_string(header_name::CONTENT_TYPE)
        << ":"
@@ -305,7 +405,7 @@ void set_content_type_header(T& st, content_type t)
 }
 
 template<typename T>
-void set_content_encoding_header(T& st, content_encoding e)
+static void set_content_encoding_header(T& st, content_encoding e)      noexcept
 {
     st << to_string(header_name::CONTENT_ENCODING)
        << ":"
@@ -313,7 +413,7 @@ void set_content_encoding_header(T& st, content_encoding e)
 }
 
 template<typename T>
-static void redirect(T& st, const char* location, version ver)
+static void redirect(T& st, const char* location, version ver)          noexcept
 {
     ecl::web::write_status_line(st, ver, ecl::web::status_code::SEE_OTHER);
 

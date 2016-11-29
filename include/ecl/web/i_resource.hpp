@@ -14,12 +14,24 @@ namespace web
 template<typename ST>
 struct i_resource
 {
-    virtual                ~i_resource() {}
-    virtual bool           on_request(ST&, i_request_cache&)                = 0;
-    virtual const uint8_t* data()                                           = 0;
-    virtual std::size_t    size()                                           = 0;
-    virtual bool           compressed()                                     = 0;
-    virtual content_type   type()                                           = 0;
+    using stream_t = ST;
+
+    virtual              ~i_resource()                                  noexcept
+    {}
+
+    virtual status_code  on_request(ST&, i_request_cache&)         noexcept = 0;
+};
+
+template<typename ST>
+struct i_static_resource : public i_resource<ST>
+{
+    using stream_t = typename i_resource<ST>::stream_t;
+
+    virtual              ~i_static_resource()                           noexcept
+    {}
+
+    virtual content_type get_content_type()                        noexcept = 0;
+    virtual status_code  get_status_code()                         noexcept = 0;
 };
 
 } // namespace web

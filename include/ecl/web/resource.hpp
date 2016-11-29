@@ -15,18 +15,25 @@ namespace web
 {
 
 template<typename T, typename ST>
-struct static_resource : public i_resource<ST>
+struct static_resource : public i_static_resource<ST>
 {
-    virtual ~static_resource()                                          override
+    virtual ~static_resource()                                 noexcept override
     {}
 
-    static_resource(content_type t)
+    static_resource(content_type t, status_code c = status_code::OK)
         : m_type ( t )
+        , m_code ( c )
     {}
 
-    virtual bool on_request(ST& st, i_request_cache& cache)             override
+    virtual status_code on_request(ST&              st,
+                                   i_request_cache& cache)     noexcept override
     {
-        write_status_line(st, cache.get_ver(), status_code::OK);
+        if(method::GET != cache.get_met())
+        {
+            return status_code::METHOD_NOT_ALLOWED;
+        }
+
+        write_status_line(st, cache.get_ver(), m_code);
 
         set_content_type_header(st, m_type);
 
@@ -39,31 +46,22 @@ struct static_resource : public i_resource<ST>
 
         st.flush();
 
-        return true;
+        return status_code::OK;
     }
 
-    virtual std::size_t size()                                          override
-    {
-        return T::size;
-    }
-
-    virtual const uint8_t* data()                                       override
-    {
-        return T::data;
-    }
-
-    virtual bool compressed()                                           override
-    {
-        return T::compressed;
-    }
-
-    virtual content_type type()                                         override
+    virtual content_type get_content_type()                    noexcept override
     {
         return m_type;
     }
 
+    virtual status_code get_status_code()                      noexcept override
+    {
+        return m_code;
+    }
+
 private:
     content_type m_type { content_type::TEXT_HTML };
+    status_code  m_code { status_code::OK };
 };
 
 } // namespace web
