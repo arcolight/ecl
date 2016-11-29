@@ -104,8 +104,6 @@ private:
 
     int on_body(const char* at, std::size_t length)
     {
-        std::cout << ">>> Body with size: " << length << std::cout;
-
         const_cast<char*>(at)[length] = 0;
         m_cache.set_body(std::make_pair(at, length));
 
@@ -114,20 +112,17 @@ private:
 
     int on_message_complete()
     {
-        std::cout << ">>> Call" << std::endl;
         call_resource();
         return 0;
     }
 
     int on_chunk_header()
     {
-        std::cout << ">>> Chunk header" << std::cout;
         return 0;
     }
 
     int on_chunk_complete()
     {
-        std::cout << ">>> Chunk complete" << std::cout;
         return 0;
     }
 
@@ -212,14 +207,6 @@ public:
                             &m_parser_settings,
                             m_cache.get_raw_rq(),
                             m_cache.get_raw_rq_size());
-
-        if(m_parser.http_errno != HPE_OK)
-        {
-            std::cout << http_errno_name((http_errno)m_parser.http_errno) << std::endl;
-            std::cout << http_errno_description((http_errno)m_parser.http_errno) << std::endl;
-        }
-
-        std::cout << ">>> END OF REQUEST" << std::endl;
     }
 
     bool attach_resource(url_t url, i_resource_t& res)                  noexcept
@@ -249,7 +236,6 @@ private:
 
         if(is_error(result))
         {
-            std::cout << "Error: " << to_string(result) << std::endl;
             if(nullptr != m_handlers[result])
             {
                 m_handlers[result]->on_request(m_stream, m_cache);
