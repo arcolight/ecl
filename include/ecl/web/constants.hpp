@@ -272,7 +272,7 @@ static inline str_const to_string(content_encoding e)                   noexcept
     return { "" };
 }
 
-static inline int to_int(status_code c)                                 noexcept
+static inline uint32_t to_int(status_code c)                            noexcept
 {
     switch(c)
     {
