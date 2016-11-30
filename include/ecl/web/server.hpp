@@ -20,10 +20,11 @@ namespace web
 
 template
 <
-      std::size_t CACHE_SIZE      = 1536
-    , std::size_t OUT_STREAM_SIZE = 1024
-    , std::size_t HEADERS_COUNT   = 32
-    , std::size_t RESOURCES_COUNT = 16
+      std::size_t CACHE_SIZE         = 1536
+    , std::size_t OUT_STREAM_SIZE    = 1024
+    , std::size_t HEADERS_COUNT      = 32
+    , std::size_t RESOURCES_COUNT    = 16
+    , std::size_t MAX_HANDLERS_COUNT = 40
 >
 class server
 {
@@ -58,7 +59,7 @@ private:
                                 , char_ptr_cmp
                             >;
 
-    using handlers_map_t = ecl::map<status_code, i_static_resource_t*, 40>;
+    using handlers_map_t = ecl::map<status_code, i_static_resource_t*, MAX_HANDLERS_COUNT>;
 
     int on_message_begin()
     {
