@@ -56,17 +56,17 @@ public:
 
         for(std::size_t i = 0; i < COUNT; ++i)
         {
-            m_val[i].disable();
+            details::disable<OBJ>()(m_val[i]);
         }
 
         for(std::size_t i = 0; i < COUNT; ++i)
         {
-            m_val[i].disable();
-            if(!m_val[i].deserialize_ref(s, length, false))
+            details::disable<OBJ>()(m_val[i]);
+            if(! details::val_deserializer<OBJ>::parse(s, length, m_val[i]))
             {
                 break;
             }
-            m_val[i].enable();
+            details::enable<OBJ>()(m_val[i]);
 
             if(i != COUNT - 1)
             {
@@ -106,11 +106,11 @@ public:
 
         for(std::size_t i = 0; i < COUNT; ++i)
         {
-            m_val[i].serialize(st, beautify, indent + 1, indent_increment);
+            details::val_serializer<OBJ>::stringify(st, m_val[i], beautify, indent + 1, indent_increment);
 
             if(i != COUNT - 1)
             {
-                if(m_val[i + 1].is_enabled())
+                if(details::is_enabled<OBJ>()(m_val[i + 1]))
                 {
                     st << ',';
                     details::print_beautify(st, beautify, indent + 1, indent_increment);

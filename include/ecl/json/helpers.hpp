@@ -806,6 +806,82 @@ struct val_serializer<std::string>
 };
 #endif
 
+template<typename T>
+struct is_enabled
+{
+    bool operator()(const T& o)
+    {
+        return o.is_enabled();
+    }
+};
+
+template<> struct is_enabled< bool        > { bool operator() ( const bool&        ) { return true; } };
+template<> struct is_enabled< int8_t      > { bool operator() ( const int8_t&      ) { return true; } };
+template<> struct is_enabled< uint8_t     > { bool operator() ( const uint8_t&     ) { return true; } };
+template<> struct is_enabled< int16_t     > { bool operator() ( const int16_t&     ) { return true; } };
+template<> struct is_enabled< uint16_t    > { bool operator() ( const uint16_t&    ) { return true; } };
+template<> struct is_enabled< int32_t     > { bool operator() ( const int32_t&     ) { return true; } };
+template<> struct is_enabled< uint32_t    > { bool operator() ( const uint32_t&    ) { return true; } };
+template<> struct is_enabled< int64_t     > { bool operator() ( const int64_t&     ) { return true; } };
+template<> struct is_enabled< uint64_t    > { bool operator() ( const uint64_t&    ) { return true; } };
+template<> struct is_enabled< float       > { bool operator() ( const float&       ) { return true; } };
+template<> struct is_enabled< double      > { bool operator() ( const double&      ) { return true; } };
+template<> struct is_enabled< long double > { bool operator() ( const long double& ) { return true; } };
+#ifdef ECL_WITH_STD_STRING
+template<> struct is_enabled< std::string > { bool operator() ( const std::string& ) { return true; } };
+#endif
+
+
+template<typename T>
+struct enable
+{
+    void operator()(T& o)
+    {
+        o.enable();
+    }
+};
+
+template<> struct enable< bool        > { void operator() ( const bool&        ) { } };
+template<> struct enable< int8_t      > { void operator() ( const int8_t&      ) { } };
+template<> struct enable< uint8_t     > { void operator() ( const uint8_t&     ) { } };
+template<> struct enable< int16_t     > { void operator() ( const int16_t&     ) { } };
+template<> struct enable< uint16_t    > { void operator() ( const uint16_t&    ) { } };
+template<> struct enable< int32_t     > { void operator() ( const int32_t&     ) { } };
+template<> struct enable< uint32_t    > { void operator() ( const uint32_t&    ) { } };
+template<> struct enable< int64_t     > { void operator() ( const int64_t&     ) { } };
+template<> struct enable< uint64_t    > { void operator() ( const uint64_t&    ) { } };
+template<> struct enable< float       > { void operator() ( const float&       ) { } };
+template<> struct enable< double      > { void operator() ( const double&      ) { } };
+template<> struct enable< long double > { void operator() ( const long double& ) { } };
+#ifdef ECL_WITH_STD_STRING
+template<> struct enable< std::string > { bool operator() ( const std::string& ) { } };
+#endif
+
+template<typename T>
+struct disable
+{
+    void operator()(T& o)
+    {
+        o.enable();
+    }
+};
+
+template<> struct disable< bool        > { void operator() ( const bool&        ) { } };
+template<> struct disable< int8_t      > { void operator() ( const int8_t&      ) { } };
+template<> struct disable< uint8_t     > { void operator() ( const uint8_t&     ) { } };
+template<> struct disable< int16_t     > { void operator() ( const int16_t&     ) { } };
+template<> struct disable< uint16_t    > { void operator() ( const uint16_t&    ) { } };
+template<> struct disable< int32_t     > { void operator() ( const int32_t&     ) { } };
+template<> struct disable< uint32_t    > { void operator() ( const uint32_t&    ) { } };
+template<> struct disable< int64_t     > { void operator() ( const int64_t&     ) { } };
+template<> struct disable< uint64_t    > { void operator() ( const uint64_t&    ) { } };
+template<> struct disable< float       > { void operator() ( const float&       ) { } };
+template<> struct disable< double      > { void operator() ( const double&      ) { } };
+template<> struct disable< long double > { void operator() ( const long double& ) { } };
+#ifdef ECL_WITH_STD_STRING
+template<> struct disable< std::string > { bool operator() ( const std::string& ) { } };
+#endif
+
 } // namespace details
 
 } // namespace json

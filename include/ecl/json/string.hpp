@@ -307,7 +307,25 @@ public:
         return m_val.data();
     }
 
+    bool is_enabled()                                                      const
+    {
+        return m_enabled;
+    }
+
+    void enable()
+    {
+        m_enabled = true;
+    }
+
+    void disable()
+    {
+        m_enabled = false;
+    }
+
     std::array<char, SIZE + 1> m_val { { } }; // 1 for '0'
+
+private:
+    bool m_enabled { true };
 };
 
 } // namespace json
