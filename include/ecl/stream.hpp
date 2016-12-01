@@ -422,6 +422,11 @@ private:
         print_float(val);
     }
 
+    void print_val(const long double& val)
+    {
+        print_float(val);
+    }
+
     void print_val(const bool& val)
     {
         if(val)
