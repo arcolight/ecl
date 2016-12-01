@@ -854,7 +854,7 @@ template<> struct enable< float       > { void operator() ( const float&       )
 template<> struct enable< double      > { void operator() ( const double&      ) { } };
 template<> struct enable< long double > { void operator() ( const long double& ) { } };
 #ifdef ECL_WITH_STD_STRING
-template<> struct enable< std::string > { bool operator() ( const std::string& ) { } };
+template<> struct enable< std::string > { void operator() ( const std::string& ) { } };
 #endif
 
 template<typename T>
@@ -879,7 +879,7 @@ template<> struct disable< float       > { void operator() ( const float&       
 template<> struct disable< double      > { void operator() ( const double&      ) { } };
 template<> struct disable< long double > { void operator() ( const long double& ) { } };
 #ifdef ECL_WITH_STD_STRING
-template<> struct disable< std::string > { bool operator() ( const std::string& ) { } };
+template<> struct disable< std::string > { void operator() ( const std::string& ) { } };
 #endif
 
 } // namespace details
