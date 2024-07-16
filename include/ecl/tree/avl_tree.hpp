@@ -4,6 +4,7 @@
 #include <ecl/tree/binary_tree_base.hpp>
 
 #include <algorithm>
+#include <cstdint>
 
 namespace ecl
 {

@@ -4,6 +4,7 @@
 #include <cstdlib>
 #include <string>
 #include <ostream>
+#include <cstdint>
 
 enum class E
 {
