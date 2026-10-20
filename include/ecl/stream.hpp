@@ -15,6 +15,7 @@
 #include <cstdint>
 #include <cmath>
 #include <cctype>
+#include <cstring>
 
 #include <type_traits>
 #include <functional>
@@ -299,19 +300,19 @@ private:
     template<typename T>
     void print_num_signed(const T& val)                                 noexcept
     {
+        using unsigned_t = typename std::make_unsigned<T>::type;
+
         if(val < 0)
         {
+            unsigned_t uval = static_cast<unsigned_t>(val);
+
             if(base::d == m_base)
             {
                 print_val('-');
-                print_num_unsigned(-val);
+                uval = static_cast<unsigned_t>(0u - uval);
             }
-            else
-            {
-                typename std::make_unsigned<T>::type uval =
-                    static_cast<typename std::make_unsigned<T>::type>(val);
-                print_num_unsigned(uval);
-            }
+
+            print_num_unsigned(uval);
         }
         else
         {
@@ -483,6 +484,45 @@ private:
     template<typename T>
     void print_float(const T& val)
     {
+        if(base::d == m_base)
+        {
+            print_float_decimal(val);
+        }
+        else
+        {
+            print_float_raw(val);
+        }
+    }
+
+    template<typename T>
+    typename std::enable_if<(sizeof(T) <= sizeof(uint64_t))>::type
+    print_float_raw(const T& val)                                       noexcept
+    {
+        using raw_t = typename std::conditional
+                      <
+                          (sizeof(T) <= sizeof(uint32_t)),
+                          uint32_t,
+                          uint64_t
+                      >::type;
+
+        raw_t raw = 0;
+        std::memcpy(&raw, &val, sizeof(T));
+        print_num_unsigned(raw);
+    }
+
+    template<typename T>
+    typename std::enable_if<(sizeof(T) > sizeof(uint64_t))>::type
+    print_float_raw(const T& val)
+    {
+        const base saved_base = m_base;
+        m_base = base::d;
+        print_float_decimal(val);
+        m_base = saved_base;
+    }
+
+    template<typename T>
+    void print_float_decimal(const T& val)
+    {
         T i = 0.0;
         T f = std::modf(val, &i);
 
@@ -501,9 +541,38 @@ private:
             f = -f;
         }
 
-        print_num_unsigned(static_cast<uint64_t>(i));
-        print_val('.');
-        print_num_unsigned(static_cast<uint64_t>(f * std::pow(10, m_width)));
+        constexpr std::size_t max_width = 19;
+        const std::size_t width = (m_width > max_width) ? max_width : m_width;
+
+        uint64_t scale = 1;
+        for(std::size_t n = 0; n < width; ++n)
+        {
+            scale *= 10;
+        }
+
+        uint64_t int_part  = static_cast<uint64_t>(i);
+        uint64_t frac_part = static_cast<uint64_t>(f * static_cast<T>(scale) +
+                                                   static_cast<T>(0.5));
+
+        if(frac_part >= scale)
+        {
+            frac_part -= scale;
+            ++int_part;
+        }
+
+        print_num_unsigned(int_part);
+
+        if(0 != width)
+        {
+            print_val('.');
+
+            for(uint64_t p = scale / 10; (p > 1) && (frac_part < p); p /= 10)
+            {
+                print_val('0');
+            }
+
+            print_num_unsigned(frac_part);
+        }
     }
 
     template<typename T>

@@ -173,6 +173,8 @@ public:
 
     iterator insert(pointer n, bool allow_update = true)                noexcept
     {
+        n->height = 1;
+
         auto result        = this->base::insert_internal(n, allow_update);
         pointer inserted_n = result.second;
         iterator it        = result.first;
@@ -212,6 +214,8 @@ public:
         {
             balance(to_erase->parent);
         }
+
+        to_erase->detach();
 
         return ret;
     }

@@ -349,7 +349,7 @@ struct node_base
                 n->parent = pointer_to_this();
                 return left;
             }
-            return left->insert(n);
+            return left->insert(n, allow_update);
         }
         else if(key_compare()(key, n->key))
         {
@@ -359,7 +359,7 @@ struct node_base
                 n->parent = pointer_to_this();
                 return right;
             }
-            return right->insert(n);
+            return right->insert(n, allow_update);
         }
 
         if(allow_update)

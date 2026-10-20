@@ -112,11 +112,18 @@ public:
             splay(to_erase->parent);
         }
 
+        to_erase->detach();
+
         return ret;
     }
 
     iterator find(const key_type& k)                                    noexcept
     {
+        if(empty())
+        {
+            return end();
+        }
+
         pointer p = m_header.parent->find(k);
         if(nullptr == p)
         {

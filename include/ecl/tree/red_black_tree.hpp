@@ -253,7 +253,10 @@ public:
             }
         }
 
-        return this->erase_internal(to_erase);
+        erase_return ret = this->erase_internal(to_erase);
+        to_erase->detach();
+
+        return ret;
     }
 
 private:

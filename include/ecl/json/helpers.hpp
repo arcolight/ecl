@@ -106,14 +106,46 @@ void print_beautify(STREAM& st,
 
 inline bool spaces_rollup(const char*& s, std::size_t& length)
 {
-    while(*s == ' '  ||
-          *s == '\n' ||
-          *s == '\r' ||
-          *s == '\t')
+    while((0 != length) &&
+          (*s == ' '  ||
+           *s == '\n' ||
+           *s == '\r' ||
+           *s == '\t'))
     {
         ECL_JSON_SHIFT_S_L(s, length)
-        ECL_JSON_TEST_LENGTH_RETURN(length, false)
     }
+
+    return true;
+}
+
+inline bool parse_string_char(const char*& s, std::size_t& length, char& c)
+{
+    ECL_JSON_TEST_LENGTH_RETURN(length, false)
+
+    if('\\' != *s)
+    {
+        c = *s;
+        ECL_JSON_SHIFT_S_L(s, length)
+        return true;
+    }
+
+    ECL_JSON_SHIFT_S_L(s, length)
+    ECL_JSON_TEST_LENGTH_RETURN(length, false)
+
+    switch(*s)
+    {
+        case '"':  c = '"';  break;
+        case '\\': c = '\\'; break;
+        case '/':  c = '/';  break;
+        case 'b':  c = '\b'; break;
+        case 'f':  c = '\f'; break;
+        case 'n':  c = '\n'; break;
+        case 'r':  c = '\r'; break;
+        case 't':  c = '\t'; break;
+        default:   return false;
+    }
+
+    ECL_JSON_SHIFT_S_L(s, length)
 
     return true;
 }
@@ -341,6 +373,10 @@ struct val_deserializer_numeric_signed
     {
         char* end = nullptr;
         val = static_cast<T>(strtoll(s, &end, 10));
+        if(end == s)
+        {
+            return false;
+        }
         length -= static_cast<std::size_t>(end - s);
         s = end;
         return true;
@@ -354,11 +390,30 @@ struct val_deserializer_numeric_unsigned
     {
         char* end = nullptr;
         val = static_cast<T>(strtoull(s, &end, 10));
+        if(end == s)
+        {
+            return false;
+        }
         length -= static_cast<std::size_t>(end - s);
         s = end;
         return true;
     }
 };
+
+inline void str_to_fp(const char* s, char** end, float& val)
+{
+    val = strtof(s, end);
+}
+
+inline void str_to_fp(const char* s, char** end, double& val)
+{
+    val = strtod(s, end);
+}
+
+inline void str_to_fp(const char* s, char** end, long double& val)
+{
+    val = strtold(s, end);
+}
 
 template<typename T>
 struct val_deserializer_numeric_fp
@@ -366,7 +421,11 @@ struct val_deserializer_numeric_fp
     static bool parse(const char*& s, std::size_t& length, T& val)
     {
         char* end = nullptr;
-        val = static_cast<T>(strtof(s, &end));
+        str_to_fp(s, &end, val);
+        if(end == s)
+        {
+            return false;
+        }
         length -= static_cast<std::size_t>(end - s);
         s = end;
         return true;
@@ -388,32 +447,29 @@ struct val_deserializer<std::string>
 {
     static bool parse(const char*& s, std::size_t& length, std::string& val)
     {
+        ECL_JSON_TEST_LENGTH_RETURN(length, false)
         ECL_JSON_TEST_SYMBOL_RETURN(s, '"', length)
 
-        for(std::size_t i = 0; i < length; ++i)
+        val.clear();
+
+        while(true)
         {
+            ECL_JSON_TEST_LENGTH_RETURN(length, false)
+
             if(*s == '"')
             {
                 ECL_JSON_SHIFT_S_L(s, length)
-                ECL_JSON_TEST_LENGTH_RETURN(length, false)
-                break;
+                return true;
             }
 
-            ECL_JSON_TEST_LENGTH_RETURN(length, false)
-            ECL_JSON_TEST_LENGTH_RETURN(length - 1, false)
-
-            if(*s == '\\' && *(s + 1) == '"')
+            char c = 0;
+            if(!parse_string_char(s, length, c))
             {
-                ECL_JSON_SHIFT_S_L(s, length)
-                ECL_JSON_TEST_LENGTH_RETURN(length, false)
+                return false;
             }
 
-            val.push_back(*s);
-            ECL_JSON_SHIFT_S_L(s, length)
-            ECL_JSON_TEST_LENGTH_RETURN(length, false)
+            val.push_back(c);
         }
-
-        return true;
     }
 };
 #endif
@@ -862,7 +918,7 @@ struct disable
 {
     void operator()(T& o)
     {
-        o.enable();
+        o.disable();
     }
 };
 

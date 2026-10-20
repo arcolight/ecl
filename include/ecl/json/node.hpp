@@ -79,17 +79,17 @@ protected:
                    std::size_t indent,
                    std::size_t indent_increment)                           const
     {
-        details::val_serializer<const char*>::template stringify(st,
-                                                                 NAME::name(),
-                                                                 beautify,
-                                                                 indent,
-                                                                 indent_increment);
+        details::val_serializer<const char*>::stringify(st,
+                                                        NAME::name(),
+                                                        beautify,
+                                                        indent,
+                                                        indent_increment);
         st << ':';
-        details::val_serializer<value_t>::template stringify(st,
-                                                             m_val,
-                                                             beautify,
-                                                             indent,
-                                                             indent_increment);
+        details::val_serializer<value_t>::stringify(st,
+                                                    m_val,
+                                                    beautify,
+                                                    indent,
+                                                    indent_increment);
     }
 
     /**

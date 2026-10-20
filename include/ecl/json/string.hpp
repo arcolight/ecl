@@ -143,32 +143,37 @@ public:
      */
     bool deserialize_ref(const char*& s, std::size_t& length, bool)
     {
+        ECL_JSON_TEST_LENGTH_RETURN(length, false)
         ECL_JSON_TEST_SYMBOL_RETURN(s, '"', length)
 
-        for(std::size_t i = 0; i < SIZE; ++i)
+        m_val.fill('\0');
+
+        std::size_t i = 0;
+
+        while(true)
         {
+            ECL_JSON_TEST_LENGTH_RETURN(length, false)
+
             if(*s == '"')
             {
                 ECL_JSON_SHIFT_S_L(s, length)
-                ECL_JSON_TEST_LENGTH_RETURN(length, false)
-
-                break;
+                return true;
             }
 
-            ECL_JSON_TEST_LENGTH_RETURN(length, false)
-            ECL_JSON_TEST_LENGTH_RETURN(length - 1, false)
-
-            if(*s == '\\' && *(s + 1) == '"')
+            char c = 0;
+            if(!details::parse_string_char(s, length, c))
             {
-                ECL_JSON_SHIFT_S_L(s, length)
+                return false;
             }
 
-            m_val[i] = *s;
-            ECL_JSON_SHIFT_S_L(s, length)
-            ECL_JSON_TEST_LENGTH_RETURN(length, false)
-        }
+            if(SIZE == i)
+            {
+                return false;
+            }
 
-        return true;
+            m_val[i] = c;
+            ++i;
+        }
     }
 
     /**

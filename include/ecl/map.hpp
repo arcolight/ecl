@@ -75,7 +75,7 @@ public:
 
     template<typename... Args>
     explicit map (Args&&... args)                                       noexcept
-        : m_nodes_pool { { std::forward<Args>(args)... } }
+        : m_nodes_pool { { tree_node_t(std::forward<Args>(args))... } }
     {
         static_assert(std::is_nothrow_default_constructible<mapped_type>::value,
             "Mapped type should be nothrow default constructible.");
