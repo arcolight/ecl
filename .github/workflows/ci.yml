@@ -66,9 +66,23 @@ jobs:
           sudo apt-get install -y --no-install-recommends libboost-test-dev
 
       - name: Tests
-        run: make check ADD_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer" TESTS_ARGS="--report_level=short"
+        run: make check ADD_FLAGS="-fsanitize=address,undefined,float-cast-overflow -fno-omit-frame-pointer" TESTS_ARGS="--report_level=short"
         env:
-          UBSAN_OPTIONS: print_stacktrace=1
+          UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
+
+      - name: Examples
+        run: |
+          make examples ADD_FLAGS="-fsanitize=address,undefined,float-cast-overflow -fno-omit-frame-pointer"
+          for e in bin/*_g++; do
+            case "$e" in
+              *tests_*|*command_processor_*) continue ;;
+            esac
+            echo "::group::$e"
+            "$e" > /dev/null
+            echo "::endgroup::"
+          done
+        env:
+          UBSAN_OPTIONS: print_stacktrace=1:halt_on_error=1
 
   arm:
     name: arm-none-eabi cortex-m4

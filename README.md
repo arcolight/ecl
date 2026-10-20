@@ -99,4 +99,4 @@ tests:
 
     make check
     CXX=clang++ make check
-    make check ADD_FLAGS="-fsanitize=address,undefined"
+    make check ADD_FLAGS="-fsanitize=address,undefined,float-cast-overflow"
