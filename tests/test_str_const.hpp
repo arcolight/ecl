@@ -6,6 +6,8 @@
 #include <boost/test/unit_test.hpp>
 
 #include <string>
+#include <sstream>
+#include <cstring>
 
 BOOST_AUTO_TEST_SUITE( str_const_suite )
 
@@ -34,14 +36,45 @@ BOOST_AUTO_TEST_CASE( zero_length_case )
     BOOST_CHECK_MESSAGE(test.size() == 0, test.size() << " = 0");
 }
 
-// BOOST_AUTO_TEST_CASE( cast_to_ptr_case )
-// {
-//     constexpr ecl::str_const test(STR_CONST_TEST_STRING);
+BOOST_AUTO_TEST_CASE( cast_to_ptr_case )
+{
+    constexpr ecl::str_const test(STR_CONST_TEST_STRING);
 
-//     const char* test_ptr = static_cast<const char*>(test);
+    const char* test_ptr = static_cast<const char*>(test);
 
-//     BOOST_CHECK_MESSAGE( test_ptr == STR_CONST_TEST_STRING, "cast to pointer error! pointer = " << test_ptr << " instead of " << STR_CONST_TEST_STRING);
-// }
+    BOOST_CHECK_EQUAL(std::strcmp(test_ptr, STR_CONST_TEST_STRING), 0);
+}
+
+BOOST_AUTO_TEST_CASE( ptr_and_size_ctor_case )
+{
+    constexpr ecl::str_const test(STR_CONST_TEST_STRING, 4);
+
+    BOOST_CHECK_EQUAL(test.size(), 4u);
+    BOOST_CHECK_EQUAL(test[std::size_t { 3 }], 't');
+    BOOST_CHECK_EQUAL(test[std::size_t { 4 }], 0);
+    BOOST_CHECK_EQUAL(std::string(test.begin(), test.end()), "test");
+}
+
+BOOST_AUTO_TEST_CASE( compile_time_case )
+{
+    constexpr ecl::str_const test(STR_CONST_TEST_STRING);
+
+    static_assert(test.size() == STR_CONST_TEST_STRING_LENGTH, "size() must be constexpr");
+    static_assert(test[std::size_t { 0 }] == 't', "operator[] must be constexpr");
+    static_assert(test[std::size_t { STR_CONST_TEST_STRING_LENGTH }] == 0, "out of bound access must be 0");
+
+    BOOST_CHECK(true);
+}
+
+BOOST_AUTO_TEST_CASE( stream_case )
+{
+    constexpr ecl::str_const test(STR_CONST_TEST_STRING);
+
+    std::stringstream ss;
+    test << ss;
+
+    BOOST_CHECK_EQUAL(ss.str(), STR_CONST_TEST_STRING);
+}
 
 BOOST_AUTO_TEST_CASE( index_access_case )
 {
