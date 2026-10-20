@@ -523,6 +523,12 @@ private:
     template<typename T>
     void print_float_decimal(const T& val)
     {
+        if(std::isnan(val))
+        {
+            print_val("nan");
+            return;
+        }
+
         T i = 0.0;
         T f = std::modf(val, &i);
 
@@ -539,6 +545,18 @@ private:
         if(f < 0.0)
         {
             f = -f;
+        }
+
+        if(std::isinf(i))
+        {
+            print_val("inf");
+            return;
+        }
+
+        if(i >= std::ldexp(static_cast<T>(1), 64))
+        {
+            print_val("ovf");
+            return;
         }
 
         constexpr std::size_t max_width = 19;

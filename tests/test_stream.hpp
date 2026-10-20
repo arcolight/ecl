@@ -152,6 +152,20 @@ BOOST_FIXTURE_TEST_CASE( float_zero_width_case, stream_fixture )
     BOOST_CHECK_EQUAL(output(), "3 4");
 }
 
+BOOST_FIXTURE_TEST_CASE( float_special_values_case, stream_fixture )
+{
+    st << ecl::width(2)
+       << std::numeric_limits<double>::quiet_NaN()  << " "
+       << std::numeric_limits<double>::infinity()   << " "
+       << -std::numeric_limits<float>::infinity()   << " "
+       << std::numeric_limits<float>::max()         << " "
+       << -std::numeric_limits<double>::max()       << " "
+       << 18446744073709551616.0                    << " "
+       << 18446744073709549568.0;
+
+    BOOST_CHECK_EQUAL(output(), "nan inf -inf ovf -ovf ovf 18446744073709549568.00");
+}
+
 BOOST_FIXTURE_TEST_CASE( float_raw_hex_case, stream_fixture )
 {
     st << ecl::base::h << ecl::width(3) << -1.0f << " " << 1.0 << " "
