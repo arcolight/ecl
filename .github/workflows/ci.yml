@@ -1,0 +1,102 @@
+name: CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  host:
+    name: ${{ matrix.compiler.cxx }}
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler:
+          - { cxx: g++,     gcov: gcov }
+          - { cxx: clang++, gcov: llvm-cov gcov }
+    env:
+      CXX: ${{ matrix.compiler.cxx }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libboost-test-dev llvm
+
+      - name: Build examples
+        run: make examples
+
+      - name: Run examples
+        run: |
+          for e in bin/*_${CXX}; do
+            case "$e" in
+              *tests_*|*command_processor_*) continue ;;
+            esac
+            echo "::group::$e"
+            "$e" > /dev/null
+            echo "::endgroup::"
+          done
+
+      - name: Tests
+        run: make check TESTS_ARGS="--report_level=detailed"
+
+      - name: Coverage
+        if: always()
+        run: make gcov_tests GCOV="${{ matrix.compiler.gcov }}" TESTS_ARGS="--log_level=nothing" > /dev/null
+
+      - name: Upload coverage
+        if: always() && matrix.compiler.cxx == 'g++'
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
+
+  sanitizers:
+    name: g++ asan+ubsan
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libboost-test-dev
+
+      - name: Tests
+        run: make check ADD_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer" TESTS_ARGS="--report_level=short"
+        env:
+          UBSAN_OPTIONS: print_stacktrace=1
+
+  arm:
+    name: arm-none-eabi cortex-m4
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib \
+            qemu-user libboost-test-dev
+          arm-none-eabi-g++ --version
+
+      - name: Build examples
+        run: make examples_arm
+
+      - name: Run examples
+        run: |
+          for e in bin/*_arm-none-eabi-g++; do
+            case "$e" in
+              *command_processor_*) continue ;;
+            esac
+            echo "::group::$e"
+            qemu-arm -cpu cortex-m4 "$e" > /dev/null
+            echo "::endgroup::"
+          done
+
+      - name: Tests
+        run: make check_arm TESTS_ARGS="--report_level=detailed"

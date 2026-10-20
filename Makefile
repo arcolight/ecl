@@ -1,4 +1,8 @@
-ARM_LD_FLAGS = --specs=rdimon.specs
+ARM_CXX      ?= arm-none-eabi-g++
+ARM_FLAGS    ?= -mcpu=cortex-m4 -mthumb -mfpu=fpv4-sp-d16 -mfloat-abi=hard
+ARM_LD_FLAGS ?= --specs=rdimon.specs -Wl,--undefined=_getentropy -lnosys
+QEMU_ARM     ?= qemu-arm -cpu cortex-m4
+BOOST_INCLUDE_DIR ?= /usr/include
 OPTIMIZATION = -O0
 DEBUG = -g2
 
@@ -58,7 +62,11 @@ ifndef GCOV
 	GCOV=gcov
 endif
 
+TESTS_ARGS ?= --report_level=short
+
 all: examples tests
+
+.PHONY: all examples tests check $(TESTS_BIN)_arm check_arm examples_arm doxygen clean clean_doc clean_gcov gen_web_res
 
 out_dir:
 	@mkdir -p $(BIN_DIR)
@@ -117,13 +125,27 @@ $(EXAMPLE_PREFIX)_$(WEB): out_dir gen_web_res
 tests: out_dir clean_gcov
 	$(CXX) $(TESTS_FLAGS) -I$(INCLUDE_DIR) $(TESTS_DIR)/$(TESTS_BIN).cpp -lboost_unit_test_framework -o $(BIN_DIR)/$(TESTS_BIN)_$(CXX)
 
+check: $(TESTS_BIN)
+	$(BIN_DIR)/$(TESTS_BIN)_$(CXX) $(TESTS_ARGS)
+
+$(TESTS_BIN)_arm: out_dir
+	@mkdir -p $(BIN_DIR)/arm_include
+	@ln -sfn $(BOOST_INCLUDE_DIR)/boost $(BIN_DIR)/arm_include/boost
+	$(ARM_CXX) -std=c++11 $(OPTIMIZATION) $(DEBUG) $(WARNINGS) $(ADD_WARN) $(ARM_FLAGS) \
+		-DECL_TESTS_HEADER_ONLY -D_POSIX_TIMERS -D_POSIX_MONOTONIC_CLOCK \
+		-I$(INCLUDE_DIR) -idirafter $(BIN_DIR)/arm_include \
+		$(TESTS_DIR)/$(TESTS_BIN).cpp $(TESTS_DIR)/newlib_clock_gettime.cpp \
+		$(ARM_LD_FLAGS) -o $(BIN_DIR)/$(TESTS_BIN)_arm
+
+check_arm: $(TESTS_BIN)_arm
+	$(QEMU_ARM) $(BIN_DIR)/$(TESTS_BIN)_arm $(TESTS_ARGS)
+
+examples_arm:
+	$(MAKE) examples CXX=$(ARM_CXX) ADD_FLAGS="$(ARM_FLAGS) $(ARM_LD_FLAGS) $(ADD_FLAGS)"
+
 $(GCOV_PREFIX)_$(TESTS_BIN): $(TESTS_BIN)
-	$(BIN_DIR)/$(TESTS_BIN)_$(CXX)
-	cp $(TESTS_BIN).gcno $(TESTS_DIR)/
-	cp $(TESTS_BIN).gcda $(TESTS_DIR)/
-	$(GCOV) $(TESTS_DIR)/$(TESTS_BIN).cpp
-	rm $(TESTS_DIR)/$(TESTS_BIN).gcno
-	rm $(TESTS_DIR)/$(TESTS_BIN).gcda
+	-$(BIN_DIR)/$(TESTS_BIN)_$(CXX) $(TESTS_ARGS)
+	$(GCOV) -o $(BIN_DIR)/$(TESTS_BIN)_$(CXX)-$(TESTS_BIN) $(TESTS_DIR)/$(TESTS_BIN).cpp
 
 $(GCOV_PREFIX)_all: $(GCOV_PREFIX)_$(TESTS_BIN)
 
@@ -134,6 +156,8 @@ clean_gcov:
 	$(RM) *.gcno
 	$(RM) *.gcda
 	$(RM) *.gcov
+	$(RM) $(BIN_DIR)/*.gcno
+	$(RM) $(BIN_DIR)/*.gcda
 
 clean_doc:
 	$(RM) -r $(DOC_DIR)

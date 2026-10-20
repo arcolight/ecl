@@ -2,7 +2,7 @@ ecl
 ===
 
 [![Build Status](https://scan.coverity.com/projects/8398/badge.svg)](https://scan.coverity.com/projects/8398)
-[![Build Status](https://travis-ci.org/simkimsia/UtilityBehaviors.png)](https://travis-ci.org/arcolight/ecl)
+[![CI](https://github.com/arcolight/ecl/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/arcolight/ecl/actions/workflows/ci.yml)
 [![codecov.io](https://codecov.io/github/arcolight/ecl/coverage.svg?branch=master)](https://codecov.io/github/arcolight/ecl?branch=master)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/hyperium/hyper/master/LICENSE)
 
@@ -65,7 +65,11 @@ Targets:
 
     * all - all examples and tests
     * examples - all examples
-    * tests - tests
+    * tests - build tests (Boost.Test required)
+    * check - build and run tests
+    * check_arm - build tests with arm-none-eabi-g++ and run them in qemu-arm
+    * examples_arm - build examples with arm-none-eabi-g++
+    * gcov_tests - run tests and generate gcov reports
     * example_fsm
     * example_scope_guard
     * example_cb
@@ -86,6 +90,13 @@ clang:
 
     CXX=clang++ make all
 
-arm-none-eabi-gcc:
+arm-none-eabi-gcc (cortex-m4, run with qemu-arm):
 
-    CXX=arm-none-eabi-g++ ADD_FLAGS=--specs=rdimon.specs make all
+    make examples_arm
+    make check_arm
+
+tests:
+
+    make check
+    CXX=clang++ make check
+    make check ADD_FLAGS="-fsanitize=address,undefined"
